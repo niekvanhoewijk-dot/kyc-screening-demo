@@ -38,7 +38,7 @@ async function submittedCase(parse: ParseCall) {
   await saveIdentity(deps, current(), identityFields, { front: file("poi.png"), selfie: file("selfie.png") });
   await saveResidence(deps, current(), residenceFields, { por: file("por.png") });
   saveQuestionnaire(deps, current(), questionnaire);
-  submitCase(deps, current());
+  await submitCase(deps, current());
   return { deps, current };
 }
 

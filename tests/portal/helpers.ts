@@ -5,6 +5,8 @@ import { createDb } from "@/db/client";
 import { MemoryMailer } from "@/adapters/mailer";
 import { MockFaceMatchProvider } from "@/adapters/face-match";
 import { LocalFileStore } from "@/adapters/file-store";
+import { MockScreeningProvider } from "@/adapters/screening";
+import { loadConsoleConfig } from "@/console/config";
 import { loadEngineConfig } from "@/engine";
 import { loadPortalConfig } from "@/portal/config";
 import type { PortalDeps } from "@/portal/deps";
@@ -17,9 +19,11 @@ export function makeDeps(start = "2026-10-18T10:00:00Z") {
     db: createDb(":memory:"),
     mailer,
     faceMatch: new MockFaceMatchProvider(),
+    screening: new MockScreeningProvider(),
     files: new LocalFileStore(fs.mkdtempSync(path.join(os.tmpdir(), "kyc-uploads-"))),
     engine: loadEngineConfig(),
     portal: loadPortalConfig(),
+    consoleConfig: loadConsoleConfig(),
     now: () => clock.now,
   };
   const advance = (ms: number) => (clock.now = new Date(clock.now.getTime() + ms));

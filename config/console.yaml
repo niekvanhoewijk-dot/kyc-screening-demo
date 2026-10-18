@@ -1,0 +1,13 @@
+# Analyst console settings (docs/spec/01: queue, case view, actions).
+version: 1
+
+# Demo analysts. No real authentication: the console asks who is working, for the audit trail.
+analysts:
+  - {id: analyst-1, name: "Analyst One"}
+  - {id: analyst-2, name: "Analyst Two"}
+
+# Queue age filter options, in days since submission.
+age_filters_days: [1, 3, 7]
+
+# Default operating mode (spec 01 orchestration lane). Switchable in the console; stored in the DB.
+default_mode: mvp1     # mvp1 = manual checks, Claude off; mvp2 = Claude pre-review on

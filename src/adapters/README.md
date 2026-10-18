@@ -8,6 +8,6 @@ Vendor-style interfaces with mock implementations (no real vendors integrated). 
 | `FaceMatchProvider` | `face-match.ts` | Passes unless the selfie file name contains `spoof` / `mismatch` | Phase 2 |
 | `FileStore` | `file-store.ts` | `LocalFileStore` under `data/uploads` | Phase 2 |
 | `CountryRiskProvider` | `src/engine/country.ts` (`CountryRiskLookup`) | Config-backed resolver | Phase 1 |
-| `ScreeningProvider` | — | Seeded fictional watchlist | Phase 4 |
+| `ScreeningProvider` | `screening.ts` | Fictional watchlist (`fixtures/screening/watchlist.yaml`), fuzzy name + DOB + country | Phase 4 |
 | `IDVProvider` | — | — | later |
 | `DocumentReader` | `src/documents/reader.ts` | `ClaudeDocumentReader` (structured outputs, retry once, replay cache) | Phase 3 |

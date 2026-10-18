@@ -35,7 +35,7 @@ describe("applicant flow 2.1.3 - 2.1.8", () => {
     const t = await signedUp();
     await completeAllSteps(t);
     expect(resumeStep(stepCase(t.current()))).toBe("check");
-    submitCase(t.deps, t.current());
+    await submitCase(t.deps, t.current());
 
     const c = t.current();
     expect(c.status).toBe("submitted");
@@ -65,7 +65,7 @@ describe("applicant flow 2.1.3 - 2.1.8", () => {
     const t = await signedUp();
     await expect(saveResidence(t.deps, t.current(), residenceFields, { por: file("por.png") })).rejects.toMatchObject({ code: "STEP_LOCKED" });
     await completeAllSteps(t);
-    submitCase(t.deps, t.current());
+    await submitCase(t.deps, t.current());
     expect(() => saveQuestionnaire(t.deps, t.current(), questionnaire)).toThrow(expect.objectContaining({ code: "NOT_EDITABLE" }));
   });
 
@@ -147,7 +147,7 @@ describe("applicant flow 2.1.3 - 2.1.8", () => {
         await saveIdentity(t.deps, t.current(), identityFields, { front: file("f.png"), selfie: file("s.png") });
         await saveResidence(t.deps, t.current(), residence, { por: file("por.png") });
         saveQuestionnaire(t.deps, t.current(), answers);
-        submitCase(t.deps, t.current());
+        await submitCase(t.deps, t.current());
         expect(t.current().riskResult).toMatchObject({ decision: "reject" });
         expect(t.current().thresholdResult).toBeNull();
         expect(applicantView(t.current())).toEqual({ kind: "check" });
@@ -160,7 +160,7 @@ describe("applicant flow 2.1.3 - 2.1.8", () => {
   it("requires a reason for every decision", async () => {
     const t = await signedUp();
     await completeAllSteps(t);
-    submitCase(t.deps, t.current());
+    await submitCase(t.deps, t.current());
     expect(() => recordDecision(t.deps, t.current().id, "approve", "  ", "dev")).toThrow(expect.objectContaining({ code: "VALIDATION" }));
   });
 });

@@ -1,5 +1,5 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
-import { cases, documents, faceMatches } from "@/db/schema";
+import { applicants, cases, documents, faceMatches, screeningHits } from "@/db/schema";
 import { initialThreshold, scoreApplicant } from "@/engine";
 import { audit } from "@/lib/audit";
 import { newId, sha256 } from "@/lib/ids";
@@ -54,7 +54,7 @@ function currentDoc(deps: PortalDeps, caseId: string, kind: DocKind) {
     .get();
 }
 
-function checkUpload(deps: PortalDeps, field: string, file: UploadInput | undefined, mimes: string[], errors: FieldErrors) {
+export function checkUpload(deps: PortalDeps, field: string, file: UploadInput | undefined, mimes: string[], errors: FieldErrors) {
   if (!file || file.size === 0) return undefined;
   const maxMb = Math.round(deps.portal.uploads.max_bytes / 1_048_576);
   if (!mimes.includes(file.type)) errors[field] = [`Upload a ${mimes.map((m) => EXT[m] ?? m).join(", ")} file`];
@@ -62,16 +62,18 @@ function checkUpload(deps: PortalDeps, field: string, file: UploadInput | undefi
   return file;
 }
 
-async function storeDoc(deps: PortalDeps, c: CaseRow, kind: DocKind, file: UploadInput, docType: string | null) {
+/** Stores an upload. By default it supersedes the current document of that kind; SoF evidence accumulates instead. */
+export async function storeDoc(deps: PortalDeps, c: CaseRow, kind: DocKind, file: UploadInput, docType: string | null, opts: { keepPrevious?: boolean } = {}) {
   const now = deps.now();
   const id = newId();
   const storedPath = await deps.files.save(c.id, `${kind}-${id}.${EXT[file.type] ?? "bin"}`, file.bytes);
   const hash = sha256(file.bytes);
   deps.db.transaction((tx) => {
-    tx.update(documents)
-      .set({ supersededAt: now.toISOString() })
-      .where(and(eq(documents.caseId, c.id), eq(documents.kind, kind), isNull(documents.supersededAt)))
-      .run();
+    if (!opts.keepPrevious)
+      tx.update(documents)
+        .set({ supersededAt: now.toISOString() })
+        .where(and(eq(documents.caseId, c.id), eq(documents.kind, kind), isNull(documents.supersededAt)))
+        .run();
     tx.insert(documents)
       .values({ id, caseId: c.id, kind, docType, originalName: file.name, storedPath, mime: file.type, sizeBytes: file.size, sha256: hash, uploadedAt: now.toISOString() })
       .run();
@@ -190,17 +192,17 @@ export function saveQuestionnaire(deps: PortalDeps, c: CaseRow, input: unknown) 
   audit(deps.db, deps.now(), `applicant:${c.applicantId}`, "step.completed", `case:${c.id}`, { step: "questionnaire" });
 }
 
-/** 2.1.7 Submit: the rules engine scores the case; it lands in the analyst queue whatever the result. */
-export function submitCase(deps: PortalDeps, c: CaseRow) {
-  assertEditable(c, "check");
+/**
+ * Rules engine over the stored answers. `pepConfirmed` applies an analyst-confirmed PEP screening
+ * match (D9: PEP = band at least High) on top of the self-declaration.
+ */
+export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: boolean } = {}) {
   const q = c.questionnaire as QuestionnaireData;
   const r = c.residence as ResidenceData;
-  const now = deps.now();
-
   const risk = scoreApplicant(
     {
       country: r.country,
-      pep: q.pep,
+      pep: q.pep || opts.pepConfirmed === true,
       us_tax_resident: q.usTaxResident,
       deposit_12m: q.deposit_12m,
       source_of_funds: q.source_of_funds,
@@ -230,8 +232,36 @@ export function submitCase(deps: PortalDeps, c: CaseRow) {
     country_list_version: deps.engine.countries.meta.list_version,
     country_as_of: deps.engine.countries.meta.as_of,
   };
+  return { risk, threshold, engineVersions };
+}
 
-  touch(deps, c.id, { status: "submitted", submittedAt: now.toISOString(), riskResult: risk, thresholdResult: threshold, engineVersions });
+/** 2.1.7 Submit: the rules engine scores the case and screening runs; it lands in the analyst queue whatever the result. */
+export async function submitCase(deps: PortalDeps, c: CaseRow) {
+  assertEditable(c, "check");
+  const now = deps.now();
+  const { risk, threshold, engineVersions } = scoreCase(deps, c);
+
+  // Screening (spec 02): name + DOB against the provider; nationality and residence as countries.
+  const applicant = deps.db.select().from(applicants).where(eq(applicants.id, c.applicantId)).get()!;
+  const q = c.questionnaire as QuestionnaireData;
+  const r = c.residence as ResidenceData;
+  const screening = await deps.screening.screen({
+    fullName: `${applicant.firstName} ${applicant.lastName}`,
+    dateOfBirth: q.dateOfBirth,
+    countries: [...new Set([q.nationality, r.country])],
+  });
+
+  deps.db.transaction((tx) => {
+    tx.update(cases)
+      .set({ status: "submitted", submittedAt: now.toISOString(), riskResult: risk, thresholdResult: threshold, engineVersions, updatedAt: now.toISOString() })
+      .where(eq(cases.id, c.id))
+      .run();
+    for (const h of screening.hits)
+      tx.insert(screeningHits)
+        .values({ id: newId(), caseId: c.id, provider: screening.provider, listVersion: screening.listVersion, entryId: h.entryId, entryName: h.entryName, category: h.category, program: h.program, match: h.match, strength: h.strength, status: "open", createdAt: now.toISOString() })
+        .run();
+  });
   audit(deps.db, now, `applicant:${c.applicantId}`, "case.submitted", `case:${c.id}`);
   audit(deps.db, now, "engine", "engine.scored", `case:${c.id}`, { risk, threshold, engineVersions });
+  audit(deps.db, now, "system", "screening.completed", `case:${c.id}`, { provider: screening.provider, listVersion: screening.listVersion, hits: screening.hits.length });
 }

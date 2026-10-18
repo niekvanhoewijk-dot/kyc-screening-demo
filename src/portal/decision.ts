@@ -9,7 +9,7 @@ export type Decision = "approve" | "reject" | "edd";
 const NEXT_STATUS = { approve: "approved", reject: "rejected", edd: "edd_requested" } as const;
 const DECIDABLE = new Set(["submitted", "in_review", "edd_submitted"]);
 
-/** Human decision node (D8). Reason is mandatory. Used by the dev tool now, the analyst console in Phase 4. */
+/** Human decision node (D8). Reason is mandatory. Call through src/console/actions.ts, which applies the guards. */
 export function recordDecision(deps: PortalDeps, caseId: string, decision: Decision, reason: string, analystId: string) {
   const c = deps.db.select().from(cases).where(eq(cases.id, caseId)).get();
   if (!c) throw new PortalError("NOT_FOUND", "Case not found.");
@@ -29,7 +29,7 @@ export type ApplicantView =
   | { kind: "check" }
   | { kind: "confirmation"; threshold: number | null }
   | { kind: "no_go" }
-  | { kind: "edd" }
+  | { kind: "edd"; extraKyc: "required" | "already_satisfied" }
   | { kind: "por_expired" };
 
 /** What the applicant sees. Never exposes score, band, screening or the decision reason (D7). */
@@ -41,12 +41,16 @@ export function applicantView(c: CaseRow): ApplicantView {
     case "in_review":
     case "edd_submitted":
       return { kind: "check" };
-    case "approved":
-      return { kind: "confirmation", threshold: (c.thresholdResult as { threshold?: number } | null)?.threshold ?? null };
+    case "approved": {
+      // After EDD the recalculated threshold replaces the initial one (spec 05, O-25).
+      const edd = (c.eddResult as { result?: { outcome: string; new_threshold?: number } } | null)?.result;
+      const initial = (c.thresholdResult as { threshold?: number } | null)?.threshold ?? null;
+      return { kind: "confirmation", threshold: edd?.outcome === "new_threshold" ? (edd.new_threshold ?? initial) : initial };
+    }
     case "rejected":
       return { kind: "no_go" };
     case "edd_requested":
-      return { kind: "edd" };
+      return { kind: "edd", extraKyc: (c.eddRequest as { items?: { extraKyc?: "required" | "already_satisfied" } } | null)?.items?.extraKyc ?? "required" };
     case "expired_por":
       return { kind: "por_expired" };
   }

@@ -63,6 +63,10 @@ export const cases = sqliteTable("cases", {
   thresholdResult: text("threshold_result", { mode: "json" }),
   // Claude pre-review (MVP 2): rule checks over document extractions. Advisory, analyst-facing only.
   preReview: text("pre_review", { mode: "json" }),
+  // EDD (docs/spec/05): what was asked, what the applicant sent, and the engine recalculation.
+  eddRequest: text("edd_request", { mode: "json" }),
+  eddSubmission: text("edd_submission", { mode: "json" }),
+  eddResult: text("edd_result", { mode: "json" }),
   engineVersions: text("engine_versions", { mode: "json" }),
   decision: text("decision", { enum: ["approve", "reject", "edd"] }),
   decisionReason: text("decision_reason"),
@@ -76,7 +80,7 @@ export const cases = sqliteTable("cases", {
 export const documents = sqliteTable("documents", {
   id: text("id").primaryKey(),
   caseId: text("case_id").notNull().references(() => cases.id),
-  kind: text("kind", { enum: ["poi_front", "poi_back", "selfie", "por"] }).notNull(),
+  kind: text("kind", { enum: ["poi_front", "poi_back", "selfie", "por", "sof", "edd_kyc"] }).notNull(),
   docType: text("doc_type"),
   originalName: text("original_name").notNull(),
   storedPath: text("stored_path").notNull(),
@@ -112,4 +116,30 @@ export const documentReadings = sqliteTable("document_readings", {
   inputHash: text("input_hash").notNull(),
   source: text("source", { enum: ["live", "replay"] }).notNull(),
   createdAt: text("created_at").notNull(),
+});
+
+export const screeningHits = sqliteTable("screening_hits", {
+  id: text("id").primaryKey(),
+  caseId: text("case_id").notNull().references(() => cases.id),
+  provider: text("provider").notNull(),
+  listVersion: text("list_version").notNull(),
+  entryId: text("entry_id").notNull(),
+  entryName: text("entry_name").notNull(),
+  category: text("category", { enum: ["sanctions", "pep", "adverse_media"] }).notNull(),
+  program: text("program").notNull(),
+  match: text("match", { mode: "json" }).notNull(), // name similarity, DOB and country comparison
+  strength: text("strength", { enum: ["strong", "possible"] }).notNull(),
+  status: text("status", { enum: ["open", "false_positive", "true_match"] }).notNull(),
+  triagedBy: text("triaged_by"),
+  triageReason: text("triage_reason"),
+  triagedAt: text("triaged_at"),
+  createdAt: text("created_at").notNull(),
+});
+
+/** Demo-wide settings, e.g. the MVP 1 / MVP 2 mode. Changes are audited. */
+export const settings = sqliteTable("settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: text("updated_at").notNull(),
+  updatedBy: text("updated_by").notNull(),
 });

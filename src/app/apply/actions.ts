@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { after } from "next/server";
+import { getMode } from "@/console/mode";
 import { runPreReview } from "@/documents/pre-review";
 import { audit } from "@/lib/audit";
 import { redirect } from "next/navigation";
@@ -18,6 +19,7 @@ import {
   type UploadInput,
 } from "@/portal/cases";
 import { portalDeps } from "@/portal/deps";
+import { submitEdd } from "@/portal/edd";
 import { PortalError } from "@/portal/errors";
 import { resumeStep, stepPath } from "@/portal/steps";
 import type { FormState } from "./form-state";
@@ -153,12 +155,13 @@ export async function questionnaireAction(_: FormState, fd: FormData): Promise<F
 export async function submitAction(_: FormState, fd: FormData): Promise<FormState> {
   const { deps, c } = await signedInCase();
   try {
-    submitCase(deps, c);
+    await submitCase(deps, c);
   } catch (e) {
     return failed(e, fd);
   }
   // MVP 2 pre-review runs after the response; the applicant never waits for or sees it.
-  after(async () => {
+  // MVP 1: Claude is off (spec 01); an analyst can still run it later from the console.
+  if (getMode(deps) === "mvp2") after(async () => {
     try {
       await runPreReview(deps, c.id);
     } catch (e) {
@@ -173,4 +176,18 @@ export async function signOutAction(): Promise<void> {
   endSession(portalDeps(), jar.get(SESSION_COOKIE)?.value);
   jar.delete(SESSION_COOKIE);
   redirect("/apply/continue");
+}
+
+// EDD (spec 05): proof of source of funds, plus extra KYC when asked.
+export async function eddAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { deps, c } = await signedInCase();
+  try {
+    const sof = await Promise.all(
+      fd.getAll("sof").filter((f): f is File => f instanceof File && f.size > 0).map(async (f) => ({ name: f.name, type: f.type, size: f.size, bytes: Buffer.from(await f.arrayBuffer()) })),
+    );
+    await submitEdd(deps, c, { note: textValues(fd).note }, { sof, eddKyc: await upload(fd, "eddKyc") });
+  } catch (e) {
+    return failed(e, fd);
+  }
+  redirect("/apply/status");
 }

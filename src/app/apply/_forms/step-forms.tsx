@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { Field, FormMessage, Submit, v } from "@/components/form";
-import { identityAction, questionnaireAction, residenceAction, submitAction } from "../actions";
+import { eddAction, identityAction, questionnaireAction, residenceAction, submitAction } from "../actions";
 import { initialState, type FormState } from "../form-state";
 
 type Option = { id: string; label: string };
@@ -216,6 +216,30 @@ export function SubmitForm() {
     <form action={action}>
       <FormMessage state={state} />
       <div className="actions"><Submit pending="Submitting…">Submit application</Submit></div>
+    </form>
+  );
+}
+
+// EDD request from the analyst (spec 05). Neutral wording: never says why (D7).
+export function EddForm({ extraKyc, documentAccept, selfieAccept }: { extraKyc: "required" | "already_satisfied"; documentAccept: string; selfieAccept: string }) {
+  const [state, action] = useActionState(eddAction, initialState);
+  return (
+    <form action={action} noValidate>
+      <FormMessage state={state} />
+      <Field name="sof" label="Proof of source of funds" hint="For example a tax report, payslips or a sale contract. You can select several files." state={state}>
+        <input id="sof" name="sof" type="file" multiple accept={documentAccept} />
+      </Field>
+      {extraKyc === "required" ? (
+        <Field name="eddKyc" label="Photo of you holding your identity document" hint="Your face and the document both clearly visible." state={state}>
+          <input id="eddKyc" name="eddKyc" type="file" accept={selfieAccept} capture="user" />
+        </Field>
+      ) : (
+        <p className="on-file">Extra identity check: already done with your selfie. Nothing more needed.</p>
+      )}
+      <Field name="note" label="Anything you'd like to add (optional)" state={state}>
+        <input id="note" name="note" defaultValue={state.values?.note} />
+      </Field>
+      <div className="actions"><Submit pending="Uploading…">Send documents</Submit></div>
     </form>
   );
 }

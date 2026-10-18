@@ -1,0 +1,6 @@
+# Mock ScreeningProvider (World-Check / OFAC style). Matching settings for the seeded fictional
+# watchlist in fixtures/screening/watchlist.yaml. Hits are triaged by the analyst; nothing auto-clears.
+version: 1
+provider: "Demo watchlist (fictional)"
+name_similarity_min: 0.8      # report a hit at or above this normalised name similarity (0-1)
+strong_name_similarity: 0.95  # "strong" when the name is at least this similar AND the date of birth matches

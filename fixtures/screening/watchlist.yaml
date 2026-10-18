@@ -1,0 +1,10 @@
+# FICTIONAL watchlist for the demo ScreeningProvider. Every entry is invented; any resemblance to a
+# real person is coincidental. Never add real names here.
+list_version: "DEMO-WL-2026-10"
+as_of: "2026-10-01"
+entries:
+  - {id: WL-001, name: "Ada Sampel",        dob: "1962-02-11", country: RU, category: sanctions,     program: "Demo sanctions programme A"}
+  - {id: WL-002, name: "Petros Demopoulos", dob: "1971-08-30", country: GR, category: pep,           program: "Demo PEP list: former deputy minister"}
+  - {id: WL-003, name: "Victor Fictus",     dob: "1980-03-14", country: CY, category: sanctions,     program: "Demo sanctions programme B"}
+  - {id: WL-004, name: "Maria Placeholder", dob: "1985-11-02", country: NL, category: adverse_media, program: "Demo adverse media: fraud allegation 2025"}
+  - {id: WL-005, name: "Jan Voorbeeld",     dob: "1958-06-21", country: NL, category: pep,           program: "Demo PEP list: municipal council member"}

@@ -4,7 +4,7 @@ import { stepCase } from "@/portal/cases";
 import { applicantView } from "@/portal/decision";
 import { resumeStep, stepPath } from "@/portal/steps";
 import { signOutAction } from "../actions";
-import { SubmitForm } from "../_forms/step-forms";
+import { EddForm, SubmitForm } from "../_forms/step-forms";
 import { requireStep } from "../session";
 
 // D7: neutral, no reasons. Never reveals sanctions, PEP, watchlist or risk-score reasons.
@@ -15,7 +15,7 @@ const usd = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", c
 
 // 2.1.7 Check, then the outcome screens: 2.1.8 Confirmation, EDD, no-go.
 export default async function StatusPage() {
-  const { c } = await requireStep("check");
+  const { c, deps } = await requireStep("check");
   const view = applicantView(c);
   if (view.kind === "draft" && resumeStep(stepCase(c)) !== "check") redirect(stepPath(resumeStep(stepCase(c))));
 
@@ -43,7 +43,7 @@ export default async function StatusPage() {
             <div className="banner ok" role="status">Welcome aboard. You can now make deposits.</div>
             {view.threshold !== null && (
               <>
-                <p style={{ marginBottom: 4 }}>Your initial deposit limit</p>
+                <p style={{ marginBottom: 4 }}>Your deposit limit</p>
                 <p className="amount" style={{ marginTop: 0 }}>{usd(view.threshold)}</p>
                 <p className="lede">If you'd like to deposit more later, we'll ask for proof of your source of funds.</p>
               </>
@@ -54,7 +54,8 @@ export default async function StatusPage() {
         return (
           <>
             <h1>We need a little more information</h1>
-            <p className="lede">We'll contact you by email with what we need to complete your application.</p>
+            <p className="lede">To complete your application, please send proof of where your funds come from.</p>
+            <EddForm extraKyc={view.extraKyc} documentAccept={deps.portal.uploads.document_mime.join(",")} selfieAccept={deps.portal.uploads.selfie_mime.join(",")} />
           </>
         );
       case "no_go":
