@@ -20,8 +20,9 @@ import {
 } from "@/portal/cases";
 import { portalDeps } from "@/portal/deps";
 import { submitEdd } from "@/portal/edd";
+import { confirmPersons, removePerson, saveCompany, saveCompanyDocuments, savePerson } from "@/portal/company";
 import { PortalError } from "@/portal/errors";
-import { resumeStep, stepPath } from "@/portal/steps";
+import { nextStep, resumeStep, stepPath } from "@/portal/steps";
 import type { FormState } from "./form-state";
 import { cookieOptions, currentApplicant, PENDING_EMAIL_COOKIE, SESSION_COOKIE } from "./session";
 
@@ -126,7 +127,7 @@ export async function identityAction(_: FormState, fd: FormData): Promise<FormSt
     revalidatePath("/apply/identity");
     return failed(e, fd);
   }
-  redirect("/apply/residence");
+  redirect(stepPath(nextStep("identity", c)));
 }
 
 // 2.1.5
@@ -137,7 +138,7 @@ export async function residenceAction(_: FormState, fd: FormData): Promise<FormS
   } catch (e) {
     return failed(e, fd);
   }
-  redirect("/apply/questionnaire");
+  redirect(stepPath(nextStep("residence", c)));
 }
 
 // 2.1.6
@@ -190,4 +191,67 @@ export async function eddAction(_: FormState, fd: FormData): Promise<FormState> 
     return failed(e, fd);
   }
   redirect("/apply/status");
+}
+
+// Company KYB (spec 03)
+export async function companyAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { deps, c } = await signedInCase();
+  try {
+    saveCompany(deps, c, textValues(fd));
+  } catch (e) {
+    return failed(e, fd);
+  }
+  redirect(stepPath(nextStep("company", c)));
+}
+
+export async function personAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { deps, c } = await signedInCase();
+  try {
+    const personId = textValues(fd).personId || undefined;
+    await savePerson(
+      deps,
+      c,
+      { ...textValues(fd), roles: fd.getAll("roles").map(String) },
+      { poi: await upload(fd, "poi"), por: await upload(fd, "por") },
+      { personId, isApplicant: textValues(fd).isApplicant === "true" },
+    );
+  } catch (e) {
+    return failed(e, fd);
+  }
+  redirect("/apply/persons");
+}
+
+export async function removePersonAction(fd: FormData): Promise<void> {
+  const { deps, c } = await signedInCase();
+  removePerson(deps, c, String(fd.get("personId")));
+  revalidatePath("/apply/persons");
+}
+
+export async function confirmPersonsAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { deps, c } = await signedInCase();
+  try {
+    confirmPersons(deps, c);
+  } catch (e) {
+    return failed(e, fd);
+  }
+  await goToResume();
+  return {};
+}
+
+export async function companyDocumentsAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { deps, c } = await signedInCase();
+  const finish = fd.get("intent") === "finish";
+  try {
+    const files: Record<string, UploadInput[]> = {};
+    for (const [key, v] of fd.entries()) {
+      if (!key.startsWith("doc_") || !(v instanceof File) || v.size === 0) continue;
+      (files[key.slice("doc_".length)] ??= []).push({ name: v.name, type: v.type, size: v.size, bytes: Buffer.from(await v.arrayBuffer()) });
+    }
+    await saveCompanyDocuments(deps, c, files, { finish });
+  } catch (e) {
+    return failed(e, fd);
+  }
+  if (finish) redirect("/apply/status");
+  revalidatePath("/apply/documents");
+  return { ok: true, message: "Uploaded. Add more, or continue when you're done." };
 }

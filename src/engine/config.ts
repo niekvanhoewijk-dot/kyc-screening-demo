@@ -132,10 +132,10 @@ export function parseEngineConfig(rawMatrix: unknown, rawCountries: unknown): En
 let cached: EngineConfig | undefined;
 
 /** Reads and validates config/*.yaml. Throws on any schema violation, so a bad config never scores. */
-export function loadEngineConfig(configDir = path.resolve(process.cwd(), "config")): EngineConfig {
-  if (cached && configDir === path.resolve(process.cwd(), "config")) return cached;
+export function loadEngineConfig(configDir = path.resolve(/* turbopackIgnore: true */ process.cwd(), "config")): EngineConfig {
+  if (cached && configDir === path.resolve(/* turbopackIgnore: true */ process.cwd(), "config")) return cached;
   const read = (f: string) => parse(fs.readFileSync(path.join(configDir, f), "utf8"));
   const config = parseEngineConfig(read("risk-matrix.yaml"), read("country-risk.yaml"));
-  if (configDir === path.resolve(process.cwd(), "config")) cached = config;
+  if (configDir === path.resolve(/* turbopackIgnore: true */ process.cwd(), "config")) cached = config;
   return config;
 }

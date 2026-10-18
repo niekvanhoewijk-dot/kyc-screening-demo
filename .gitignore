@@ -18,3 +18,5 @@ next-env.d.ts
 *.tsbuildinfo
 coverage/
 data/uploads/
+# generated eval reports (commit a real one deliberately)
+reports/

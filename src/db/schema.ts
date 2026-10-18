@@ -67,6 +67,12 @@ export const cases = sqliteTable("cases", {
   eddRequest: text("edd_request", { mode: "json" }),
   eddSubmission: text("edd_submission", { mode: "json" }),
   eddResult: text("edd_result", { mode: "json" }),
+  // Company cases (spec 03): company details and corporate questionnaire.
+  company: text("company", { mode: "json" }),
+  persons: text("persons_step", { mode: "json" }), // step completion marker for the persons step
+  companyDocs: text("company_docs_step", { mode: "json" }),
+  // Claude case memo (spec 06 CaseMemo). Advisory, analyst-facing only.
+  memo: text("memo", { mode: "json" }),
   engineVersions: text("engine_versions", { mode: "json" }),
   decision: text("decision", { enum: ["approve", "reject", "edd"] }),
   decisionReason: text("decision_reason"),
@@ -80,7 +86,8 @@ export const cases = sqliteTable("cases", {
 export const documents = sqliteTable("documents", {
   id: text("id").primaryKey(),
   caseId: text("case_id").notNull().references(() => cases.id),
-  kind: text("kind", { enum: ["poi_front", "poi_back", "selfie", "por", "sof", "edd_kyc"] }).notNull(),
+  kind: text("kind", { enum: ["poi_front", "poi_back", "selfie", "por", "sof", "edd_kyc", "company_doc", "person_poi", "person_por"] }).notNull(),
+  personId: text("person_id"), // company cases: whose POI/POR this is
   docType: text("doc_type"),
   originalName: text("original_name").notNull(),
   storedPath: text("stored_path").notNull(),
@@ -106,7 +113,7 @@ export const documentReadings = sqliteTable("document_readings", {
   id: text("id").primaryKey(),
   caseId: text("case_id").notNull().references(() => cases.id),
   documentId: text("document_id").notNull().references(() => documents.id),
-  kind: text("kind", { enum: ["poi", "por"] }).notNull(),
+  kind: text("kind", { enum: ["poi", "por", "kyb"] }).notNull(),
   status: text("status", { enum: ["ok", "failed"] }).notNull(),
   extraction: text("extraction", { mode: "json" }),
   error: text("error"),
@@ -121,6 +128,7 @@ export const documentReadings = sqliteTable("document_readings", {
 export const screeningHits = sqliteTable("screening_hits", {
   id: text("id").primaryKey(),
   caseId: text("case_id").notNull().references(() => cases.id),
+  subject: text("subject"), // company cases: "company" or a person id; null = the individual applicant
   provider: text("provider").notNull(),
   listVersion: text("list_version").notNull(),
   entryId: text("entry_id").notNull(),
@@ -142,4 +150,19 @@ export const settings = sqliteTable("settings", {
   value: text("value").notNull(),
   updatedAt: text("updated_at").notNull(),
   updatedBy: text("updated_by").notNull(),
+});
+
+/** Natural persons on a company case (spec 03): representative, UBOs, shareholders, board members. */
+export const casePersons = sqliteTable("case_persons", {
+  id: text("id").primaryKey(),
+  caseId: text("case_id").notNull().references(() => cases.id),
+  fullName: text("full_name").notNull(),
+  dateOfBirth: text("date_of_birth").notNull(),
+  nationality: text("nationality").notNull(),
+  countryOfResidence: text("country_of_residence").notNull(),
+  roles: text("roles", { mode: "json" }).notNull(), // PersonRole[]
+  sharePercent: text("share_percent"), // decimal string as declared, null if not a shareholder
+  pep: integer("pep", { mode: "boolean" }).notNull(),
+  isApplicant: integer("is_applicant", { mode: "boolean" }).notNull(), // the representative using the portal
+  createdAt: text("created_at").notNull(),
 });

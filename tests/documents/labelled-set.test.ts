@@ -16,7 +16,7 @@ const reader = new ClaudeDocumentReader({ model: env.CLAUDE_MODEL, mode: "replay
 const cache = new ReplayCache();
 const recorded = (doc: (typeof set.documents)[number]) => {
   const bytes = fs.readFileSync(path.join(FIXTURE_DIR, doc.file));
-  return cache.get(reader.cacheKey(doc.kind, { bytes, mime: "", sha256: sha256(bytes) })) !== null;
+  return cache.get(reader.cacheKey(doc.kind, { sha256: sha256(bytes) })) !== null;
 };
 
 describe("labelled synthetic set", () => {
@@ -33,6 +33,23 @@ describe("labelled synthetic set", () => {
     it.skipIf(!recorded(doc))(`${doc.id}: fires exactly [${doc.expected_codes.join(", ")}]`, async () => {
       const r = await evaluateDocument(reader, set, doc, { poi: poi(), por: por() }, checkRulesFromConfig());
       expect(r.status).toBe("ok");
+      expect(r.fired).toEqual([...doc.expected_codes].sort());
+    });
+  }
+});
+
+// KYB set: classification + document-level gap codes, replayed. Skipped until recorded.
+import { loadKybConfig } from "@/engine";
+import { evaluateKybDocument, KYB_FIXTURE_DIR, loadKybSet } from "@/eval/kyb-set";
+
+const kybSet = loadKybSet();
+describe("labelled KYB set", () => {
+  for (const doc of kybSet.documents) {
+    const bytes = fs.readFileSync(path.join(KYB_FIXTURE_DIR, doc.file));
+    const has = cache.get(reader.cacheKey("kyb", { sha256: sha256(bytes) })) !== null;
+    it.skipIf(!has)(`${doc.id}: reads as ${doc.expected_type}, fires [${doc.expected_codes.join(", ")}]`, async () => {
+      const r = await evaluateKybDocument(reader, kybSet, doc, loadKybConfig());
+      expect(r.type).toBe(doc.expected_type);
       expect(r.fired).toEqual([...doc.expected_codes].sort());
     });
   }

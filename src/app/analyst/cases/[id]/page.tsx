@@ -7,13 +7,18 @@ import { getMode } from "@/console/mode";
 import type { Check } from "@/documents/checks";
 import type { PreReview } from "@/documents/pre-review";
 import type { PoiExtraction, PorExtraction } from "@/documents/schemas";
-import type { BreakdownLine, CountryResolution, ThresholdResult } from "@/engine";
+import { uploadableItems, type BreakdownLine, type CompanyScore, type CountryResolution, type ThresholdResult } from "@/engine";
+import type { CaseMemo } from "@/documents/memo";
+import type { KybClassification } from "@/documents/kyb-schemas";
+import { caseGaps } from "@/kyb/load";
+import type { Gap } from "@/kyb/gaps";
+import type { CompanyData } from "@/portal/company";
 import { countryName } from "@/lib/countries";
 import type { IdentityData, QuestionnaireData, ResidenceData } from "@/portal/cases";
 import { portalDeps } from "@/portal/deps";
 import type { EddSubmission } from "@/portal/edd";
 import { PortalError } from "@/portal/errors";
-import { decisionAction, eddRecalcAction, runPreReviewAction, startReviewAction, triageAction } from "../../actions";
+import { decisionAction, draftMemoAction, eddRecalcAction, runPreReviewAction, startReviewAction, triageAction } from "../../actions";
 import { ActionForm } from "../../action-form";
 import { answerLabel, BAND_LABEL, STATUS_LABEL, usd } from "../../labels";
 
@@ -47,22 +52,27 @@ export default async function CasePage({ params }: { params: Promise<{ id: strin
       <div className="console-bar">
         <div>
           <Link href="/analyst" className="muted">← Queue</Link>
-          <h1 style={{ marginTop: 4 }}>{applicant.firstName} {applicant.lastName}</h1>
-          <span className="muted">{applicant.email} · submitted {c.submittedAt?.slice(0, 16).replace("T", " ") ?? "-"} UTC</span>
+          <h1 style={{ marginTop: 4 }}>{c.persona === "company" ? (c.company as CompanyData | null)?.legalName : `${applicant.firstName} ${applicant.lastName}`}</h1>
+          <span className="muted">{c.persona === "company" && <>Representative {applicant.firstName} {applicant.lastName} · </>}{applicant.email} · submitted {c.submittedAt?.slice(0, 16).replace("T", " ") ?? "-"} UTC</span>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <span className="pill">{STATUS_LABEL[c.status] ?? c.status}</span>
+          {c.persona === "company" && <span className="pill">Company</span>}
           {risk?.band && <span className={`pill ${risk.band}`}>{BAND_LABEL[risk.band]}</span>}
         </div>
       </div>
       {!["approved", "rejected"].includes(c.status) && <Routing risk={risk} />}
+      {mode === "mvp2" && <MemoPanel caseId={c.id} memo={c.memo as CaseMemo | null} />}
       <div className="grid">
-        <ScorePanel risk={risk} engineVersions={c.engineVersions as Record<string, unknown> | null} />
+        {c.persona === "company"
+          ? <CompanyScorePanel risk={c.riskResult as CompanyScore | null} />
+          : <ScorePanel risk={risk} engineVersions={c.engineVersions as Record<string, unknown> | null} />}
         <div className="stack">
           <ThresholdPanel threshold={c.thresholdResult as ThresholdResult | null} edd={c.eddResult as EddResultRecord | null} />
           <DecisionPanel view={view} />
         </div>
       </div>
+      {c.persona === "company" && <CompanyPanels view={view} mode={mode} />}
       <ScreeningPanel view={view} />
       <DocumentsPanel view={view} mode={mode} />
       {mode === "mvp2" && <PreReviewPanel caseId={c.id} pre={c.preReview as PreReview | null} />}
@@ -182,12 +192,13 @@ function ScreeningPanel({ view }: { view: CaseView }) {
       {view.hits.length === 0 ? <p className="muted">No hits.</p> : (
         <div className="table-scroll">
           <table>
-            <thead><tr><th>Entry</th><th>Category</th><th>Name</th><th>DOB</th><th>Country</th><th>Strength</th><th>Triage</th></tr></thead>
+            <thead><tr>{view.c.persona === "company" && <th>Subject</th>}<th>Entry</th><th>Category</th><th>Name</th><th>DOB</th><th>Country</th><th>Strength</th><th>Triage</th></tr></thead>
             <tbody>
               {view.hits.map((h) => {
                 const m = h.match as { nameSimilarity: number; dob: string; country: string };
                 return (
                   <tr key={h.id}>
+                    {view.c.persona === "company" && <td>{h.subject === "company" ? "Company" : (view.persons.find((p) => p.id === h.subject)?.fullName ?? "-")}</td>}
                     <td>{h.entryName}<br /><span className="muted">{h.entryId} · {h.program}</span></td>
                     <td>{h.category.replace("_", " ")}</td>
                     <td>{Math.round(m.nameSimilarity * 100)}% similar</td>
@@ -212,7 +223,7 @@ function ScreeningPanel({ view }: { view: CaseView }) {
           </table>
         </div>
       )}
-      <p className="muted" style={{ marginTop: 8 }}>Only an analyst clears a hit. A confirmed PEP match re-scores the case as PEP (D9); a confirmed sanctions match blocks approval.</p>
+      <p className="muted" style={{ marginTop: 8 }}>Only an analyst clears a hit. A confirmed PEP match re-scores the case (the person counts as PEP, D9); a confirmed sanctions match blocks approval.</p>
     </Panel>
   );
 }
@@ -372,5 +383,119 @@ function AuditPanel({ view }: { view: CaseView }) {
         </table>
       </div>
     </Panel>
+  );
+}
+
+function MemoPanel({ caseId, memo }: { caseId: string; memo: CaseMemo | null }) {
+  const ACTION = { approve: "approve", edd: "request EDD", reject: "reject", needs_human_review: "needs human review" } as const;
+  return (
+    <Panel title="Claude case memo" aside={<span className="muted">{memo?.disclaimer ?? "Advisory only. Decision rests with the analyst."}</span>}>
+      {memo ? (
+        <div className="advisory stack">
+          <p style={{ margin: 0 }}>{memo.summary}</p>
+          <p style={{ margin: 0 }}>Suggested (advisory, under the engine routing): <strong>{ACTION[memo.recommended_action]}</strong></p>
+          {memo.screening_notes && <p style={{ margin: 0 }}><span className="muted">Screening:</span> {memo.screening_notes}</p>}
+          {memo.suggested_edd_requests.length > 0 && <div><span className="muted">If EDD: ask for</span><ul style={{ margin: "4px 0", paddingLeft: 18 }}>{memo.suggested_edd_requests.map((r) => <li key={r}>{r}</li>)}</ul></div>}
+          <details><summary className="muted">Engine result as restated in the memo (copied by code)</summary><ul style={{ paddingLeft: 18 }}>{memo.score_breakdown_restatement.map((l) => <li key={l}>{l}</li>)}</ul></details>
+          <span className="muted">{memo.model} · {memo.promptVersion} · {memo.draftedAt.slice(0, 16).replace("T", " ")} UTC</span>
+        </div>
+      ) : <p className="muted">No memo yet.</p>}
+      <ActionForm key="memo" action={draftMemoAction} hidden={{ caseId }} submit={memo ? "Redraft memo" : "Draft memo"} pending="Claude is writing…" />
+    </Panel>
+  );
+}
+
+function CompanyScorePanel({ risk }: { risk: CompanyScore | null }) {
+  if (!risk) return <Panel title="Risk (rules engine)"><p className="muted">Not scored.</p></Panel>;
+  return (
+    <Panel title="Risk (rules engine)" aside={<span className="muted">demo default, O-8</span>}>
+      <p className="muted" style={{ marginTop: 0 }}>The requirements define no company scoring. Demo: the higher of the country-of-incorporation band and every person&apos;s band (residence country, PEP at least High).</p>
+      <div className="table-scroll"><table>
+        <thead><tr><th>Subject</th><th>Basis</th><th>Band</th></tr></thead>
+        <tbody>
+          <tr><td>Company</td><td>Incorporated in {countryName(risk.companyCountry.code)}: {risk.companyCountry.source}, as of {risk.companyCountry.as_of}{risk.companyCountry.unassessed && " (unassessed)"}</td><td><span className={`pill ${risk.companyCountryBand}`}>{BAND_LABEL[risk.companyCountryBand]}</span></td></tr>
+          {risk.persons.map((p) => (
+            <tr key={p.id}><td>{p.name}</td><td>Resident in {countryName(p.country.code)}{p.raisedBy === "pep" && ", PEP (D9)"}</td><td><span className={`pill ${p.band}`}>{BAND_LABEL[p.band]}</span></td></tr>
+          ))}
+        </tbody>
+      </table></div>
+      <KV rows={[["Company band", <><strong>{BAND_LABEL[risk.band]}</strong>, set by {risk.driver.kind === "company_country" ? "the country of incorporation" : risk.driver.name}</>], ["Threshold", "Not defined for companies (O-32)"]]} />
+    </Panel>
+  );
+}
+
+function CompanyPanels({ view, mode }: { view: CaseView; mode: string }) {
+  const deps = portalDeps();
+  const company = view.c.company as CompanyData | null;
+  const risk = view.c.riskResult as CompanyScore | null;
+  const gaps: Gap[] = caseGaps(deps, view.c.id, mode === "mvp2") ?? [];
+  const roleLabel = (id: string) => deps.kyb.person_roles.find((r) => r.id === id)?.label.split(" (")[0] ?? id;
+  const docsOf = (personId: string) => view.docs.filter((d) => d.personId === personId);
+  const items = uploadableItems(deps.kyb);
+  const companyDocs = view.docs.filter((d) => d.kind === "company_doc");
+  return (
+    <>
+      <div className="grid">
+        <Panel title="Company">
+          {company && <KV rows={[
+            ["Legal name", company.legalName], ["Registration no.", company.registrationNumber], ["Incorporated in", countryName(company.countryOfIncorporation)],
+            ["Registered address", [company.addressLine1, company.city, company.postcode, countryName(company.addressCountry)].filter(Boolean).join(", ")],
+            ["Industry", `${answerLabel(deps.engine, "occupation_industry", company.industry)}${company.industryDetail ? `: ${company.industryDetail}` : ""}`],
+            ["Deposit 12m", answerLabel(deps.engine, "deposit_12m", company.deposit_12m)], ["Source of funds", answerLabel(deps.engine, "source_of_funds", company.source_of_funds)],
+          ]} />}
+        </Panel>
+        <Panel title={`KYB gap list (${gaps.length})`} aside={<span className="muted">{mode === "mvp2" ? "declared data + Claude classifications" : "declared data only (MVP 1)"}</span>}>
+          {gaps.length === 0 ? <p className="muted">No gaps found.</p> : (
+            <ul style={{ paddingLeft: 18, margin: 0 }}>
+              {gaps.map((g, i) => <li key={i} style={{ marginBottom: 4 }}><span className={`pill ${g.severity === "missing" ? "fail" : "flag"}`}>{g.severity}</span> {g.detail} {g.code && <span className="muted">{g.code}</span>} {g.source === "claude" && <span className="muted">· Claude</span>}</li>)}
+            </ul>
+          )}
+        </Panel>
+      </div>
+      <Panel title="People (KYC on each)">
+        <div className="table-scroll">
+          <table>
+            <thead><tr><th>Name</th><th>Roles</th><th>Born / nationality</th><th>Band</th><th>Documents</th></tr></thead>
+            <tbody>
+              {view.persons.map((p) => {
+                const band = risk?.persons.find((x) => x.id === p.id)?.band;
+                return (
+                  <tr key={p.id}>
+                    <td>{p.fullName}{p.isApplicant && <> <span className="pill">applicant</span></>}{p.pep && <> <span className="pill flag">PEP declared</span></>}</td>
+                    <td>{(p.roles as string[]).map(roleLabel).join(", ")}{p.sharePercent && ` · ${p.sharePercent}%`}</td>
+                    <td>{p.dateOfBirth} · {countryName(p.nationality)}<br /><span className="muted">resident {countryName(p.countryOfResidence)}</span></td>
+                    <td>{band ? <span className={`pill ${band}`}>{BAND_LABEL[band]}</span> : "-"}</td>
+                    <td>{p.isApplicant ? <span className="muted">See documents below</span> : docsOf(p.id).map((d) => <div key={d.id}><a href={`/analyst/documents/${d.id}`} target="_blank" rel="noreferrer">{d.kind === "person_poi" ? "ID" : "Proof of residence"}: {d.originalName}</a></div>)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
+      <Panel title="Company documents">
+        {companyDocs.length === 0 ? <p className="muted">None uploaded.</p> : (
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>File</th><th>Uploaded as</th>{mode === "mvp2" && <th>Claude reads it as</th>}</tr></thead>
+              <tbody>
+                {companyDocs.map((d) => {
+                  const r = view.kybReadingOf(d.id);
+                  const x = r?.status === "ok" ? (r.extraction as KybClassification) : null;
+                  const label = (id: string | null) => (id ? (items.find((i) => i.id === id)?.label ?? id) : "Unsorted");
+                  return (
+                    <tr key={d.id}>
+                      <td><a href={`/analyst/documents/${d.id}`} target="_blank" rel="noreferrer">{d.originalName}</a></td>
+                      <td>{label(d.docType)}</td>
+                      {mode === "mvp2" && <td className="advisory">{!r ? <span className="muted">Not read yet</span> : !x ? <span className="muted">Extraction failed</span> : <>{x.document_type === "unrecognised" ? "Unrecognised" : label(x.document_type)} <span className="muted">({Math.round(x.overall_confidence * 100)}%)</span>{x.persons.length > 0 && <><br /><span className="muted">{x.persons.map((p) => `${p.name} (${p.role}${p.share_percent !== null ? ` ${p.share_percent}%` : ""})`).join(", ")}</span></>}</>}</td>}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
+    </>
   );
 }

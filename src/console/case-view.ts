@@ -1,5 +1,5 @@
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
-import { applicants, auditLog, cases, documentReadings, documents, faceMatches, screeningHits } from "@/db/schema";
+import { applicants, auditLog, casePersons, cases, documentReadings, documents, faceMatches, screeningHits } from "@/db/schema";
 import type { PortalDeps } from "@/portal/deps";
 import { PortalError } from "@/portal/errors";
 import { guardInput } from "./actions";
@@ -21,11 +21,15 @@ export function loadCaseView(deps: PortalDeps, caseId: string) {
     .orderBy(asc(auditLog.id))
     .all();
   const latestReading = (kind: "poi" | "por") => readings.filter((r) => r.kind === kind).at(-1) ?? null;
+  const persons = deps.db.select().from(casePersons).where(eq(casePersons.caseId, caseId)).orderBy(asc(casePersons.createdAt)).all();
+  const kybReadingOf = (docId: string) => readings.filter((r) => r.kind === "kyb" && r.documentId === docId).at(-1) ?? null;
   return {
     c,
     applicant,
     docs,
     readings: { poi: latestReading("poi"), por: latestReading("por") },
+    persons,
+    kybReadingOf,
     hits,
     faces,
     trail,

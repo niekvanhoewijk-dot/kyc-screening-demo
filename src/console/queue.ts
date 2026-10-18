@@ -7,6 +7,7 @@ export type QueueFilters = { band?: string; status?: string; olderThanDays?: num
 export type QueueRow = {
   caseId: string;
   applicant: string;
+  persona: string;
   email: string;
   status: string;
   submittedAt: string | null;
@@ -38,7 +39,8 @@ export function listQueue(deps: PortalDeps, filters: QueueFilters = {}): QueueRo
       const pre = c.preReview as { summary: { fail: number; flag: number } } | null;
       return {
         caseId: c.id,
-        applicant: `${a.firstName} ${a.lastName}`,
+        applicant: c.persona === "company" ? ((c.company as { legalName?: string } | null)?.legalName ?? `${a.firstName} ${a.lastName}`) : `${a.firstName} ${a.lastName}`,
+        persona: c.persona,
         email: a.email,
         status: c.status,
         submittedAt: c.submittedAt,

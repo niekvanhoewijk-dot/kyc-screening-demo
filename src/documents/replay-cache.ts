@@ -19,7 +19,7 @@ export type CacheRecord = {
  * Only real recorded responses belong here; never hand-write a record.
  */
 export class ReplayCache {
-  constructor(private readonly dir = path.resolve(process.cwd(), "fixtures/claude-cache")) {}
+  constructor(private readonly dir = path.resolve(/* turbopackIgnore: true */ process.cwd(), "fixtures/claude-cache")) {}
 
   private file(key: string) {
     return path.join(this.dir, `${key}.json`);

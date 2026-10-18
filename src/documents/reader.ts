@@ -1,11 +1,13 @@
+import type { KybClassification, MemoDraft } from "./kyb-schemas";
 import type { PoiExtraction, PorExtraction } from "./schemas";
 
-export type DocumentKind = "poi" | "por";
+export type DocumentKind = "poi" | "por" | "kyb";
+export type CallKind = DocumentKind | "memo";
 export type DocumentInput = { bytes: Buffer; mime: string; sha256: string };
 
 export type CallLog = {
   reader: string;
-  kind: DocumentKind;
+  kind: CallKind;
   source: "live" | "replay";
   modelRequested: string;
   model: string | null; // model that actually answered (may differ after a refusal fallback)
@@ -30,4 +32,11 @@ export type ReadOutcome<T> =
 export interface DocumentReader {
   readPoi(doc: DocumentInput): Promise<ReadOutcome<PoiExtraction>>;
   readPor(doc: DocumentInput): Promise<ReadOutcome<PorExtraction>>;
+  /** spec 03/06: classify a company document into checklist items 3-13 and extract company data. */
+  readKyb(doc: DocumentInput): Promise<ReadOutcome<KybClassification>>;
+}
+
+/** Drafts the analyst-facing case memo from facts the engine and rule checks produced. */
+export interface MemoWriter {
+  draftMemo(facts: unknown): Promise<ReadOutcome<MemoDraft>>;
 }

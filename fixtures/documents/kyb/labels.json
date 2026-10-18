@@ -1,0 +1,102 @@
+{
+  "description": "Labelled synthetic company documents. All fictional, all marked SAMPLE. expected_codes = codes the document-level KYB checks must raise against the declared context below (uploaded untagged).",
+  "context": {
+    "company": {
+      "legalName": "Sample Holdings B.V.",
+      "registrationNumber": "SAMPLE-12345"
+    },
+    "persons": [
+      {
+        "id": "ada",
+        "fullName": "Ada Sample",
+        "roles": [
+          "representative",
+          "ubo",
+          "shareholder",
+          "director"
+        ],
+        "sharePercent": 60
+      },
+      {
+        "id": "bo",
+        "fullName": "Bo Sample",
+        "roles": [
+          "shareholder",
+          "director"
+        ],
+        "sharePercent": 40
+      }
+    ]
+  },
+  "documents": [
+    {
+      "id": "kyb-certificate-of-incorporation",
+      "file": "kyb-certificate-of-incorporation.png",
+      "expected_type": "certificate_of_incorporation",
+      "expected_codes": [],
+      "note": "Clean certificate."
+    },
+    {
+      "id": "kyb-articles-of-association",
+      "file": "kyb-articles-of-association.png",
+      "expected_type": "articles_of_association",
+      "expected_codes": [],
+      "note": "Articles."
+    },
+    {
+      "id": "kyb-register-of-members",
+      "file": "kyb-register-of-members.png",
+      "expected_type": "register_of_members",
+      "expected_codes": [],
+      "note": "Shareholders match the declared 60/40."
+    },
+    {
+      "id": "kyb-register-adds-to-90",
+      "file": "kyb-register-adds-to-90.png",
+      "expected_type": "register_of_members",
+      "expected_codes": [
+        "KYB_SHAREHOLDING_NOT_100"
+      ],
+      "note": "Shareholdings total 90%."
+    },
+    {
+      "id": "kyb-register-undeclared-holder",
+      "file": "kyb-register-undeclared-holder.png",
+      "expected_type": "register_of_members",
+      "expected_codes": [
+        "KYB_PERSON_WITHOUT_KYC"
+      ],
+      "note": "A shareholder not on the KYC list (percentages also differ from those declared)."
+    },
+    {
+      "id": "kyb-good-standing",
+      "file": "kyb-good-standing.png",
+      "expected_type": "good_standing",
+      "expected_codes": [],
+      "note": "Good standing."
+    },
+    {
+      "id": "kyb-directors-resolution",
+      "file": "kyb-directors-resolution.png",
+      "expected_type": "directors_resolution",
+      "expected_codes": [],
+      "note": "Board resolution naming both directors."
+    },
+    {
+      "id": "kyb-name-mismatch",
+      "file": "kyb-name-mismatch.png",
+      "expected_type": "certificate_of_incorporation",
+      "expected_codes": [
+        "NAME_MISMATCH"
+      ],
+      "note": "Different company name from the one declared."
+    },
+    {
+      "id": "kyb-unrelated-receipt",
+      "file": "kyb-unrelated-receipt.png",
+      "expected_type": "unrecognised",
+      "expected_codes": [],
+      "note": "Not a company document."
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import { MockScreeningProvider, type ScreeningProvider } from "@/adapters/screen
 import { loadConsoleConfig, type ConsoleConfig } from "@/console/config";
 import { checkRulesFromConfig, documentReaderFromEnv } from "@/documents/factory";
 import type { PreReviewDeps } from "@/documents/pre-review";
-import { loadEngineConfig, type EngineConfig } from "@/engine";
+import { loadEngineConfig, loadKybConfig, type EngineConfig, type KybConfig } from "@/engine";
 import { loadPortalConfig, type PortalConfig } from "./config";
 
 export type PortalDeps = {
@@ -17,6 +17,7 @@ export type PortalDeps = {
   files: FileStore;
   engine: EngineConfig;
   portal: PortalConfig;
+  kyb: KybConfig;
   consoleConfig: ConsoleConfig;
   now: () => Date;
 };
@@ -32,6 +33,7 @@ export function portalDeps(): PreReviewDeps {
     files: new LocalFileStore(),
     engine: loadEngineConfig(),
     portal: loadPortalConfig(),
+    kyb: loadKybConfig(),
     consoleConfig: loadConsoleConfig(),
     now: () => new Date(),
     documentReader: (log) => documentReaderFromEnv(log),

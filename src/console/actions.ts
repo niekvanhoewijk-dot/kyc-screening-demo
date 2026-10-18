@@ -68,7 +68,11 @@ export function triageHit(deps: PortalDeps, caseId: string, hitId: string, verdi
 
   // D9: a confirmed PEP match makes the client a PEP; the engine re-scores (band at least High).
   if (verdict === "true_match" && hit.category === "pep") {
-    const { risk, threshold, engineVersions } = scoreCase(deps, c, { pepConfirmed: true });
+    // Individual: the applicant is a PEP. Company: the matched person is (O-27).
+    const confirmed = deps.db.select().from(screeningHits).where(eq(screeningHits.caseId, caseId)).all()
+      .filter((h) => h.category === "pep" && (h.status === "true_match" || h.id === hitId) && h.subject && h.subject !== "company")
+      .map((h) => h.subject!);
+    const { risk, threshold, engineVersions } = scoreCase(deps, c, { pepConfirmed: true, pepPersonIds: confirmed });
     deps.db.update(cases).set({ riskResult: risk, thresholdResult: threshold, engineVersions, updatedAt: now }).where(eq(cases.id, caseId)).run();
     audit(deps.db, deps.now(), "engine", "engine.rescored", `case:${caseId}`, { cause: "pep_match_confirmed", hitId, risk, threshold });
   }
@@ -117,11 +121,12 @@ export function recalculateEddForCase(
   const bad = (n: number | null) => n !== null && (!Number.isInteger(n) || n < 0);
   if (bad(input.documentedAnnualAmount) || bad(input.depositedToDate))
     throw new PortalError("VALIDATION", "Amounts must be whole dollars, zero or more.");
-  const q = c.questionnaire as QuestionnaireData;
+  const q = c.questionnaire as QuestionnaireData | null;
+  const company = c.company as { source_of_funds: string } | null;
   const result = recalculateEdd(
     {
-      source_of_funds: q.source_of_funds,
-      only_source_of_wealth: q.onlySourceOfWealth,
+      source_of_funds: q?.source_of_funds ?? company!.source_of_funds,
+      only_source_of_wealth: q?.onlySourceOfWealth ?? false,
       documented_annual_amount: input.documentedAnnualAmount,
       deposited_to_date: input.depositedToDate,
     },

@@ -75,8 +75,8 @@ export function nameSimilarity(a: string, b: string): number {
 
 /** Mock provider over the seeded fictional watchlist. Deterministic. */
 export class MockScreeningProvider implements ScreeningProvider {
-  private readonly settings = settingsSchema.parse(parse(fs.readFileSync(path.resolve(process.cwd(), "config/screening.yaml"), "utf8")));
-  private readonly list = watchlistSchema.parse(parse(fs.readFileSync(path.resolve(process.cwd(), "fixtures/screening/watchlist.yaml"), "utf8")));
+  private readonly settings = settingsSchema.parse(parse(fs.readFileSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), "config/screening.yaml"), "utf8")));
+  private readonly list = watchlistSchema.parse(parse(fs.readFileSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), "fixtures/screening/watchlist.yaml"), "utf8")));
 
   async screen(subject: ScreeningSubject): Promise<ScreeningResult> {
     const s = this.settings;

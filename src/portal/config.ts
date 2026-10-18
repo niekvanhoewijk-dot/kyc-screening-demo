@@ -35,7 +35,7 @@ export type PortalConfig = z.infer<typeof portalConfigSchema>;
 
 let cached: PortalConfig | undefined;
 
-export function loadPortalConfig(file = path.resolve(process.cwd(), "config/portal.yaml")): PortalConfig {
+export function loadPortalConfig(file = path.resolve(/* turbopackIgnore: true */ process.cwd(), "config/portal.yaml")): PortalConfig {
   if (!cached) cached = portalConfigSchema.parse(parse(fs.readFileSync(file, "utf8")));
   return cached;
 }

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { decide, recalculateEddForCase, requestEdd, startReview, triageHit } from "@/console/actions";
 import { setMode, type Mode } from "@/console/mode";
+import { draftCaseMemo } from "@/documents/memo";
 import { runPreReview } from "@/documents/pre-review";
 import { audit } from "@/lib/audit";
 import { portalDeps } from "@/portal/deps";
@@ -94,5 +95,17 @@ export async function runPreReviewAction(_: FormState, fd: FormData) {
       await runPreReview(deps, caseId);
     },
     "Claude pre-review finished.",
+  );
+}
+
+export async function draftMemoAction(_: FormState, fd: FormData) {
+  const caseId = str(fd, "caseId");
+  return run(
+    caseId,
+    async (a) => {
+      const memo = await draftCaseMemo(portalDeps(), caseId, a);
+      if ("error" in memo) throw new PortalError("VALIDATION", `Memo not drafted: ${memo.error}`);
+    },
+    "Memo drafted.",
   );
 }

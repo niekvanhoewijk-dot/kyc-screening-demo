@@ -16,7 +16,7 @@ export const documentReadingConfigSchema = z.object({
 export type DocumentReadingConfig = z.infer<typeof documentReadingConfigSchema>;
 
 let cached: DocumentReadingConfig | undefined;
-export function loadDocumentReadingConfig(file = path.resolve(process.cwd(), "config/document-reading.yaml")) {
+export function loadDocumentReadingConfig(file = path.resolve(/* turbopackIgnore: true */ process.cwd(), "config/document-reading.yaml")) {
   cached ??= documentReadingConfigSchema.parse(parse(fs.readFileSync(file, "utf8")));
   return cached;
 }

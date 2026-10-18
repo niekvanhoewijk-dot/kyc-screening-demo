@@ -34,3 +34,9 @@ Add new ones here instead of guessing. Format: ID, question, current default, st
 | O-28 | EDD trigger 2 (deposits reach the threshold) and `deposited_to_date` | The demo has no deposit ledger: the analyst enters deposited-to-date in the EDD recalculation | Demo limitation |
 | O-29 | Analyst identity | Demo picker, no authentication; every action is audited under the chosen analyst | Demo limitation |
 | O-30 | MVP 1 vs MVP 2 | MVP 1: Claude does not run at submission and its output is hidden. MVP 2: pre-review runs after submission and is shown as advisory. Analysts can run it on demand in MVP 2 | Default |
+| O-31 | Company KYB: how do UBOs, shareholders and board members do their KYC? | The representative uploads each person's ID and proof of residence in the portal; only the representative takes a selfie. A per-person invite flow is out of scope for the demo | Default, confirm |
+| O-32 | Deposit threshold for companies | Not defined in the requirements: none is computed or shown; EDD recalculation uses the company's declared source of funds | Open |
+| O-33 | Company risk (O-8 default) in detail | Band = highest of the country-of-incorporation band and each person's band (residence country tier, PEP at least High). Corporate questionnaire answers (industry, deposits, SoF) are collected but not scored | Demo default, confirm |
+| O-34 | Applicant-tagged document vs Claude classification disagree | The tag still counts for coverage; the disagreement is listed as an inconsistency for the analyst (Claude only flags) | Default |
+| O-35 | Persons' own POI/POR in company cases are not read by Claude in the pre-review | Only the representative's POI/POR and the company documents are read; persons' documents are checked for presence | Demo scope |
+| O-36 | Company entity screening | The company name is screened against the (person-only) demo watchlist; no entity list is seeded | Demo limitation |

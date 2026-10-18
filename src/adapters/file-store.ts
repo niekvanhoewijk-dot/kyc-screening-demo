@@ -9,7 +9,7 @@ export interface FileStore {
 
 /** Local disk under data/uploads (gitignored). Synthetic SAMPLE documents only. */
 export class LocalFileStore implements FileStore {
-  constructor(private readonly root = path.resolve(process.cwd(), "data/uploads")) {}
+  constructor(private readonly root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "data/uploads")) {}
 
   async save(caseId: string, fileName: string, bytes: Buffer): Promise<string> {
     const rel = path.join(caseId, fileName);

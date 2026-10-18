@@ -24,11 +24,6 @@ export async function createAccount(deps: PortalDeps, input: unknown): Promise<{
     await issueOtp(deps, existing.id, existing.email, { ignoreCooldown: false, quietCooldown: true });
     return { email: data.email };
   }
-  if (data.persona === "company")
-    throw new PortalError("VALIDATION", "Company onboarding is not available in this demo yet.", {
-      persona: ["Company onboarding is coming soon. Choose Individual for now."],
-    });
-
   const applicantId = newId();
   const caseId = newId();
   db.transaction((tx) => {

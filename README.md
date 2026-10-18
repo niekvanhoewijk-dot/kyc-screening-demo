@@ -2,9 +2,9 @@
 
 An illustrative onboarding and compliance-screening demo built from the Ateaya KYC-KYB-AML requirements (Full v3) and the DVAULT onboarding flow, using Claude for document reading and case preparation and a deterministic rules engine for every decision number.
 
-**Status:** Phases 0-4 done: scaffold, rules engine (`src/engine`), applicant portal for individuals (`/apply`, steps 2.1.1-2.1.8 plus EDD), Claude document reading (`src/documents`), analyst console (`/analyst`: queue, case view, screening triage, EDD, decisions, audit trail, MVP 1/2 toggle). OTP codes print in the `npm run dev` console.
+**Status:** Phases 0-5 done: scaffold, rules engine (`src/engine`), applicant portal for individuals and companies (`/apply`, steps 2.1.1-2.1.8 plus EDD and KYB), Claude document reading, KYB classification and case memo (`src/documents`), KYB gap list (`src/kyb`), analyst console (`/analyst`), eval report (`npm run eval`). OTP codes print in the `npm run dev` console.
 
-**Claude document reading:** put `ANTHROPIC_API_KEY=...` in `.env.local`, then `npm run docs:record` reads the labelled SAMPLE set in `fixtures/documents/` live and records the responses in `fixtures/claude-cache/`. After that, `npm run test` replays them offline and asserts the expected reason codes, and `DEMO_MODE=replay` runs the app without a key. `npm run docs:samples` regenerates the documents (macOS, uses `sips`).
+**Claude document reading:** put `ANTHROPIC_API_KEY=...` in `.env.local`, then `npm run docs:record` reads the labelled SAMPLE set in `fixtures/documents/` live and records the responses in `fixtures/claude-cache/`. After that, `npm run test` replays them offline and asserts the expected reason codes, `npm run eval` writes `reports/eval-<date>.md` (precision/recall per reason code, KYB classification accuracy, cost per case), and `DEMO_MODE=replay` runs the app without a key. `npm run docs:samples` regenerates the documents (macOS, uses `sips`).
 
 ## Start building
 1. Open a terminal in this folder: `cd ~/Documents/Ateaya/KYC/claude-code`

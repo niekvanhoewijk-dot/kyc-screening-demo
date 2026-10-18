@@ -1,6 +1,6 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
-import { applicants, cases, documents, faceMatches, screeningHits } from "@/db/schema";
-import { initialThreshold, scoreApplicant } from "@/engine";
+import { applicants, casePersons, cases, documents, faceMatches, screeningHits } from "@/db/schema";
+import { initialThreshold, scoreApplicant, scoreCompany } from "@/engine";
 import { audit } from "@/lib/audit";
 import { newId, sha256 } from "@/lib/ids";
 import type { PortalDeps } from "./deps";
@@ -34,6 +34,10 @@ export function getCurrentCase(deps: PortalDeps, applicantId: string): CaseRow {
 }
 
 export const stepCase = (c: CaseRow) => ({
+  persona: c.persona,
+  company: c.company as { complete?: boolean } | null,
+  persons: c.persons as { complete?: boolean } | null,
+  companyDocs: c.companyDocs as { complete?: boolean } | null,
   status: c.status,
   overviewSeenAt: c.overviewSeenAt,
   identity: c.identity as IdentityData | null,
@@ -41,7 +45,7 @@ export const stepCase = (c: CaseRow) => ({
   questionnaire: c.questionnaire as QuestionnaireData | null,
 });
 
-function assertEditable(c: CaseRow, step: StepId) {
+export function assertEditable(c: CaseRow, step: StepId) {
   if (c.status !== "draft") throw new PortalError("NOT_EDITABLE", "Your application has been submitted and can no longer be changed.");
   if (!canOpen(step, stepCase(c))) throw new PortalError("STEP_LOCKED", "Please complete the earlier steps first.");
 }
@@ -63,7 +67,7 @@ export function checkUpload(deps: PortalDeps, field: string, file: UploadInput |
 }
 
 /** Stores an upload. By default it supersedes the current document of that kind; SoF evidence accumulates instead. */
-export async function storeDoc(deps: PortalDeps, c: CaseRow, kind: DocKind, file: UploadInput, docType: string | null, opts: { keepPrevious?: boolean } = {}) {
+export async function storeDoc(deps: PortalDeps, c: CaseRow, kind: DocKind, file: UploadInput, docType: string | null, opts: { keepPrevious?: boolean; personId?: string } = {}) {
   const now = deps.now();
   const id = newId();
   const storedPath = await deps.files.save(c.id, `${kind}-${id}.${EXT[file.type] ?? "bin"}`, file.bytes);
@@ -72,13 +76,20 @@ export async function storeDoc(deps: PortalDeps, c: CaseRow, kind: DocKind, file
     if (!opts.keepPrevious)
       tx.update(documents)
         .set({ supersededAt: now.toISOString() })
-        .where(and(eq(documents.caseId, c.id), eq(documents.kind, kind), isNull(documents.supersededAt)))
+        .where(
+          and(
+            eq(documents.caseId, c.id),
+            eq(documents.kind, kind),
+            isNull(documents.supersededAt),
+            opts.personId ? eq(documents.personId, opts.personId) : isNull(documents.personId),
+          ),
+        )
         .run();
     tx.insert(documents)
-      .values({ id, caseId: c.id, kind, docType, originalName: file.name, storedPath, mime: file.type, sizeBytes: file.size, sha256: hash, uploadedAt: now.toISOString() })
+      .values({ id, caseId: c.id, personId: opts.personId ?? null, kind, docType, originalName: file.name, storedPath, mime: file.type, sizeBytes: file.size, sha256: hash, uploadedAt: now.toISOString() })
       .run();
   });
-  audit(deps.db, now, `applicant:${c.applicantId}`, "document.uploaded", `case:${c.id}`, { documentId: id, kind, docType, sha256: hash, sizeBytes: file.size });
+  audit(deps.db, now, `applicant:${c.applicantId}`, "document.uploaded", `case:${c.id}`, { documentId: id, kind, docType, personId: opts.personId, sha256: hash, sizeBytes: file.size });
   return { id, name: file.name, bytes: file.bytes };
 }
 
@@ -196,7 +207,8 @@ export function saveQuestionnaire(deps: PortalDeps, c: CaseRow, input: unknown) 
  * Rules engine over the stored answers. `pepConfirmed` applies an analyst-confirmed PEP screening
  * match (D9: PEP = band at least High) on top of the self-declaration.
  */
-export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: boolean } = {}) {
+export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: boolean; pepPersonIds?: string[] } = {}) {
+  if (c.persona === "company") return scoreCompanyCase(deps, c, opts.pepPersonIds ?? []);
   const q = c.questionnaire as QuestionnaireData;
   const r = c.residence as ResidenceData;
   const risk = scoreApplicant(
@@ -227,12 +239,48 @@ export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: b
           deps.engine,
         )
       : null;
-  const engineVersions = {
-    risk_matrix_version: deps.engine.matrix.version,
-    country_list_version: deps.engine.countries.meta.list_version,
-    country_as_of: deps.engine.countries.meta.as_of,
-  };
-  return { risk, threshold, engineVersions };
+  return { risk, threshold, engineVersions: versions(deps) };
+}
+
+const versions = (deps: PortalDeps) => ({
+  risk_matrix_version: deps.engine.matrix.version,
+  country_list_version: deps.engine.countries.meta.list_version,
+  country_as_of: deps.engine.countries.meta.as_of,
+  kyb_version: deps.kyb.version,
+});
+
+/** Company: demo default (spec 03, O-8). No company threshold is defined (O-32). */
+function scoreCompanyCase(deps: PortalDeps, c: CaseRow, pepPersonIds: string[]) {
+  const company = c.company as { countryOfIncorporation: string };
+  const persons = deps.db.select().from(casePersons).where(eq(casePersons.caseId, c.id)).all();
+  const risk = scoreCompany(
+    {
+      countryOfIncorporation: company.countryOfIncorporation,
+      persons: persons.map((p) => ({ id: p.id, name: p.fullName, countryOfResidence: p.countryOfResidence, pep: p.pep || pepPersonIds.includes(p.id) })),
+    },
+    deps.engine,
+    deps.kyb,
+  );
+  return { risk, threshold: null, engineVersions: versions(deps) };
+}
+
+/** Who gets screened: the individual, or the company and every natural person on it (spec 03 item 14). */
+async function screenCase(deps: PortalDeps, c: CaseRow) {
+  if (c.persona === "company") {
+    const company = c.company as { legalName: string; countryOfIncorporation: string };
+    const persons = deps.db.select().from(casePersons).where(eq(casePersons.caseId, c.id)).all();
+    const subjects = [
+      { subject: "company", fullName: company.legalName, dateOfBirth: "", countries: [company.countryOfIncorporation] },
+      ...persons.map((p) => ({ subject: p.id, fullName: p.fullName, dateOfBirth: p.dateOfBirth, countries: [...new Set([p.nationality, p.countryOfResidence])] })),
+    ];
+    const results = await Promise.all(subjects.map(async (s) => ({ subject: s.subject, result: await deps.screening.screen(s) })));
+    return results;
+  }
+  const applicant = deps.db.select().from(applicants).where(eq(applicants.id, c.applicantId)).get()!;
+  const q = c.questionnaire as QuestionnaireData;
+  const r = c.residence as ResidenceData;
+  const result = await deps.screening.screen({ fullName: `${applicant.firstName} ${applicant.lastName}`, dateOfBirth: q.dateOfBirth, countries: [...new Set([q.nationality, r.country])] });
+  return [{ subject: null as string | null, result }];
 }
 
 /** 2.1.7 Submit: the rules engine scores the case and screening runs; it lands in the analyst queue whatever the result. */
@@ -240,28 +288,26 @@ export async function submitCase(deps: PortalDeps, c: CaseRow) {
   assertEditable(c, "check");
   const now = deps.now();
   const { risk, threshold, engineVersions } = scoreCase(deps, c);
-
-  // Screening (spec 02): name + DOB against the provider; nationality and residence as countries.
-  const applicant = deps.db.select().from(applicants).where(eq(applicants.id, c.applicantId)).get()!;
-  const q = c.questionnaire as QuestionnaireData;
-  const r = c.residence as ResidenceData;
-  const screening = await deps.screening.screen({
-    fullName: `${applicant.firstName} ${applicant.lastName}`,
-    dateOfBirth: q.dateOfBirth,
-    countries: [...new Set([q.nationality, r.country])],
-  });
+  const screenings = await screenCase(deps, c);
 
   deps.db.transaction((tx) => {
     tx.update(cases)
       .set({ status: "submitted", submittedAt: now.toISOString(), riskResult: risk, thresholdResult: threshold, engineVersions, updatedAt: now.toISOString() })
       .where(eq(cases.id, c.id))
       .run();
-    for (const h of screening.hits)
-      tx.insert(screeningHits)
-        .values({ id: newId(), caseId: c.id, provider: screening.provider, listVersion: screening.listVersion, entryId: h.entryId, entryName: h.entryName, category: h.category, program: h.program, match: h.match, strength: h.strength, status: "open", createdAt: now.toISOString() })
-        .run();
+    for (const { subject, result } of screenings)
+      for (const h of result.hits)
+        tx.insert(screeningHits)
+          .values({ id: newId(), caseId: c.id, subject, provider: result.provider, listVersion: result.listVersion, entryId: h.entryId, entryName: h.entryName, category: h.category, program: h.program, match: h.match, strength: h.strength, status: "open", createdAt: now.toISOString() })
+          .run();
   });
+  const first = screenings[0]?.result;
   audit(deps.db, now, `applicant:${c.applicantId}`, "case.submitted", `case:${c.id}`);
   audit(deps.db, now, "engine", "engine.scored", `case:${c.id}`, { risk, threshold, engineVersions });
-  audit(deps.db, now, "system", "screening.completed", `case:${c.id}`, { provider: screening.provider, listVersion: screening.listVersion, hits: screening.hits.length });
+  audit(deps.db, now, "system", "screening.completed", `case:${c.id}`, {
+    provider: first?.provider,
+    listVersion: first?.listVersion,
+    subjects: screenings.length,
+    hits: screenings.reduce((n, s) => n + s.result.hits.length, 0),
+  });
 }

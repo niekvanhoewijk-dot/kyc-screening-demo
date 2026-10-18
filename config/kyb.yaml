@@ -1,0 +1,35 @@
+# Company KYB (docs/spec/03). Checklist, roles and the DEMO company-risk default.
+version: 1
+
+# Document pack items that are company documents (spec 03 items 3-13). Items 1-2 are per person
+# (POI, POR); item 12 is answered in the portal; item 14 is the screening the system runs.
+checklist:
+  - {id: certificate_of_incorporation, item: 3,  label: "Certificate of Incorporation or Commercial Register entry"}
+  - {id: articles_of_association,      item: 4,  label: "Articles and Memorandum of Association (or equivalent)"}
+  - {id: beneficial_ownership,         item: 5,  label: "Evidence of beneficial ownership"}
+  - {id: registered_address_cert,      item: 6,  label: "Certificate of Registered Address"}
+  - {id: company_proof_of_address,     item: 7,  label: "Evidence of the company's current address (in the company's name)"}
+  - {id: good_standing,                item: 8,  label: "Certified Certificate of Good Standing / Incumbency"}
+  - {id: register_of_members,          item: 9,  label: "Register of Members"}
+  - {id: certificate_of_shareholders,  item: 10, label: "Certificate of Shareholders"}
+  - {id: directors_resolution,         item: 11, label: "Resolution / Certificate of Directors"}
+  - {id: corporate_questionnaire,      item: 12, label: "Corporate questionnaire", provided_by: portal}
+  - {id: directors_shares,             item: 13, label: "Proof of directors' shares, allocation and other specifics"}
+
+person_roles:
+  - {id: representative, label: "Representative (handles the account)"}
+  - {id: ubo,            label: "Ultimate Beneficial Owner"}
+  - {id: shareholder,    label: "Shareholder"}
+  - {id: director,       label: "Board member (BoD)"}
+
+# Every case needs at least one person in each of these roles (spec 03: KYC on representative and UBO).
+required_roles: [representative, ubo]
+
+# Declared and extracted shareholdings must add up to this (spec 06: KYB_SHAREHOLDING_NOT_100).
+shareholding_total_percent: 100
+
+# DEMO DEFAULT (spec 03, O-8): company band = the higher of the country-of-incorporation band and
+# the highest natural-person band. Person band = country-of-residence band, at least `pep_min_band`
+# for a PEP (D9). Country tiers map to bands of the same name. Not a defined requirement.
+country_tier_to_band: {low: low, medium: medium, high: high, auto_high: auto_high, prohibited: prohibited}
+pep_min_band: high

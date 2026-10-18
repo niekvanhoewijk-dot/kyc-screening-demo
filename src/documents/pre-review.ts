@@ -1,14 +1,16 @@
 import { and, eq, isNull } from "drizzle-orm";
-import { applicants, cases, documentReadings, documents } from "@/db/schema";
+import { applicants, casePersons, cases, documentReadings, documents } from "@/db/schema";
+import { caseGaps } from "@/kyb/load";
+import type { Gap } from "@/kyb/gaps";
 import { audit } from "@/lib/audit";
 import { newId } from "@/lib/ids";
 import type { PortalDeps } from "@/portal/deps";
 import type { IdentityData, QuestionnaireData, ResidenceData } from "@/portal/cases";
 import { runChecks, type Check, type CheckRules } from "./checks";
-import type { CallLog, DocumentReader, ReadOutcome } from "./reader";
+import type { CallLog, DocumentReader, MemoWriter, ReadOutcome } from "./reader";
 
 export type PreReviewDeps = PortalDeps & {
-  documentReader: (log: (entry: CallLog) => void) => DocumentReader;
+  documentReader: (log: (entry: CallLog) => void) => DocumentReader & MemoWriter;
   checkRules: CheckRules;
 };
 
@@ -16,7 +18,9 @@ export type PreReview = {
   ranAt: string;
   checks: Check[];
   porValidUntil: string | null;
-  summary: { fail: number; flag: number; pass: number; reasonCodes: string[] };
+  /** Company cases: KYB gap list including Claude's classifications. */
+  gaps?: Gap[];
+  summary: { fail: number; flag: number; pass: number; gaps?: number; reasonCodes: string[] };
 };
 
 const missing = (error: string): ReadOutcome<never> => ({ status: "failed", error, calls: [] });
@@ -32,7 +36,9 @@ export async function runPreReview(deps: PreReviewDeps, caseId: string): Promise
   const applicant = db.select().from(applicants).where(eq(applicants.id, c.applicantId)).get()!;
   const identity = c.identity as IdentityData;
   const residence = c.residence as ResidenceData;
-  const questionnaire = c.questionnaire as QuestionnaireData;
+  // Company: the representative's own DOB is on their person record (spec 03).
+  const rep = c.persona === "company" ? db.select().from(casePersons).where(eq(casePersons.caseId, caseId)).all().find((p) => p.isApplicant) : undefined;
+  const dateOfBirth = rep?.dateOfBirth ?? (c.questionnaire as QuestionnaireData).dateOfBirth;
 
   const reader = deps.documentReader((call) =>
     // spec: log model, prompt version, input hash and output of every Claude call
@@ -42,11 +48,7 @@ export async function runPreReview(deps: PreReviewDeps, caseId: string): Promise
   const current = (kind: "poi_front" | "por") =>
     db.select().from(documents).where(and(eq(documents.caseId, caseId), eq(documents.kind, kind), isNull(documents.supersededAt))).get();
 
-  const read = async <K extends "poi" | "por">(kind: K) => {
-    const doc = current(kind === "poi" ? "poi_front" : "por");
-    if (!doc) return { doc, outcome: missing("Document not uploaded.") };
-    const input = { bytes: await deps.files.read(doc.storedPath), mime: doc.mime, sha256: doc.sha256 };
-    const outcome = kind === "poi" ? await reader.readPoi(input) : await reader.readPor(input);
+  const store = (doc: typeof documents.$inferSelect, kind: "poi" | "por" | "kyb", outcome: ReadOutcome<unknown>) => {
     const last = outcome.calls.at(-1);
     db.insert(documentReadings)
       .values({
@@ -65,6 +67,14 @@ export async function runPreReview(deps: PreReviewDeps, caseId: string): Promise
         createdAt: deps.now().toISOString(),
       })
       .run();
+  };
+
+  const read = async <K extends "poi" | "por">(kind: K) => {
+    const doc = current(kind === "poi" ? "poi_front" : "por");
+    if (!doc) return { doc, outcome: missing("Document not uploaded.") };
+    const input = { bytes: await deps.files.read(doc.storedPath), mime: doc.mime, sha256: doc.sha256 };
+    const outcome = kind === "poi" ? await reader.readPoi(input) : await reader.readPor(input);
+    store(doc, kind, outcome);
     return { doc, outcome };
   };
 
@@ -72,19 +82,33 @@ export async function runPreReview(deps: PreReviewDeps, caseId: string): Promise
   const { checks, porValidUntil } = runChecks(
     {
       today: deps.now().toISOString().slice(0, "yyyy-mm-dd".length),
-      applicant,
-      declared: { dateOfBirth: questionnaire.dateOfBirth, address: residence, selfie: identity.selfie },
+      applicant: rep ? { firstName: applicant.firstName, lastName: applicant.lastName } : applicant,
+      declared: { dateOfBirth, address: residence, selfie: identity.selfie },
       poi: poi.outcome as Parameters<typeof runChecks>[0]["poi"],
       por: por.outcome as Parameters<typeof runChecks>[0]["por"],
     },
     deps.checkRules,
   );
+  // Company: Claude classifies each company document (spec 03), then code builds the gap list.
+  let gaps: Gap[] | undefined;
+  if (c.persona === "company") {
+    const companyDocs = db.select().from(documents).where(and(eq(documents.caseId, caseId), eq(documents.kind, "company_doc"), isNull(documents.supersededAt))).all();
+    for (const doc of companyDocs) store(doc, "kyb", await reader.readKyb({ bytes: await deps.files.read(doc.storedPath), mime: doc.mime, sha256: doc.sha256 }));
+    gaps = caseGaps(deps, caseId, true) ?? [];
+  }
   const count = (s: Check["status"]) => checks.filter((x) => x.status === s).length;
   const result: PreReview = {
     ranAt: deps.now().toISOString(),
     checks,
     porValidUntil,
-    summary: { fail: count("fail"), flag: count("flag"), pass: count("pass"), reasonCodes: [...new Set(checks.flatMap((x) => x.reason_codes))] },
+    ...(gaps ? { gaps } : {}),
+    summary: {
+      fail: count("fail"),
+      flag: count("flag"),
+      pass: count("pass"),
+      ...(gaps ? { gaps: gaps.length } : {}),
+      reasonCodes: [...new Set([...checks.flatMap((x) => x.reason_codes), ...(gaps ?? []).flatMap((g) => (g.code ? [g.code] : []))])],
+    },
   };
   db.update(cases).set({ preReview: result }).where(eq(cases.id, caseId)).run();
   audit(db, deps.now(), "claude", "prereview.completed", `case:${caseId}`, result.summary);

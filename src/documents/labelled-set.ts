@@ -21,7 +21,7 @@ const labelsSchema = z.object({
 });
 
 export type LabelledSet = z.infer<typeof labelsSchema>;
-export const FIXTURE_DIR = path.resolve(process.cwd(), "fixtures/documents");
+export const FIXTURE_DIR = path.resolve(/* turbopackIgnore: true */ process.cwd(), "fixtures/documents");
 
 export function loadLabelledSet(): LabelledSet {
   return labelsSchema.parse(JSON.parse(fs.readFileSync(path.join(FIXTURE_DIR, "labels.json"), "utf8")));

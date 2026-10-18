@@ -15,5 +15,5 @@ const fromFile = Object.fromEntries(
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
-  test: { environment: "node", include: ["tools/record/**/*.record.ts"], env: fromFile },
+  test: { environment: "node", include: [process.env.VITEST_INCLUDE ?? "tools/record/**/*.record.ts"], env: fromFile },
 });

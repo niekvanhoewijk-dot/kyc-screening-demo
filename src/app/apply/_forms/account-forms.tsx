@@ -17,7 +17,7 @@ export function CreateAccountForm() {
           <input type="radio" name="persona" value="individual" defaultChecked={persona === "individual"} /> An individual
         </label>
         <label className="choice">
-          <input type="radio" name="persona" value="company" defaultChecked={persona === "company"} /> A company (coming soon)
+          <input type="radio" name="persona" value="company" defaultChecked={persona === "company"} /> A company
         </label>
         {state.fieldErrors?.persona?.map((e) => <span key={e} className="error">{e}</span>)}
       </fieldset>

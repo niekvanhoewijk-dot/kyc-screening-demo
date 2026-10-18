@@ -44,7 +44,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
           <tbody>
             {rows.map((r) => (
               <tr key={r.caseId}>
-                <td><Link href={`/analyst/cases/${r.caseId}`}>{r.applicant}</Link><br /><span className="muted">{r.email}</span></td>
+                <td><Link href={`/analyst/cases/${r.caseId}`}>{r.applicant}</Link>{r.persona === "company" && <> <span className="pill">Company</span></>}<br /><span className="muted">{r.email}</span></td>
                 <td>{STATUS_LABEL[r.status] ?? r.status}</td>
                 <td>{r.band ? <><span className={`pill ${r.band}`}>{BAND_LABEL[r.band]}</span> {r.total}</> : <span className="muted">Not scored</span>}</td>
                 <td>{ROUTE_LABEL[r.route]}</td>

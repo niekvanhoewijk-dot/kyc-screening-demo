@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { auditLog } from "@/db/schema";
+import { auditLog, cases } from "@/db/schema";
 import { createAccount, getSessionApplicant, resendOtp, startSignIn, verifyOtp } from "@/portal/accounts";
 import { PortalError } from "@/portal/errors";
 import { account, makeDeps } from "./helpers";
@@ -69,12 +69,13 @@ describe("account and OTP (2.1.1 - 2.1.2)", () => {
     expect(attempt(() => verifyOtp(deps, "nobody@example.test", { code: "123456" }))).toBe("OTP_EXPIRED");
   });
 
-  it("validates the form and keeps company onboarding closed for now", async () => {
+  it("validates the form and opens a company case for the company persona", async () => {
     const { deps } = makeDeps();
     await expect(createAccount(deps, { ...account(), email: "not-an-email" })).rejects.toMatchObject({
       code: "VALIDATION",
       fieldErrors: { email: [expect.any(String)] },
     });
-    await expect(createAccount(deps, { ...account(), persona: "company" })).rejects.toMatchObject({ fieldErrors: { persona: [expect.any(String)] } });
+    await createAccount(deps, { ...account("rep@example.test"), persona: "company" });
+    expect(deps.db.select().from(cases).all()).toEqual([expect.objectContaining({ persona: "company", status: "draft" })]);
   });
 });

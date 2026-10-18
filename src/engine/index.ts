@@ -4,3 +4,5 @@ export * from "./factors";
 export * from "./scoring";
 export * from "./threshold";
 export * from "./edd";
+export * from "./kyb-config";
+export * from "./company";

@@ -141,6 +141,33 @@ const DOCS = [
   ["por-address-mismatch", POR, letter({ address: ["27 Other Road", "54622 Thessaloniki, Central Macedonia", "Greece"] }), "por", ["ADDRESS_MISMATCH"], "Different address from the one declared."],
 ];
 
+
+// ---- KYB: company documents (spec 03 items 3-13) for "Sample Holdings B.V."
+function corporate(title, lines, o = {}) {
+  return (g, w, h) => {
+    g.rect(30, 30, w - 60, h - 60, { fill: "1 1 1", lw: 3 });
+    g.text(70, h - 100, o.issuer ?? "DEMO CHAMBER OF COMMERCE - COMPANY REGISTRY", { size: 20, font: "F2", color: "0.25 0.25 0.35" });
+    g.text(70, h - 150, title, { size: 30, font: "F2" });
+    lines.forEach((s, i) => g.text(70, h - 220 - i * 34, s, { size: 20, font: s.startsWith("  ") ? "F3" : "F1" }));
+    g.text(70, 120, o.footer ?? "Issued 12 September 2026 (2026-09-12). Registrar: Demo Registry Office.", { size: 16, color: "0.3 0.3 0.3" });
+    SAMPLE(g, w - 330, 160, 70);
+  };
+}
+const CO = { name: "Sample Holdings B.V.", reg: "SAMPLE-12345", addr: "10 Example Plaza, 1011 AB Amsterdam, Netherlands" };
+const head = (name = CO.name) => [`Company name: ${name}`, `Registration number: ${CO.reg}`, `Registered address: ${CO.addr}`, ""];
+const register = (rows) => corporate("REGISTER OF MEMBERS", [...head(), "Shareholder                 Shares     Percentage", ...rows.map(([n, sh, pc]) => `  ${n.padEnd(26)}${String(sh).padEnd(11)}${pc}%`)]);
+const KYB_DOCS = [
+  ["kyb-certificate-of-incorporation", corporate("CERTIFICATE OF INCORPORATION", [...head(), "This is to certify that the company named above was", "incorporated as a private limited company on 3 March 2019."]), "certificate_of_incorporation", [], "Clean certificate."],
+  ["kyb-articles-of-association", corporate("ARTICLES OF ASSOCIATION", [...head(), "Article 1. Name and seat", "Article 2. Objects: holding and financing activities", "Article 3. Share capital: EUR 100,000 in 100,000 shares"]), "articles_of_association", [], "Articles."],
+  ["kyb-register-of-members", register([["Ada Sample", 60000, 60], ["Bo Sample", 40000, 40]]), "register_of_members", [], "Shareholders match the declared 60/40."],
+  ["kyb-register-adds-to-90", register([["Ada Sample", 60000, 60], ["Bo Sample", 30000, 30]]), "register_of_members", ["KYB_SHAREHOLDING_NOT_100"], "Shareholdings total 90%."],
+  ["kyb-register-undeclared-holder", register([["Ada Sample", 50000, 50], ["Bo Sample", 30000, 30], ["Cy Hidden", 20000, 20]]), "register_of_members", ["KYB_PERSON_WITHOUT_KYC"], "A shareholder not on the KYC list (percentages also differ from those declared)."],
+  ["kyb-good-standing", corporate("CERTIFICATE OF GOOD STANDING", [...head(), "The company is in good standing and has filed all", "required annual returns as of the date below."]), "good_standing", [], "Good standing."],
+  ["kyb-directors-resolution", corporate("RESOLUTION OF THE BOARD OF DIRECTORS", [...head(), "Directors present: Ada Sample, Bo Sample.", "Resolved: to open an account with Demo Digital Assets Platform", "and to appoint Ada Sample as authorised representative."], { issuer: "SAMPLE HOLDINGS B.V." }), "directors_resolution", [], "Board resolution naming both directors."],
+  ["kyb-name-mismatch", corporate("CERTIFICATE OF INCORPORATION", [...head("Other Trading Ltd"), "This is to certify that the company named above was", "incorporated as a private limited company on 3 March 2019."]), "certificate_of_incorporation", ["NAME_MISMATCH"], "Different company name from the one declared."],
+  ["kyb-unrelated-receipt", corporate("RECEIPT", ["Cafe Example, Amsterdam", "2 x coffee        EUR 7.00", "1 x croissant     EUR 3.50", "Total             EUR 10.50"], { issuer: "CAFE EXAMPLE", footer: "Thank you for your visit." }), "unrecognised", [], "Not a company document."],
+];
+
 const labels = [];
 for (const [id, [w, h], draw, kind, expected, note] of DOCS) {
   const pdfPath = path.join(SCRATCH, `${id}.pdf`);
@@ -158,4 +185,27 @@ fs.writeFileSync(
   path.join(OUT, "labels.json"),
   JSON.stringify({ description: "Labelled synthetic documents. All fictional, all marked SAMPLE. expected_codes = reason codes the full pipeline (Claude reading + rule checks) must raise for this document, with a clean counterpart document and the context below.", context, documents: labels }, null, 2) + "\n",
 );
-console.log(`wrote ${labels.length} documents to ${OUT}`);
+const KYB_OUT = path.join(OUT, "kyb");
+fs.mkdirSync(KYB_OUT, { recursive: true });
+const kybLabels = [];
+for (const [id, draw, type, expected, note] of KYB_DOCS) {
+  const pdfPath = path.join(SCRATCH, `${id}.pdf`);
+  fs.writeFileSync(pdfPath, pdf(900, 1100, draw));
+  execFileSync("sips", ["-s", "format", "png", pdfPath, "--out", path.join(KYB_OUT, `${id}.png`)], { stdio: "ignore" });
+  kybLabels.push({ id, file: `${id}.png`, expected_type: type, expected_codes: expected, note });
+}
+fs.writeFileSync(
+  path.join(KYB_OUT, "labels.json"),
+  JSON.stringify({
+    description: "Labelled synthetic company documents. All fictional, all marked SAMPLE. expected_codes = codes the document-level KYB checks must raise against the declared context below (uploaded untagged).",
+    context: {
+      company: { legalName: CO.name, registrationNumber: CO.reg },
+      persons: [
+        { id: "ada", fullName: "Ada Sample", roles: ["representative", "ubo", "shareholder", "director"], sharePercent: 60 },
+        { id: "bo", fullName: "Bo Sample", roles: ["shareholder", "director"], sharePercent: 40 },
+      ],
+    },
+    documents: kybLabels,
+  }, null, 2) + "\n",
+);
+console.log(`wrote ${labels.length} documents and ${kybLabels.length} KYB documents to ${OUT}`);

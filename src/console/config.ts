@@ -12,7 +12,7 @@ export const consoleConfigSchema = z.object({
 export type ConsoleConfig = z.infer<typeof consoleConfigSchema>;
 
 let cached: ConsoleConfig | undefined;
-export function loadConsoleConfig(file = path.resolve(process.cwd(), "config/console.yaml")): ConsoleConfig {
+export function loadConsoleConfig(file = path.resolve(/* turbopackIgnore: true */ process.cwd(), "config/console.yaml")): ConsoleConfig {
   cached ??= consoleConfigSchema.parse(parse(fs.readFileSync(file, "utf8")));
   return cached;
 }
