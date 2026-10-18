@@ -67,7 +67,7 @@ export function identityFieldsSchema(portal: PortalConfig, today: string) {
 }
 
 export function residenceFieldsSchema(portal: PortalConfig) {
-  const noPoBox = (label: string, s: z.ZodType<string | undefined>) =>
+  const noPoBox = <S extends z.ZodType<string | undefined>>(label: string, s: S) =>
     s.refine((v) => !v || !PO_BOX.test(v), `${label}: we can't accept a P.O. box. Enter your residential address.`);
   return z
     .object({

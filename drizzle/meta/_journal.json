@@ -15,6 +15,13 @@
       "when": 1792334898301,
       "tag": "0001_messy_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792336169150,
+      "tag": "0002_clammy_betty_ross",
+      "breakpoints": true
     }
   ]
 }

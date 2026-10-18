@@ -1,0 +1,9 @@
+# Claude document reading (docs/spec/06). The model comes from env CLAUDE_MODEL.
+version: 1
+
+prompt_version: "doc-reader-v1"     # bump on any prompt or schema change; part of the replay-cache key
+effort: medium                      # output_config.effort
+max_tokens: 16000
+max_attempts: 2                     # spec 06: retry once on invalid output, then "extraction failed"
+confidence_threshold: 0.8           # spec 06: below this on a required field -> analyst review
+refusal_fallbacks: default          # server-side fallback on a safety decline; set "off" to disable

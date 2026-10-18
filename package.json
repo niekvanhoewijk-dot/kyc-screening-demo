@@ -13,7 +13,9 @@
     "verify:golden": ".venv/bin/python3 -I tools/verify_golden.py",
     "setup:py": "python3 -m venv .venv && .venv/bin/pip install -q -r requirements-dev.txt",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "docs:samples": "node tools/make_sample_documents.mjs",
+    "docs:record": "vitest run --config vitest.record.config.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",

@@ -21,18 +21,30 @@ export default function DevCasesPage() {
       <div className="banner info">Developer tool, replaced by the analyst console in Phase 4. Every decision is written to the audit log as analyst:dev-tool.</div>
       <table>
         <thead>
-          <tr><th>Applicant</th><th>Status</th><th>Engine</th><th>Decide</th></tr>
+          <tr><th>Applicant</th><th>Status</th><th>Engine</th><th>Claude pre-review</th><th>Decide</th></tr>
         </thead>
         <tbody>
           {rows.map(({ c, a }) => {
             const risk = c.riskResult as { total?: number; band?: string; decision?: string; reason?: string } | null;
             const thr = c.thresholdResult as { threshold?: number } | null;
+            const pre = c.preReview as { summary: { fail: number; flag: number; reasonCodes: string[] }; checks: { name: string; status: string; detail: string }[] } | null;
             return (
               <tr key={c.id}>
                 <td>{a.firstName} {a.lastName}<br /><small>{a.email}</small></td>
                 <td>{c.status}{c.decisionReason && <><br /><small>{c.decisionReason}</small></>}</td>
                 <td>
                   {risk ? <>{risk.band ?? "-"} {risk.total !== undefined && `(${risk.total})`}{risk.decision && <><br /><small>{risk.decision}: {risk.reason}</small></>}{thr?.threshold !== undefined && <><br /><small>threshold {thr.threshold}</small></>}</> : "-"}
+                </td>
+                <td>
+                  {pre ? (
+                    <details>
+                      <summary>{pre.summary.fail} fail, {pre.summary.flag} flag</summary>
+                      <small>{pre.summary.reasonCodes.join(", ") || "no reason codes"}</small>
+                      <ul style={{ paddingLeft: 16, margin: "4px 0" }}>
+                        {pre.checks.filter((x) => x.status !== "pass").map((x) => <li key={x.name}><small>{x.status}: {x.name}: {x.detail}</small></li>)}
+                      </ul>
+                    </details>
+                  ) : c.status === "draft" ? "-" : "not run"}
                 </td>
                 <td>
                   {["submitted", "in_review", "edd_submitted"].includes(c.status) ? (
@@ -51,7 +63,7 @@ export default function DevCasesPage() {
               </tr>
             );
           })}
-          {rows.length === 0 && <tr><td colSpan={4}>No cases yet.</td></tr>}
+          {rows.length === 0 && <tr><td colSpan={5}>No cases yet.</td></tr>}
         </tbody>
       </table>
     </div>

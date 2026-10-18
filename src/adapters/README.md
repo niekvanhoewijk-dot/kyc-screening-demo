@@ -10,4 +10,4 @@ Vendor-style interfaces with mock implementations (no real vendors integrated). 
 | `CountryRiskProvider` | `src/engine/country.ts` (`CountryRiskLookup`) | Config-backed resolver | Phase 1 |
 | `ScreeningProvider` | — | Seeded fictional watchlist | Phase 4 |
 | `IDVProvider` | — | — | later |
-| `DocumentReader` | — | Claude implementation | Phase 3 |
+| `DocumentReader` | `src/documents/reader.ts` | `ClaudeDocumentReader` (structured outputs, retry once, replay cache) | Phase 3 |

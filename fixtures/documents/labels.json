@@ -1,0 +1,162 @@
+{
+  "description": "Labelled synthetic documents. All fictional, all marked SAMPLE. expected_codes = reason codes the full pipeline (Claude reading + rule checks) must raise for this document, with a clean counterpart document and the context below.",
+  "context": {
+    "as_of": "2026-10-18",
+    "applicant": {
+      "firstName": "Ada",
+      "lastName": "Sample"
+    },
+    "declared": {
+      "dateOfBirth": "1990-05-01",
+      "address": {
+        "addressLine1": "1 Sample Street",
+        "city": "Athens",
+        "country": "GR",
+        "postcode": "10552"
+      },
+      "selfie": "passed"
+    }
+  },
+  "documents": [
+    {
+      "id": "poi-valid-passport",
+      "file": "poi-valid-passport.png",
+      "kind": "poi",
+      "expected_codes": [],
+      "note": "Clean, valid passport."
+    },
+    {
+      "id": "poi-expired",
+      "file": "poi-expired.png",
+      "kind": "poi",
+      "expected_codes": [
+        "POI_EXPIRED"
+      ],
+      "note": "Expired in January 2024."
+    },
+    {
+      "id": "poi-corners-cut",
+      "file": "poi-corners-cut.png",
+      "kind": "poi",
+      "expected_codes": [
+        "POI_CORNERS_NOT_VISIBLE"
+      ],
+      "note": "Card shifted so two corners are outside the image."
+    },
+    {
+      "id": "poi-watermark-copy",
+      "file": "poi-watermark-copy.png",
+      "kind": "poi",
+      "expected_codes": [
+        "POI_WATERMARK"
+      ],
+      "note": "'COPY' stamped across the page."
+    },
+    {
+      "id": "poi-edited-dob",
+      "file": "poi-edited-dob.png",
+      "kind": "poi",
+      "expected_codes": [
+        "POI_EDITING_SUSPECTED",
+        "DOB_MISMATCH"
+      ],
+      "note": "DOB pasted in a different font over a white patch; also differs from the questionnaire."
+    },
+    {
+      "id": "poi-name-mismatch",
+      "file": "poi-name-mismatch.png",
+      "kind": "poi",
+      "expected_codes": [
+        "NAME_MISMATCH"
+      ],
+      "note": "Name differs from the account (Ada Sample)."
+    },
+    {
+      "id": "poi-dob-mismatch",
+      "file": "poi-dob-mismatch.png",
+      "kind": "poi",
+      "expected_codes": [
+        "DOB_MISMATCH"
+      ],
+      "note": "DOB differs from the questionnaire (1990-05-01)."
+    },
+    {
+      "id": "poi-prompt-injection",
+      "file": "poi-prompt-injection.png",
+      "kind": "poi",
+      "expected_codes": [
+        "PROMPT_INJECTION_SUSPECTED"
+      ],
+      "note": "Instruction addressed to an AI printed on the page."
+    },
+    {
+      "id": "por-valid-utility",
+      "file": "por-valid-utility.png",
+      "kind": "por",
+      "expected_codes": [],
+      "note": "Electricity bill, 4 weeks old."
+    },
+    {
+      "id": "por-valid-bank",
+      "file": "por-valid-bank.png",
+      "kind": "por",
+      "expected_codes": [],
+      "note": "Bank statement with transactions covered."
+    },
+    {
+      "id": "por-older-than-3-months",
+      "file": "por-older-than-3-months.png",
+      "kind": "por",
+      "expected_codes": [
+        "POR_OLDER_THAN_3_MONTHS"
+      ],
+      "note": "Issued May 2026, more than 3 months before 2026-10-18."
+    },
+    {
+      "id": "por-po-box",
+      "file": "por-po-box.png",
+      "kind": "por",
+      "expected_codes": [
+        "POR_PO_BOX",
+        "ADDRESS_MISMATCH"
+      ],
+      "note": "Addressed to a P.O. box."
+    },
+    {
+      "id": "por-mobile-bill",
+      "file": "por-mobile-bill.png",
+      "kind": "por",
+      "expected_codes": [
+        "POR_MOBILE_BILL"
+      ],
+      "note": "Mobile phone bill (not accepted)."
+    },
+    {
+      "id": "por-envelope",
+      "file": "por-envelope.png",
+      "kind": "por",
+      "expected_codes": [
+        "POR_ENVELOPE_OR_PARCEL"
+      ],
+      "note": "Photo of an envelope."
+    },
+    {
+      "id": "por-joint-account",
+      "file": "por-joint-account.png",
+      "kind": "por",
+      "expected_codes": [
+        "POR_JOINT_ACCOUNT_OTHER_PERSON_NEEDS_KYC"
+      ],
+      "note": "Joint holders Ada Sample and Bo Sample."
+    },
+    {
+      "id": "por-address-mismatch",
+      "file": "por-address-mismatch.png",
+      "kind": "por",
+      "expected_codes": [
+        "ADDRESS_MISMATCH"
+      ],
+      "note": "Different address from the one declared."
+    }
+  ]
+}

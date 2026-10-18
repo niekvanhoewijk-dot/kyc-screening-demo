@@ -4,6 +4,8 @@ import { MockFaceMatchProvider, type FaceMatchProvider } from "@/adapters/face-m
 import { LocalFileStore, type FileStore } from "@/adapters/file-store";
 import { loadEngineConfig, type EngineConfig } from "@/engine";
 import { loadPortalConfig, type PortalConfig } from "./config";
+import { checkRulesFromConfig, documentReaderFromEnv } from "@/documents/factory";
+import type { PreReviewDeps } from "@/documents/pre-review";
 
 export type PortalDeps = {
   db: Db;
@@ -15,9 +17,9 @@ export type PortalDeps = {
   now: () => Date;
 };
 
-let deps: PortalDeps | undefined;
+let deps: PreReviewDeps | undefined;
 
-export function portalDeps(): PortalDeps {
+export function portalDeps(): PreReviewDeps {
   deps ??= {
     db: getDb(),
     mailer: new ConsoleMailer(),
@@ -26,6 +28,8 @@ export function portalDeps(): PortalDeps {
     engine: loadEngineConfig(),
     portal: loadPortalConfig(),
     now: () => new Date(),
+    documentReader: (log) => documentReaderFromEnv(log),
+    checkRules: checkRulesFromConfig(),
   };
   return deps;
 }

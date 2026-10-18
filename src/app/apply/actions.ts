@@ -2,6 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { after } from "next/server";
+import { runPreReview } from "@/documents/pre-review";
+import { audit } from "@/lib/audit";
 import { redirect } from "next/navigation";
 import { createAccount, endSession, resendOtp, startSignIn, verifyOtp } from "@/portal/accounts";
 import {
@@ -154,6 +157,14 @@ export async function submitAction(_: FormState, fd: FormData): Promise<FormStat
   } catch (e) {
     return failed(e, fd);
   }
+  // MVP 2 pre-review runs after the response; the applicant never waits for or sees it.
+  after(async () => {
+    try {
+      await runPreReview(deps, c.id);
+    } catch (e) {
+      audit(deps.db, deps.now(), "system", "prereview.failed", `case:${c.id}`, { error: e instanceof Error ? e.message : String(e) });
+    }
+  });
   redirect("/apply/status");
 }
 

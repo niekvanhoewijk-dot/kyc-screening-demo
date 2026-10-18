@@ -61,6 +61,8 @@ export const cases = sqliteTable("cases", {
   // Engine output, never shown to the applicant.
   riskResult: text("risk_result", { mode: "json" }),
   thresholdResult: text("threshold_result", { mode: "json" }),
+  // Claude pre-review (MVP 2): rule checks over document extractions. Advisory, analyst-facing only.
+  preReview: text("pre_review", { mode: "json" }),
   engineVersions: text("engine_versions", { mode: "json" }),
   decision: text("decision", { enum: ["approve", "reject", "edd"] }),
   decisionReason: text("decision_reason"),
@@ -93,5 +95,21 @@ export const faceMatches = sqliteTable("face_matches", {
   liveness: text("liveness", { enum: ["pass", "fail"] }).notNull(),
   match: text("match", { enum: ["pass", "fail"] }).notNull(),
   score: text("score"), // provider-reported similarity, stored as given
+  createdAt: text("created_at").notNull(),
+});
+
+export const documentReadings = sqliteTable("document_readings", {
+  id: text("id").primaryKey(),
+  caseId: text("case_id").notNull().references(() => cases.id),
+  documentId: text("document_id").notNull().references(() => documents.id),
+  kind: text("kind", { enum: ["poi", "por"] }).notNull(),
+  status: text("status", { enum: ["ok", "failed"] }).notNull(),
+  extraction: text("extraction", { mode: "json" }),
+  error: text("error"),
+  reader: text("reader").notNull(),
+  model: text("model"),
+  promptVersion: text("prompt_version").notNull(),
+  inputHash: text("input_hash").notNull(),
+  source: text("source", { enum: ["live", "replay"] }).notNull(),
   createdAt: text("created_at").notNull(),
 });
