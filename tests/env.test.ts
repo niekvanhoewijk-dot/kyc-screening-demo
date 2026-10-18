@@ -5,7 +5,7 @@ describe("env", () => {
   it("applies defaults", () => {
     const env = parseEnv({});
     expect(env.CLAUDE_MODEL).toBe("claude-sonnet-5-5");
-    expect(env.DEMO_MODE).toBe("live");
+    expect(env.DEMO_MODE).toBe("replay"); // offline by default (Phase 6)
   });
 
   it("treats empty strings as unset", () => {

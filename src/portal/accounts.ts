@@ -81,7 +81,7 @@ async function issueOtp(
   audit(db, now, "system", "otp.issued", `applicant:${applicantId}`); // never log the code
   await deps.mailer.send({
     to: email,
-    subject: "Your verification code",
+    subject: "[Demo] Your verification code",
     text: `Your code is ${code}. It expires in ${portal.otp.ttl_minutes} minutes.\nIf you did not request this, ignore this email.`,
   });
 }

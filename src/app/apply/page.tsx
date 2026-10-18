@@ -14,6 +14,7 @@ export default async function ApplyPage() {
     <div className="card">
       <h1>Create your account</h1>
       <p className="lede">Step 1 of 2. You can stop at any time and continue later.</p>
+      <div className="banner info">Illustrative demo. Use made-up details and the SAMPLE documents only; never real personal data.</div>
       <CreateAccountForm />
       <p style={{ marginTop: 24 }}>
         Already started? <Link href="/apply/continue">Continue your application</Link>

@@ -40,7 +40,15 @@ export function restateScore(persona: string, risk: unknown): string[] {
   ];
 }
 
-/** Facts for the memo: engine output, screening, checks and gaps. No contact details are sent. */
+/** Drops internal ids: they mean nothing to the model and would make replay keys differ per reset. */
+function withoutIds(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(withoutIds);
+  if (value && typeof value === "object")
+    return Object.fromEntries(Object.entries(value).filter(([k]) => k !== "id").map(([k, v]) => [k, withoutIds(v)]));
+  return value;
+}
+
+/** Facts for the memo: engine output, screening, checks and gaps. No contact details or internal ids are sent. */
 export function memoFacts(deps: PreReviewDeps, caseId: string) {
   const c = deps.db.select().from(cases).where(eq(cases.id, caseId)).get()!;
   const persons = deps.db.select().from(casePersons).where(eq(casePersons.caseId, caseId)).all();
@@ -50,7 +58,7 @@ export function memoFacts(deps: PreReviewDeps, caseId: string) {
   return {
     persona: c.persona,
     status: c.status,
-    engine: c.riskResult,
+    engine: withoutIds(c.riskResult),
     threshold: (c.thresholdResult as { threshold?: number } | null)?.threshold ?? null,
     screening: hits.map((h) => ({ subject: subject(h.subject), list_entry: h.entryName, category: h.category, strength: h.strength, match: h.match, triage: h.status })),
     document_checks: pre?.checks.filter((x) => x.status !== "pass").map((x) => ({ name: x.name, status: x.status, reason_codes: x.reason_codes, detail: x.detail })) ?? "pre-review not run",

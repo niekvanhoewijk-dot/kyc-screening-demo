@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { getMode, MODE_LABEL, type Mode } from "@/console/mode";
+import { env } from "@/lib/env";
 import { portalDeps } from "@/portal/deps";
 import { chooseAnalystAction, setModeAction } from "./actions";
 import { currentAnalyst } from "./analyst-session";
@@ -16,7 +17,9 @@ export default async function AnalystLayout({ children }: { children: ReactNode 
       <div className="console-bar">
         <div>
           <Link href="/analyst" style={{ fontWeight: 700, textDecoration: "none", color: "inherit" }}>Analyst console</Link>{" "}
-          <span className="pill" title="Operating mode">{MODE_LABEL[mode]}</span>
+          <span className="pill" title="Operating mode">{MODE_LABEL[mode]}</span>{" "}
+          <span className="pill" title="Where Claude's answers come from">Claude: {env.DEMO_MODE === "replay" ? "replay" : "live API"}</span>{" "}
+          <Link href="/analyst/demo" className="muted">Demo controls</Link>
         </div>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <form action={chooseAnalystAction}>

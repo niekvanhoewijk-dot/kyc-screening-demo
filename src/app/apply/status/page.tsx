@@ -41,6 +41,7 @@ export default async function StatusPage() {
           <>
             <h1>Your account is approved</h1>
             <div className="banner ok" role="status">Welcome aboard. You can now make deposits.</div>
+            <p className="muted">Illustrative demo: no real account is opened and no money moves.</p>
             {view.threshold !== null && (
               <>
                 <p style={{ marginBottom: 4 }}>Your deposit limit</p>

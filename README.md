@@ -2,9 +2,17 @@
 
 An illustrative onboarding and compliance-screening demo built from the Ateaya KYC-KYB-AML requirements (Full v3) and the DVAULT onboarding flow, using Claude for document reading and case preparation and a deterministic rules engine for every decision number.
 
-**Status:** Phases 0-5 done: scaffold, rules engine (`src/engine`), applicant portal for individuals and companies (`/apply`, steps 2.1.1-2.1.8 plus EDD and KYB), Claude document reading, KYB classification and case memo (`src/documents`), KYB gap list (`src/kyb`), analyst console (`/analyst`), eval report (`npm run eval`). OTP codes print in the `npm run dev` console.
+**Status:** Phases 0-6 done (demo-ready): scaffold, rules engine (`src/engine`), applicant portal for individuals and companies (`/apply`, steps 2.1.1-2.1.8 plus EDD and KYB), Claude document reading, KYB classification and case memo (`src/documents`), KYB gap list (`src/kyb`), analyst console (`/analyst`), eval report (`npm run eval`). OTP codes print in the `npm run dev` console.
 
 **Claude document reading:** put `ANTHROPIC_API_KEY=...` in `.env.local`, then `npm run docs:record` reads the labelled SAMPLE set in `fixtures/documents/` live and records the responses in `fixtures/claude-cache/`. After that, `npm run test` replays them offline and asserts the expected reason codes, `npm run eval` writes `reports/eval-<date>.md` (precision/recall per reason code, KYB classification accuracy, cost per case), and `DEMO_MODE=replay` runs the app without a key. `npm run docs:samples` regenerates the documents (macOS, uses `sips`).
+
+## Run the demo (offline)
+1. `npm install && cp .env.example .env.local` (`DEMO_MODE=replay`: no API key, no network calls)
+2. `npm run demo:reset` seeds 6 synthetic personas (Low, Medium, High, Auto-High, Prohibited, a company)
+3. `npm run dev`, open http://localhost:3000/analyst, choose an analyst
+4. Follow `docs/DEMO-SCRIPT.md` (5 minutes). Reset any time at `/analyst/demo`.
+
+Claude's pre-review and memos replay recorded responses. Record them once with an API key in `.env.local`: `npm run demo:record` (persona cases) and `npm run docs:record` (labelled eval sets). Without recordings, MVP 1 runs fully and MVP 2 shows "not recorded".
 
 ## Start building
 1. Open a terminal in this folder: `cd ~/Documents/Ateaya/KYC/claude-code`

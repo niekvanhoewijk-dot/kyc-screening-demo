@@ -40,3 +40,5 @@ Add new ones here instead of guessing. Format: ID, question, current default, st
 | O-34 | Applicant-tagged document vs Claude classification disagree | The tag still counts for coverage; the disagreement is listed as an inconsistency for the analyst (Claude only flags) | Default |
 | O-35 | Persons' own POI/POR in company cases are not read by Claude in the pre-review | Only the representative's POI/POR and the company documents are read; persons' documents are checked for presence | Demo scope |
 | O-36 | Company entity screening | The company name is screened against the (person-only) demo watchlist; no entity list is seeded | Demo limitation |
+| O-37 | Persona and labelled documents carry fixed dates (POR issued Sep 2026); the rules use today's date | Demo valid until about 2026-12-20 (Low persona POR turns older than 3 months). Regenerate documents and re-record after that | Demo maintenance |
+| O-38 | Default DEMO_MODE | `replay` (offline, recorded responses only). Record scripts always call the API live | Default |

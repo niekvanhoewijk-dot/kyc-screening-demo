@@ -3,7 +3,8 @@ import { z } from "zod";
 export const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().optional(),
   CLAUDE_MODEL: z.string().min(1).default("claude-sonnet-5-5"),
-  DEMO_MODE: z.enum(["live", "replay"]).default("live"),
+  // replay (default) serves recorded Claude responses: the demo runs offline. live calls the API.
+  DEMO_MODE: z.enum(["live", "replay"]).default("replay"),
   DATABASE_PATH: z.string().min(1).default("./data/demo.sqlite"),
 });
 

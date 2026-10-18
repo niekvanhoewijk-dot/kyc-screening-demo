@@ -208,4 +208,32 @@ fs.writeFileSync(
     documents: kybLabels,
   }, null, 2) + "\n",
 );
-console.log(`wrote ${labels.length} documents and ${kybLabels.length} KYB documents to ${OUT}`);
+// ---- Personas (Phase 6): passport, proof of residence and selfie per persona, plus company persons.
+const PERSONA_DIR = path.resolve("fixtures/personas");
+const personas = JSON.parse(fs.readFileSync(path.join(PERSONA_DIR, "personas.json"), "utf8"));
+const human = (iso) => { const [y, m, d] = iso.split("-"); return `${Number(d)} ${["January","February","March","April","May","June","July","August","September","October","November","December"][Number(m) - 1]} ${y} (${iso})`; };
+const personDocs = (id, p) => {
+  const [first, ...rest] = p.fullName.split(" ");
+  const write = (name, [w, h], draw) => {
+    const pdfPath = path.join(SCRATCH, `persona-${name}.pdf`);
+    fs.writeFileSync(pdfPath, pdf(w, h, draw));
+    execFileSync("sips", ["-s", "format", "png", pdfPath, "--out", path.join(PERSONA_DIR, `${name}.png`)], { stdio: "ignore" });
+  };
+  write(`${id}-poi`, POI, passport({ surname: rest.join(" ").toUpperCase(), given: first.toUpperCase(), nationality: p.passportNationality, dob: p.dob, sex: p.sex, number: `SX${String(1000000 + id.length * 7919 + p.dob.replaceAll("-", "") % 100000).slice(0, 7)}` }));
+  write(`${id}-por`, POR, letter({ holder: p.fullName, address: [p.address.addressLine1, `${p.address.postcode} ${p.address.city}, ${p.address.region}`, p.address.countryName], issued: human(p.porIssued), lines: ["Account number: 0042-7781-SAMPLE", "Amount due: EUR 64.20", "Payment due within 30 days of the issue date."] }));
+};
+for (const p of personas.individuals) personDocs(p.id, { ...p, fullName: `${p.first} ${p.last}` });
+for (const o of personas.company.others) personDocs(o.id, o);
+const selfie = (g, w, h) => {
+  g.rect(0, 0, w, h, { fill: "0.88 0.9 0.94", stroke: "0.88 0.9 0.94" });
+  g.rect(w / 2 - 110, h / 2 - 40, 220, 260, { fill: "0.75 0.78 0.84" });
+  g.rect(w / 2 - 190, 40, 380, 220, { fill: "0.65 0.7 0.78" });
+  g.text(w / 2 - 95, h / 2 + 80, "SELFIE", { size: 40, font: "F2", color: "0.3 0.3 0.4" });
+  SAMPLE(g, 40, h - 80, 50);
+};
+{
+  const pdfPath = path.join(SCRATCH, "persona-selfie.pdf");
+  fs.writeFileSync(pdfPath, pdf(600, 800, selfie));
+  execFileSync("sips", ["-s", "format", "png", pdfPath, "--out", path.join(PERSONA_DIR, "selfie.png")], { stdio: "ignore" });
+}
+console.log(`wrote ${labels.length} documents, ${kybLabels.length} KYB documents and persona documents`);

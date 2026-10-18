@@ -16,7 +16,9 @@
     "db:migrate": "drizzle-kit migrate",
     "docs:samples": "node tools/make_sample_documents.mjs",
     "docs:record": "vitest run --config vitest.record.config.ts",
-    "eval": "VITEST_INCLUDE='tools/eval/**/*.eval.ts' vitest run --config vitest.record.config.ts"
+    "eval": "VITEST_INCLUDE='tools/eval/**/*.eval.ts' vitest run --config vitest.record.config.ts",
+    "demo:reset": "VITEST_INCLUDE='tools/demo/reset.demo.ts' vitest run --config vitest.record.config.ts",
+    "demo:record": "VITEST_INCLUDE='tools/demo/record.demo.ts' vitest run --config vitest.record.config.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",
