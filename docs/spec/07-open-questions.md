@@ -15,6 +15,7 @@ Add new ones here instead of guessing. Format: ID, question, current default, st
 | O-9 | Employment "Other"/"Unemployed" with a deposit: doc gives a $10k threshold; confirm intent for unemployed High-Risk clients | min of caps | Open |
 | O-10 | Post-rejection process ("to be formulated" in the flow) | Message only + analyst note | Open |
 | O-11 | Selfie and POI: separate steps or one capture? Supplier is external, not integrated | Selfie inside 2.1.4 via mock | Open |
-| O-12 | Equality case in EDD (`covered == deposited`) | headroom 0 | Open |
+| O-12 | Equality case in EDD (`covered == deposited`) | headroom 0 (`new_threshold` = deposited), as in spec 05; implemented in `src/engine/edd.ts`. **Note:** `tools/verify_golden.py` returns `return_excess_and_block` with excess 0 for this input. No golden case covers it, so both pass today | Open: confirm, then align the oracle and add a golden case |
 | O-13 | Source docs are confidential (Ateaya / Omikron Financial Holdings Europe LTD, vendor pricing, Polis-X branding): what may be reused publicly? | Private, generic branding, synthetic data | Needs clearance before any sharing |
 | O-14 | Thresholds and amounts are in USD in the doc; the Dutch/EU audience may expect EUR | USD as in the doc, currency in config | Open |
+| O-15 | EDD recalculation: does the "only source of wealth" 80% rule apply to investment/inheritance SoF documents, as it does for the initial threshold? Spec 05 is silent; the oracle always uses the "not only wealth" rate | Engine accepts `only_source_of_wealth` (default false = oracle behaviour) | Open |
