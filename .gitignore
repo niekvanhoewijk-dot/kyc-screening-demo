@@ -1,0 +1,19 @@
+node_modules/
+.next/
+.env
+.env.local
+*.sqlite
+*.db
+# confidential source documents must never enter the repo
+docs/source/
+*.pdf
+*.pptx
+# real documents must never enter the repo; only fixtures marked SAMPLE
+fixtures/real/
+.DS_Store
+# local tooling
+.venv/
+data/*.sqlite*
+next-env.d.ts
+*.tsbuildinfo
+coverage/

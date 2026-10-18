@@ -1,0 +1,23 @@
+{
+  "description": "Enhanced Due Diligence recalculation (Full v3 section 6). EDD-1 is the doc example. Others exercise the two failure branches the doc describes. The $100k initial ceiling does NOT apply after EDD (the doc example reaches $160k).",
+  "cases": [
+    {
+      "id": "EDD-1-doc",
+      "source": "doc section 6 example",
+      "input": {"source_of_funds": "salary", "documented_annual_amount": 200000, "deposited_to_date": 100000},
+      "expect": {"outcome": "new_threshold", "new_threshold": 160000, "headroom": 60000}
+    },
+    {
+      "id": "EDD-2-sof-does-not-cover",
+      "source": "derived from doc: SoF does not cover the deposited amount",
+      "input": {"source_of_funds": "salary", "documented_annual_amount": 50000, "deposited_to_date": 100000},
+      "expect": {"outcome": "return_excess_and_block", "excess_to_return": 60000, "report_to": ["aml", "compliance"]}
+    },
+    {
+      "id": "EDD-3-no-sof-provided",
+      "source": "derived from doc: client unable/unwilling to provide SoF",
+      "input": {"source_of_funds": "salary", "documented_annual_amount": null, "deposited_to_date": 100000},
+      "expect": {"outcome": "return_all_and_terminate", "amount_to_return": 100000, "report_to": ["aml", "compliance"]}
+    }
+  ]
+}

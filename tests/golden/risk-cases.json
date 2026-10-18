@@ -1,0 +1,53 @@
+{
+  "description": "Client risk scoring. Cases 1-4 are the worked examples in Full v3 section 5. 'country_tier_override' replaces the country lookup so the doc's historic Albania example still works as a fixture (Albania is no longer on the FATF grey list).",
+  "cases": [
+    {
+      "id": "RISK-1-uk-medium",
+      "source": "doc example 1",
+      "input": {"country": "GB", "deposit_12m": "20k_50k", "source_of_funds": "savings", "employment_status": "self_employed", "occupation_industry": "financial_services", "annual_income": "500k_1m", "net_worth": "500k_1m"},
+      "expect": {"total": 15, "band": "medium"}
+    },
+    {
+      "id": "RISK-2-albania-fixture-auto-high",
+      "source": "doc example 2 (country tier is a fixture, not current FATF status)",
+      "input": {"country_tier_override": "auto_high", "deposit_12m": "lt_20k", "source_of_funds": "salary", "employment_status": "employed", "occupation_industry": "education", "annual_income": "lt_50k", "net_worth": "lt_50k"},
+      "expect": {"total": 36, "band": "auto_high"}
+    },
+    {
+      "id": "RISK-3-greece-low",
+      "source": "doc example 3",
+      "input": {"country": "GR", "deposit_12m": "lt_20k", "source_of_funds": "salary", "employment_status": "employed", "occupation_industry": "it", "annual_income": "lt_50k", "net_worth": "lt_50k"},
+      "expect": {"total": 8, "band": "low"}
+    },
+    {
+      "id": "RISK-4-iran-prohibited",
+      "source": "doc example 4",
+      "input": {"country": "IR", "deposit_12m": "20k_50k", "source_of_funds": "salary", "employment_status": "employed", "occupation_industry": "it", "annual_income": "lt_50k", "net_worth": "lt_50k"},
+      "expect": {"total": 107, "band": "prohibited"}
+    },
+    {
+      "id": "RISK-5-band-gap-16",
+      "source": "derived: D1 closes the 16 gap (High)",
+      "input": {"country": "GB", "deposit_12m": "250k_500k", "source_of_funds": "savings", "employment_status": "self_employed", "occupation_industry": "financial_services", "annual_income": "500k_1m", "net_worth": "500k_1m"},
+      "expect": {"total": 16, "band": "high"}
+    },
+    {
+      "id": "RISK-6-grey-list-country",
+      "source": "derived: FATF grey list (Kenya) -> auto_high",
+      "input": {"country": "KE", "deposit_12m": "lt_20k", "source_of_funds": "salary", "employment_status": "employed", "occupation_industry": "education", "annual_income": "lt_50k", "net_worth": "lt_50k"},
+      "expect": {"total": 36, "band": "auto_high"}
+    },
+    {
+      "id": "RISK-7-pep-forces-high",
+      "source": "derived: D9 PEP forces band high",
+      "input": {"country": "GR", "pep": true, "deposit_12m": "lt_20k", "source_of_funds": "salary", "employment_status": "employed", "occupation_industry": "education", "annual_income": "lt_50k", "net_worth": "lt_50k"},
+      "expect": {"total": 7, "band": "high", "forced_by": "pep"}
+    },
+    {
+      "id": "RISK-8-us-tax-resident-rejected",
+      "source": "derived: doc section 3 g",
+      "input": {"country": "GB", "us_tax_resident": true, "deposit_12m": "lt_20k", "source_of_funds": "salary", "employment_status": "employed", "occupation_industry": "education", "annual_income": "lt_50k", "net_worth": "lt_50k"},
+      "expect": {"decision": "reject", "reason": "us_tax_resident"}
+    }
+  ]
+}

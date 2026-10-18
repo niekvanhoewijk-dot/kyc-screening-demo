@@ -1,0 +1,106 @@
+# Risk matrix: INDIVIDUAL questionnaire scoring + threshold rules
+# Source: Ateaya KYC-KYB-AML Requirements Full v3 (13 Jun 2024), sections 3, 5, 6
+# Decisions: see docs/spec/00-scope-and-decisions.md (D1, D2, D9)
+# The rules engine reads ONLY this file for numbers. Never hard-code them in application code.
+
+version: 1
+
+points:            # score per factor answer
+  low: 1
+  medium: 2
+  high: 3
+  auto_high: 30    # country on FATF increased monitoring / EU sanctions (doc section 5)
+  prohibited: 100  # country on FATF call-for-action list
+
+bands:             # overall client risk from total score (D1: gaps in the doc closed, 16-29 = high)
+  - {id: low,        min: 1,   max: 9}
+  - {id: medium,     min: 10,  max: 15}
+  - {id: high,       min: 16,  max: 29}
+  - {id: auto_high,  min: 30,  max: 99}
+  - {id: prohibited, min: 100, max: null}
+
+# Factors scored. "country" is resolved via config/country-risk.yaml.
+# Amount bands are whole dollars; max=null means open ended.
+factors:
+  deposit_12m:
+    - {id: lt_20k,   label: "Less than $20,000",        min: 0,       max: 19999,   tier: low}
+    - {id: 20k_50k,  label: "$20,001 to $50,000",       min: 20001,   max: 50000,   tier: low}
+    - {id: 50k_250k, label: "$50,001 to $250,000",      min: 50001,   max: 250000,  tier: medium}
+    - {id: 250k_500k,label: "$250,001 to $500,000",     min: 250001,  max: 500000,  tier: medium}
+    - {id: 500k_1m,  label: "$500,001 to $1,000,000",   min: 500001,  max: 1000000, tier: high}
+    - {id: gt_1m,    label: "More than $1,000,000",     min: 1000001, max: null,    tier: high}
+
+  source_of_funds:
+    - {id: salary,      label: "Salary",      tier: low}
+    - {id: savings,     label: "Savings",     tier: medium}
+    - {id: investment,  label: "Investment",  tier: medium}
+    - {id: inheritance, label: "Inheritance", tier: high}
+    - {id: pension,     label: "Pension",     tier: medium}
+    - {id: other,       label: "Other",       tier: high}
+
+  employment_status:
+    - {id: employed,      label: "Employed",      tier: low}
+    - {id: self_employed, label: "Self-Employed", tier: medium}
+    - {id: unemployed,    label: "Unemployed",    tier: high}
+    - {id: retired,       label: "Retired",       tier: medium}
+    - {id: student,       label: "Student",       tier: high}
+    - {id: other,         label: "Other",         tier: high}
+
+  # Doc: "The list is huge, and the risk is determined by the regulator" -> only the three
+  # doc examples are defined. Everything else = default_tier until Compliance supplies the list.
+  occupation_industry:
+    default_tier: medium
+    values:
+      - {id: financial_services, label: "Financial Services", tier: high}
+      - {id: it,                 label: "IT",                 tier: medium}
+      - {id: education,          label: "Education",          tier: low}
+
+  annual_income:
+    - {id: lt_50k,   label: "Less than $50,000",      min: 0,       max: 49999,   tier: low}
+    - {id: 50k_100k, label: "$50,001 to $100,000",    min: 50001,   max: 100000,  tier: low}
+    - {id: 100k_500k,label: "$100,001 to $500,000",   min: 100001,  max: 500000,  tier: medium}
+    - {id: 500k_1m,  label: "$500,001 to $1,000,000", min: 500001,  max: 1000000, tier: high}
+    - {id: gt_1m,    label: "More than $1,000,000",   min: 1000001, max: null,    tier: high}
+
+  net_worth:
+    - {id: lt_50k,   label: "Less than $50,000",      min: 0,       max: 49999,   tier: low}
+    - {id: 50k_100k, label: "$50,001 to $100,000",    min: 50001,   max: 100000,  tier: low}
+    - {id: 100k_500k,label: "$100,001 to $500,000",   min: 100001,  max: 500000,  tier: medium}
+    - {id: 500k_1m,  label: "$500,001 to $1,000,000", min: 500001,  max: 1000000, tier: high}
+    - {id: gt_1m,    label: "More than $1,000,000",   min: 1000001, max: null,    tier: high}
+
+# Hard rules outside the points system (doc section 3 g, h; D9)
+hard_rules:
+  us_tax_resident: reject          # "if yes, the client cannot be accepted"
+  pep: force_band_high             # D9: PEP = at least band "high" (doc: "PEPs are High-Risk"); analyst decides acceptance
+  prohibited_band: reject
+  high_or_auto_high_band: require_edd   # doc section 5: High-Risk clients go through EDD
+
+# Deposit threshold (doc section 5 "Threshold", section 6)
+threshold:
+  # Category cap = MIN of every cap that applies
+  restricted_employment: [student, unemployed, other]
+  caps:
+    restricted_employment: 10000
+    high_or_auto_high_band: 40000
+    standard: 100000                # low/medium band AND employed / self_employed / retired
+  hard_ceiling_initial: 100000      # D2 (Niek): ceiling on the INITIAL threshold only. EDD may raise it (doc example reaches $160k)
+  # Share of the documented amount that may be deposited, by source of funds
+  sof_percent:
+    salary: 0.80
+    savings: 0.80
+    investment_not_only_wealth: 1.00
+    investment_only_wealth: 0.80
+    inheritance_not_only_wealth: 1.00
+    inheritance_only_wealth: 0.80
+    pension: 0.80                   # ASSUMPTION: not in doc table, defaulted to 80%. Confirm.
+    other: 0.80                     # ASSUMPTION: not in doc table, defaulted to 80%. Confirm.
+  # Doc table also lists "any kind of income (e.g. rent)" 80% and "sold property" 100%;
+  # not questionnaire options in the doc. Kept here for a later questionnaire revision.
+  future_sof_percent: {rental_income: 0.80, sold_property: 1.00}
+  # Formula (INFERRED from the 3 doc examples, only the ceiling is confirmed):
+  #   initial_threshold = floor(min(
+  #       deposit_band.max            (null = no limit),
+  #       sof_percent * income_band.max   (null = no limit),
+  #       applicable category cap,
+  #       hard_ceiling_initial ))

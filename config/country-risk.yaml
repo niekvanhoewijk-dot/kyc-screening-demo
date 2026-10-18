@@ -1,0 +1,65 @@
+# Country risk seed for the DEMO. Replace/extend via the CountryRiskProvider adapter.
+# LSEG does not publish a per-country list (Country Risk Ranking is a subscription product,
+# 240+ jurisdictions, bands very high..very low). This seed uses the public primary
+# sources LSEG names (FATF first). It is NOT an LSEG rating and must not be presented as one.
+
+meta:
+  list_version: "FATF-2026-06"
+  as_of: "2026-06-19"              # date of the FATF lists below
+  verified_on: "2026-10-18"
+  refresh_due: "after the FATF October 2026 plenary"
+  sources:
+    - https://www.fatf-gafi.org/en/countries/black-and-grey-lists.html
+    - https://www.fatf-gafi.org/en/publications/High-risk-and-other-monitored-jurisdictions/increased-monitoring-june-2026.html
+    - https://www.fatf-gafi.org/en/publications/Fatfgeneral/outcomes-fatf-plenary-june-2026.html
+
+# Resolution order (first match wins). See docs/spec/04-risk-scoring-and-thresholds.md
+#  1 fatf_call_for_action     -> prohibited (100)   doc: "cannot accept any clients"
+#  2 fatf_increased_monitoring-> auto_high (30)     doc: "accepted but automatically High-Risk"
+#  3 eu_sanctions_map         -> auto_high (30)     TODO: load from https://www.sanctionsmap.eu
+#  4 demo_seed_low            -> low (1)
+#  5 default_tier             -> medium (2), flagged "unassessed" in the analyst view
+
+fatf_call_for_action:            # 3
+  - {code: KP, name: "Democratic People's Republic of Korea"}
+  - {code: IR, name: "Iran"}
+  - {code: MM, name: "Myanmar"}
+
+fatf_increased_monitoring:       # 22
+  - {code: AO, name: "Angola"}
+  - {code: BO, name: "Bolivia"}
+  - {code: BA, name: "Bosnia and Herzegovina", added: "2026-06"}
+  - {code: BG, name: "Bulgaria"}
+  - {code: CM, name: "Cameroon"}
+  - {code: CI, name: "Côte d'Ivoire"}
+  - {code: CD, name: "Democratic Republic of the Congo"}
+  - {code: HT, name: "Haiti"}
+  - {code: IQ, name: "Iraq", added: "2026-06"}
+  - {code: KE, name: "Kenya"}
+  - {code: KW, name: "Kuwait"}
+  - {code: LA, name: "Lao PDR"}
+  - {code: LB, name: "Lebanon"}
+  - {code: MC, name: "Monaco"}
+  - {code: NP, name: "Nepal"}
+  - {code: PG, name: "Papua New Guinea"}
+  - {code: SS, name: "South Sudan"}
+  - {code: SY, name: "Syria"}
+  - {code: VE, name: "Venezuela"}
+  - {code: VN, name: "Vietnam"}
+  - {code: VG, name: "Virgin Islands (UK)"}
+  - {code: YE, name: "Yemen"}
+
+recently_delisted:               # removed from the grey list Jun 2026: normal tier, analyst note only
+  - {code: DZ, name: "Algeria",  removed: "2026-06"}
+  - {code: NA, name: "Namibia",  removed: "2026-06"}
+
+eu_sanctions_map: []             # TODO (Phase 1): populate from primary source with as_of date
+
+# PLACEHOLDER, not a real assessment: only here so the doc's example clients (UK, Greece) score Low.
+# Replace with a sourced tiering (EU high-risk third countries, Basel AML Index, or an LSEG feed).
+demo_seed_low:
+  - {code: GB, name: "United Kingdom"}
+  - {code: GR, name: "Greece"}
+  - {code: NL, name: "Netherlands"}
+
+default_tier: medium             # conservative: unassessed countries are never silently Low

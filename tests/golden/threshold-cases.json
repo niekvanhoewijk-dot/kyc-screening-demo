@@ -1,0 +1,47 @@
+{
+  "description": "Initial deposit threshold. Cases 1-3 are the worked examples in Full v3 section 5. The formula is INFERRED from them (see config/risk-matrix.yaml); only the $100k ceiling is confirmed by Niek (D2). Cases marked 'derived' exercise branches the doc does not illustrate.",
+  "cases": [
+    {
+      "id": "THR-1-doc",
+      "source": "doc threshold example 1",
+      "input": {"deposit_12m": "20k_50k", "source_of_funds": "salary", "employment_status": "employed", "annual_income": "lt_50k", "band": "medium"},
+      "expect": {"threshold": 39999}
+    },
+    {
+      "id": "THR-2-doc",
+      "source": "doc threshold example 2",
+      "input": {"deposit_12m": "lt_20k", "source_of_funds": "salary", "employment_status": "employed", "annual_income": "lt_50k", "band": "low"},
+      "expect": {"threshold": 19999}
+    },
+    {
+      "id": "THR-3-doc",
+      "source": "doc threshold example 3 (band assumed medium: the doc does not state it)",
+      "input": {"deposit_12m": "gt_1m", "source_of_funds": "investment", "only_source_of_wealth": false, "employment_status": "self_employed", "annual_income": "500k_1m", "band": "medium"},
+      "expect": {"threshold": 100000}
+    },
+    {
+      "id": "THR-4-student-cap",
+      "source": "derived: restricted employment cap $10,000",
+      "input": {"deposit_12m": "20k_50k", "source_of_funds": "salary", "employment_status": "student", "annual_income": "lt_50k", "band": "low"},
+      "expect": {"threshold": 10000}
+    },
+    {
+      "id": "THR-5-high-risk-cap",
+      "source": "derived: high band cap $40,000",
+      "input": {"deposit_12m": "250k_500k", "source_of_funds": "salary", "employment_status": "employed", "annual_income": "100k_500k", "band": "high"},
+      "expect": {"threshold": 40000}
+    },
+    {
+      "id": "THR-6-open-ended-bands-hit-ceiling",
+      "source": "derived: no upper bounds, the $100k hard ceiling binds (D2)",
+      "input": {"deposit_12m": "gt_1m", "source_of_funds": "inheritance", "only_source_of_wealth": false, "employment_status": "retired", "annual_income": "gt_1m", "band": "low"},
+      "expect": {"threshold": 100000}
+    },
+    {
+      "id": "THR-7-only-source-of-wealth-80pct",
+      "source": "derived: inheritance as only wealth = 80%",
+      "input": {"deposit_12m": "gt_1m", "source_of_funds": "inheritance", "only_source_of_wealth": true, "employment_status": "retired", "annual_income": "lt_50k", "band": "low"},
+      "expect": {"threshold": 39999}
+    }
+  ]
+}
