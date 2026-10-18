@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Link from "next/link";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Demo Digital Assets Platform",
@@ -9,14 +11,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: "system-ui, sans-serif", margin: 0, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-        <header style={{ padding: "16px 24px", borderBottom: "1px solid #ddd" }}>
-          <strong>Demo Digital Assets Platform</strong>
+      <body>
+        <header className="site-header">
+          <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
+            <strong>Demo Digital Assets Platform</strong>
+          </Link>
         </header>
-        <main style={{ flex: 1, padding: "24px" }}>{children}</main>
-        <footer style={{ padding: "12px 24px", borderTop: "1px solid #ddd", fontSize: 13, color: "#555" }}>
-          Illustrative demo. Not a regulated compliance system.
-        </footer>
+        <main>{children}</main>
+        <footer className="site-footer">Illustrative demo. Not a regulated compliance system.</footer>
       </body>
     </html>
   );

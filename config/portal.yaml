@@ -1,0 +1,48 @@
+# Applicant portal settings: operational limits and document rules.
+# Source: docs/spec/01 (flow), docs/spec/02 (POI/POR), D5 (selfie), D10 (POR).
+# Read by src/portal/config.ts (Zod-validated). Never hard-code these in application code.
+
+version: 1
+
+otp:
+  length: 6
+  ttl_minutes: 10
+  max_attempts: 5               # wrong codes before the challenge is burned
+  resend_cooldown_seconds: 30
+
+session:
+  ttl_days: 30                  # resumable: the applicant may leave and return (spec 01)
+
+uploads:
+  max_bytes: 10485760           # 10 MB per file
+  document_mime: [image/jpeg, image/png, application/pdf]
+  selfie_mime: [image/jpeg, image/png]
+
+face_match:
+  max_attempts: 3               # failed selfie attempts before the case is flagged for the analyst
+
+poi:                            # spec 02: passport, ID card, driving licence; valid, four corners
+  document_types:
+    - {id: passport,        label: "Passport",        needs_back: false}
+    - {id: id_card,         label: "ID card",         needs_back: true}
+    - {id: driving_licence, label: "Driving licence", needs_back: true}
+
+por:                            # D10: one document, issued within 3 months, four corners
+  max_age_months: 3
+  default_validity_months: 6    # spec 02: "6 or 12 months after issue (configurable)"
+  renewal_notice_days: 14       # spec 02: notify two weeks before expiry
+  document_types:
+    - {id: utility_bill,        label: "Utility bill (electricity, gas, water, sewage, internet, TV, home phone)"}
+    - {id: bank_statement,      label: "Bank or credit card statement"}
+    - {id: government_document, label: "Official government document stating residence (tax declaration, tax card, stay permit, certificate of residence)"}
+  # Mobile phone bills, envelopes/parcels and P.O. boxes are rejected (D10): not offered as types;
+  # P.O. box addresses are refused at address entry.
+
+questionnaire:
+  preferred_languages:
+    - {id: en, label: "English"}
+    - {id: nl, label: "Nederlands"}
+    - {id: de, label: "Deutsch"}
+    - {id: fr, label: "Français"}
+    - {id: es, label: "Español"}
+    - {id: el, label: "Ελληνικά"}

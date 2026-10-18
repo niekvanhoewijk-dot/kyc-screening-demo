@@ -2,7 +2,7 @@
 
 An illustrative onboarding and compliance-screening demo built from the Ateaya KYC-KYB-AML requirements (Full v3) and the DVAULT onboarding flow, using Claude for document reading and case preparation and a deterministic rules engine for every decision number.
 
-**Status:** Phase 0 scaffold in place (Next.js, Drizzle/SQLite, Vitest, Zod). No features yet.
+**Status:** Phases 0-2 done: scaffold, rules engine (`src/engine`), applicant portal for individuals (`/apply`, steps 2.1.1-2.1.8). OTP codes print in the `npm run dev` console. `/dev/cases` is a temporary decision tool until the analyst console (Phase 4).
 
 ## Start building
 1. Open a terminal in this folder: `cd ~/Documents/Ateaya/KYC/claude-code`
