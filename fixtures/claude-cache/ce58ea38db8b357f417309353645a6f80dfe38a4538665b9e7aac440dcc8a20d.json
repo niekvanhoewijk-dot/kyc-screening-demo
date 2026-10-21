@@ -1,0 +1,119 @@
+{
+  "key": "ce58ea38db8b357f417309353645a6f80dfe38a4538665b9e7aac440dcc8a20d",
+  "kind": "poi",
+  "model_requested": "claude-sonnet-5-5",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "doc-reader-v1",
+  "input_sha256": "89a989bb1e4adebb3af62b02feaad0b057519d6e90063274185f58c7d478b92b",
+  "recorded_at": "2026-10-18T16:33:24.085Z",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 927,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2575,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "iterations": [
+      {
+        "input_tokens": 927,
+        "output_tokens": 749,
+        "cache_read_input_tokens": 2575,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "output_tokens": 749,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "output": {
+    "document_type": "passport",
+    "full_name": "TOM EXAMPLE",
+    "date_of_birth": "1984-11-23",
+    "document_number": "SX1088637",
+    "nationality_or_issuing_country": "GB",
+    "place_of_birth": null,
+    "issue_date": "2021-03-15",
+    "expiry_date": "2031-03-14",
+    "has_no_expiry": false,
+    "corners_visible": true,
+    "appears_edited": false,
+    "watermark_present": false,
+    "fields": [
+      {
+        "field": "document_type",
+        "value": "passport",
+        "confidence": 0.97,
+        "evidence": "Title 'DEMO REPUBLIC - PASSPORT' and Type/Code P / DEM"
+      },
+      {
+        "field": "full_name",
+        "value": "TOM EXAMPLE",
+        "confidence": 0.97,
+        "evidence": "Surname and Given names fields; MRZ line 1"
+      },
+      {
+        "field": "date_of_birth",
+        "value": "1984-11-23",
+        "confidence": 0.97,
+        "evidence": "Date of birth field '23 NOV 1984 / 1984-11-23'; MRZ line 2 841123"
+      },
+      {
+        "field": "document_number",
+        "value": "SX1088637",
+        "confidence": 0.97,
+        "evidence": "Passport No. field; MRZ line 2"
+      },
+      {
+        "field": "nationality_or_issuing_country",
+        "value": "GB",
+        "confidence": 0.85,
+        "evidence": "Nationality field 'GBR'; issuing state in MRZ is DEM (Demo Republic)"
+      },
+      {
+        "field": "place_of_birth",
+        "value": null,
+        "confidence": 0.95,
+        "evidence": "Not printed on the document"
+      },
+      {
+        "field": "issue_date",
+        "value": "2021-03-15",
+        "confidence": 0.97,
+        "evidence": "Date of issue field '15 MAR 2021 / 2021-03-15'"
+      },
+      {
+        "field": "expiry_date",
+        "value": "2031-03-14",
+        "confidence": 0.97,
+        "evidence": "Date of expiry field '14 MAR 2031 / 2031-03-14'; MRZ line 2 310314"
+      },
+      {
+        "field": "has_no_expiry",
+        "value": "false",
+        "confidence": 0.95,
+        "evidence": "An expiry date is printed"
+      },
+      {
+        "field": "sex",
+        "value": "M",
+        "confidence": 0.97,
+        "evidence": "Sex field; MRZ line 2"
+      }
+    ],
+    "issues": [],
+    "issue_notes": "",
+    "overall_confidence": 0.95
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "key": "bd874a73541d2ee840582a79e9c6462fd034cf27dea5b4ac0865de7cea070f1c",
+  "kind": "memo",
+  "model_requested": "claude-sonnet-5-5",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "doc-reader-v1",
+  "input_sha256": "0d644348752bb9f2525eccf874ce8da6d2898a58773f34f7faa78eb988635954",
+  "recorded_at": "2026-10-18T16:33:31.966Z",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 684,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 792,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "iterations": [
+      {
+        "input_tokens": 684,
+        "output_tokens": 213,
+        "cache_read_input_tokens": 792,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "output_tokens": 213,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "output": {
+    "summary": "Medium-risk individual (score 15, band medium); engine does not require EDD. Attention needed: the proof of residence check failed (POR_OLDER_THAN_3_MONTHS), as the document was issued 2026-05-04 and is older than 3 months. Several high-tier factors apply: financial services occupation, annual income 500k-1m, net worth 500k-1m. Source of funds is stated as savings, self-employed. There are no screening hits. A current proof of residence is needed before the analyst can proceed.",
+    "screening_notes": "",
+    "suggested_edd_requests": [],
+    "recommended_action": "needs_human_review"
+  }
+}

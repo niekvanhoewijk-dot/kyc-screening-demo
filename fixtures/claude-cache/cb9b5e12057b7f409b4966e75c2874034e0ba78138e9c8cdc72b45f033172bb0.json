@@ -1,0 +1,53 @@
+{
+  "key": "cb9b5e12057b7f409b4966e75c2874034e0ba78138e9c8cdc72b45f033172bb0",
+  "kind": "memo",
+  "model_requested": "claude-sonnet-5-5",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "doc-reader-v1",
+  "input_sha256": "7637d5a91bfd1223ee2ead48430bc1583e414907486b389c34d70433be65bc3a",
+  "recorded_at": "2026-10-18T16:33:46.232Z",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 707,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 792,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "iterations": [
+      {
+        "input_tokens": 707,
+        "output_tokens": 475,
+        "cache_read_input_tokens": 792,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "output_tokens": 475,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "output": {
+    "summary": "Individual applicant (Greece) with a strong PEP screening hit that is still open. The engine forces EDD because of the PEP match, which puts the case in the high band even though the score band is low (total 9). No document checks are on file and no EDD has been requested yet. Start with the PEP hit, then move to source of funds and wealth, as income and net worth are both 100k-500k.",
+    "screening_notes": "Applicant vs PEP list entry 'Petros Demopoulos': name similarity 1 (exact), DOB match, country match. This is likely a true match on the available fields, but it is not cleared and triage is open. Verify the identity against the PEP profile, the position held, its start and end dates, the PEP category (domestic, foreign, family member or close associate), and whether the person is still in office. Also check for any adverse media.",
+    "suggested_edd_requests": [
+      "Written explanation of the PEP role, including position, institution and dates held",
+      "Source of wealth evidence for the 100k-500k net worth (e.g. property deeds, investment statements, inheritance or sale documents)",
+      "Source of funds evidence for the expected 20k-50k deposits (e.g. recent payslips, employment contract, bank statements)",
+      "Evidence supporting the 100k-500k annual income (e.g. tax returns or employer letter)",
+      "Certified ID and proof of address if not already verified",
+      "Declaration of any PEP-connected family members or close associates"
+    ],
+    "recommended_action": "edd"
+  }
+}

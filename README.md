@@ -7,6 +7,9 @@ An illustrative onboarding and compliance-screening demo built from the Ateaya K
 **Claude document reading:** put `ANTHROPIC_API_KEY=...` in `.env.local`, then `npm run docs:record` reads the labelled SAMPLE set in `fixtures/documents/` live and records the responses in `fixtures/claude-cache/`. After that, `npm run test` replays them offline and asserts the expected reason codes, `npm run eval` writes `reports/eval-<date>.md` (precision/recall per reason code, KYB classification accuracy, cost per case), and `DEMO_MODE=replay` runs the app without a key. `npm run docs:samples` regenerates the documents (macOS, uses `sips`).
 
 ## Run the demo (offline)
+**Fast path:** `npm run preflight` checks readiness (dependencies, `.env.local`, recordings, persona dates, port). `npm run demo` runs the preflight, resets the 6 synthetic cases and starts the app at http://localhost:3000/analyst. Restart without resetting: `npm run dev`.
+
+Step by step:
 1. `npm install && cp .env.example .env.local` (`DEMO_MODE=replay`: no API key, no network calls)
 2. `npm run demo:reset` seeds 6 synthetic personas (Low, Medium, High, Auto-High, Prohibited, a company)
 3. `npm run dev`, open http://localhost:3000/analyst, choose an analyst

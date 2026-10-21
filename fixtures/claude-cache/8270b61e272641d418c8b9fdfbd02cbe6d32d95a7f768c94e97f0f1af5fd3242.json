@@ -1,0 +1,46 @@
+{
+  "key": "8270b61e272641d418c8b9fdfbd02cbe6d32d95a7f768c94e97f0f1af5fd3242",
+  "kind": "memo",
+  "model_requested": "claude-sonnet-5-5",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "doc-reader-v1",
+  "input_sha256": "a84a08410f9632375b2801e56664015a0fa147c1fe798d57480ffcc3fdb30159",
+  "recorded_at": "2026-10-18T16:34:14.871Z",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 611,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 792,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "iterations": [
+      {
+        "input_tokens": 611,
+        "output_tokens": 218,
+        "cache_read_input_tokens": 792,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "output_tokens": 218,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "output": {
+    "summary": "The rules engine has marked this individual application as reject. The total score is 107 and falls in the prohibited band. The driver is country IR, listed under the FATF call for action (list version FATF-2026-06, as of 2026-06-19), which contributes 100 points. All other factors are low or medium (salary, employed, IT, income and net worth under 50k, deposits 20k-50k). No screening hits and no document checks are present. EDD is not required by the engine. Analyst should confirm the country determination and follow the prohibited-jurisdiction procedure.",
+    "screening_notes": "",
+    "suggested_edd_requests": [],
+    "recommended_action": "reject"
+  }
+}

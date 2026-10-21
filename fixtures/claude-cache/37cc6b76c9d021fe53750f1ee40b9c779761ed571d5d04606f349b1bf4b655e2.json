@@ -1,0 +1,135 @@
+{
+  "key": "37cc6b76c9d021fe53750f1ee40b9c779761ed571d5d04606f349b1bf4b655e2",
+  "kind": "por",
+  "model_requested": "claude-sonnet-5-5",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "doc-reader-v1",
+  "input_sha256": "97ac34365acf60ebb60287d4b471a7839585df5ea2c032da90373fb16c7a553c",
+  "recorded_at": "2026-10-18T16:34:12.490Z",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 1347,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2702,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "iterations": [
+      {
+        "input_tokens": 1347,
+        "output_tokens": 713,
+        "cache_read_input_tokens": 2702,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "output_tokens": 713,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "output": {
+    "document_category": "utility_bill",
+    "issuer": "Sample Power & Light S.A.",
+    "holder_name": "Sam Nemune",
+    "address": {
+      "line1": "9 Sample Alley",
+      "line2": null,
+      "city": "Tehran",
+      "region": "Tehran Province",
+      "country": "IR",
+      "postcode": "11369"
+    },
+    "issue_date": "2026-09-10",
+    "expiry_date": null,
+    "is_po_box": false,
+    "corners_visible": true,
+    "joint_holder_name": null,
+    "fields": [
+      {
+        "field": "issuer",
+        "value": "Sample Power & Light S.A.",
+        "confidence": 0.98,
+        "evidence": "Top left header"
+      },
+      {
+        "field": "document_type",
+        "value": "Electricity bill",
+        "confidence": 0.98,
+        "evidence": "Heading below issuer name"
+      },
+      {
+        "field": "holder_name",
+        "value": "Sam Nemune",
+        "confidence": 0.98,
+        "evidence": "Address block, first line"
+      },
+      {
+        "field": "address_line1",
+        "value": "9 Sample Alley",
+        "confidence": 0.98,
+        "evidence": "Address block, second line"
+      },
+      {
+        "field": "postcode",
+        "value": "11369",
+        "confidence": 0.97,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "city",
+        "value": "Tehran",
+        "confidence": 0.97,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "region",
+        "value": "Tehran Province",
+        "confidence": 0.96,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "country",
+        "value": "IR",
+        "confidence": 0.95,
+        "evidence": "Address block, fourth line, printed as 'Iran'"
+      },
+      {
+        "field": "issue_date",
+        "value": "2026-09-10",
+        "confidence": 0.98,
+        "evidence": "Top right, 'Issue date: 10 September 2026 (2026-09-10)'"
+      },
+      {
+        "field": "expiry_date",
+        "value": null,
+        "confidence": 0.95,
+        "evidence": "No expiry date printed on the document"
+      },
+      {
+        "field": "account_number",
+        "value": "0042-7781-SAMPLE",
+        "confidence": 0.95,
+        "evidence": "Below address block"
+      },
+      {
+        "field": "amount_due",
+        "value": "EUR 64.20",
+        "confidence": 0.97,
+        "evidence": "Below account number"
+      }
+    ],
+    "issues": [],
+    "issue_notes": "",
+    "overall_confidence": 0.96
+  }
+}

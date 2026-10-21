@@ -1,0 +1,135 @@
+{
+  "key": "f2c35567aa44fb60e9cb5ed460eef9fe3da795ddffb16664285f29dcb47af01a",
+  "kind": "por",
+  "model_requested": "claude-sonnet-5-5",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "doc-reader-v1",
+  "input_sha256": "043c8a95f8249658ffc6d18af73a6d4bdd3a81f5ce49b87c506467bee7e9daac",
+  "recorded_at": "2026-10-18T16:34:23.753Z",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 1347,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2702,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "iterations": [
+      {
+        "input_tokens": 1347,
+        "output_tokens": 699,
+        "cache_read_input_tokens": 2702,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "output_tokens": 699,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "output": {
+    "document_category": "utility_bill",
+    "issuer": "Sample Power & Light S.A.",
+    "holder_name": "Ada Sample",
+    "address": {
+      "line1": "1 Sample Street",
+      "line2": null,
+      "city": "Athens",
+      "region": "Attica",
+      "country": "GR",
+      "postcode": "10552"
+    },
+    "issue_date": "2026-09-20",
+    "expiry_date": null,
+    "is_po_box": false,
+    "corners_visible": true,
+    "joint_holder_name": null,
+    "fields": [
+      {
+        "field": "issuer",
+        "value": "Sample Power & Light S.A.",
+        "confidence": 0.98,
+        "evidence": "Header, top left"
+      },
+      {
+        "field": "document_type",
+        "value": "Electricity bill",
+        "confidence": 0.98,
+        "evidence": "Subheading below issuer name"
+      },
+      {
+        "field": "holder_name",
+        "value": "Ada Sample",
+        "confidence": 0.98,
+        "evidence": "Address block, first line"
+      },
+      {
+        "field": "address_line1",
+        "value": "1 Sample Street",
+        "confidence": 0.98,
+        "evidence": "Address block, second line"
+      },
+      {
+        "field": "postcode",
+        "value": "10552",
+        "confidence": 0.97,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "city",
+        "value": "Athens",
+        "confidence": 0.97,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "region",
+        "value": "Attica",
+        "confidence": 0.95,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "country",
+        "value": "GR",
+        "confidence": 0.97,
+        "evidence": "Address block, last line reads 'Greece'"
+      },
+      {
+        "field": "issue_date",
+        "value": "2026-09-20",
+        "confidence": 0.98,
+        "evidence": "Top right, 'Issue date: 20 September 2026 (2026-09-20)'"
+      },
+      {
+        "field": "expiry_date",
+        "value": null,
+        "confidence": 0.95,
+        "evidence": "No expiry date printed on the document"
+      },
+      {
+        "field": "account_number",
+        "value": "0042-7781-SAMPLE",
+        "confidence": 0.95,
+        "evidence": "Below address block"
+      },
+      {
+        "field": "amount_due",
+        "value": "EUR 64.20",
+        "confidence": 0.95,
+        "evidence": "Below account number"
+      }
+    ],
+    "issues": [],
+    "issue_notes": "",
+    "overall_confidence": 0.96
+  }
+}

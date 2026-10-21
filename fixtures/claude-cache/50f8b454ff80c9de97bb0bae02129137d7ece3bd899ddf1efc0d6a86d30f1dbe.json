@@ -1,0 +1,141 @@
+{
+  "key": "50f8b454ff80c9de97bb0bae02129137d7ece3bd899ddf1efc0d6a86d30f1dbe",
+  "kind": "por",
+  "model_requested": "claude-sonnet-5-5",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "doc-reader-v1",
+  "input_sha256": "31c7cd47a16ac0ab856650e0fe8226ec743d3b0fcb8e5e63b7864171c4462ab4",
+  "recorded_at": "2026-10-18T16:33:29.263Z",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 1347,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2702,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "iterations": [
+      {
+        "input_tokens": 1347,
+        "output_tokens": 748,
+        "cache_read_input_tokens": 2702,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "output_tokens": 748,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "output": {
+    "document_category": "utility_bill",
+    "issuer": "Sample Power & Light S.A.",
+    "holder_name": "Tom Example",
+    "address": {
+      "line1": "22 Example Road",
+      "line2": null,
+      "city": "London",
+      "region": "Greater London",
+      "country": "GB",
+      "postcode": "SW1A 0AA"
+    },
+    "issue_date": "2026-05-04",
+    "expiry_date": null,
+    "is_po_box": false,
+    "corners_visible": true,
+    "joint_holder_name": null,
+    "fields": [
+      {
+        "field": "issuer",
+        "value": "Sample Power & Light S.A.",
+        "confidence": 0.97,
+        "evidence": "Top left header"
+      },
+      {
+        "field": "document_type",
+        "value": "Electricity bill",
+        "confidence": 0.97,
+        "evidence": "Subheading under issuer name"
+      },
+      {
+        "field": "holder_name",
+        "value": "Tom Example",
+        "confidence": 0.97,
+        "evidence": "Address block, first line"
+      },
+      {
+        "field": "address_line1",
+        "value": "22 Example Road",
+        "confidence": 0.97,
+        "evidence": "Address block, second line"
+      },
+      {
+        "field": "postcode",
+        "value": "SW1A 0AA",
+        "confidence": 0.95,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "city",
+        "value": "London",
+        "confidence": 0.95,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "region",
+        "value": "Greater London",
+        "confidence": 0.9,
+        "evidence": "Address block, third line"
+      },
+      {
+        "field": "country",
+        "value": "GB",
+        "confidence": 0.95,
+        "evidence": "Address block, fourth line 'United Kingdom'"
+      },
+      {
+        "field": "issue_date",
+        "value": "2026-05-04",
+        "confidence": 0.98,
+        "evidence": "Top right, 'Issue date: 4 May 2026 (2026-05-04)'"
+      },
+      {
+        "field": "expiry_date",
+        "value": null,
+        "confidence": 0.95,
+        "evidence": "No expiry date printed on the document"
+      },
+      {
+        "field": "account_number",
+        "value": "0042-7781-SAMPLE",
+        "confidence": 0.95,
+        "evidence": "Below address block"
+      },
+      {
+        "field": "amount_due",
+        "value": "EUR 64.20",
+        "confidence": 0.95,
+        "evidence": "Below address block"
+      },
+      {
+        "field": "joint_holder_name",
+        "value": null,
+        "confidence": 0.95,
+        "evidence": "Only one account holder named"
+      }
+    ],
+    "issues": [],
+    "issue_notes": "",
+    "overall_confidence": 0.95
+  }
+}

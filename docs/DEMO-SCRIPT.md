@@ -3,6 +3,8 @@
 Illustrative demo on synthetic data. Not a regulated compliance system. Say so in the first sentence.
 
 ## Before the call (2 minutes, once)
+Fast path: `npm run demo` (runs `npm run preflight`, resets the 6 cases, starts the app). If the preflight warns about missing recordings, run `npm run demo:record` first (needs a key, see step 3). Details below.
+
 1. `npm install`, then `cp .env.example .env.local` (keeps `DEMO_MODE=replay`: no API key, no network).
 2. `npm run demo:reset`: seeds 6 synthetic cases. `npm run dev`, open `localhost:3000/analyst`, pick **Analyst One** under "Signed in as" at the bottom of the black nav and press Sign in. Mode (top right of the Cases page): **MVP 1 · manual**.
 3. Claude panels replay recorded responses. If **Demo controls** (in the nav) says nothing is recorded, run `npm run demo:record` once with a key in `.env.local` (live calls, a few dollars at most). Without recordings, demo MVP 2 from the tests and the eval report instead.

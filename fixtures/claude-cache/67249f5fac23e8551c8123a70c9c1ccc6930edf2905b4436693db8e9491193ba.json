@@ -1,0 +1,46 @@
+{
+  "key": "67249f5fac23e8551c8123a70c9c1ccc6930edf2905b4436693db8e9491193ba",
+  "kind": "memo",
+  "model_requested": "claude-sonnet-5-5",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "doc-reader-v1",
+  "input_sha256": "355ca2502623d7e63b0a534d7fa6d9c74c88d739ae7270f7b1eb2f1a3a6e991a",
+  "recorded_at": "2026-10-18T16:33:19.219Z",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 697,
+    "cache_creation_input_tokens": 792,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 792,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "iterations": [
+      {
+        "input_tokens": 697,
+        "output_tokens": 303,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 792,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 792,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "output_tokens": 303,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "output": {
+    "summary": "Low-risk engine score (8, band low, EDD not required), but there is one open possible sanctions screening hit on the applicant that must be reviewed by an analyst before any decision. Name similarity is 0.8, with date of birth and country both differing. No document checks are present, and no EDD has been requested or submitted.",
+    "screening_notes": "Applicant vs list entry 'Ada Sampel' (sanctions, strength possible, triage open): name similarity 0.8 is moderate, not exact. DOB differs and country differs, which points toward a likely false positive, but this hit is not cleared here. Analyst should verify the applicant's full name and any aliases or spelling variants against the list entry, confirm DOB and nationality/residence from identity documents, check the entry's other identifiers, and record the rationale for the triage decision.",
+    "suggested_edd_requests": [],
+    "recommended_action": "needs_human_review"
+  }
+}
