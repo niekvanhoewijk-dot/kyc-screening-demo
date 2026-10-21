@@ -2,20 +2,21 @@ import fs from "node:fs";
 import path from "node:path";
 import { desc, eq } from "drizzle-orm";
 import Link from "next/link";
+import { Band } from "@/components/band";
 import { applicants, cases } from "@/db/schema";
 import { loadPersonas } from "@/demo/personas";
 import { env } from "@/lib/env";
 import { portalDeps } from "@/portal/deps";
-import { BAND_LABEL } from "../labels";
 import { ResetForm } from "./reset-form";
 
 export const dynamic = "force-dynamic";
 
-// Demo controls: personas, Claude source, reset. Everything here is synthetic.
+// Demo controls (AnalystNav frame, simple content): personas, Claude source, reset. All synthetic.
 export default function DemoPage() {
   const deps = portalDeps();
   const personas = loadPersonas();
-  const recorded = fs.readdirSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), "fixtures/claude-cache")).filter((f) => f.endsWith(".json")).length;
+  const cacheDir = path.resolve(/* turbopackIgnore: true */ process.cwd(), "fixtures/claude-cache");
+  const recorded = fs.existsSync(cacheDir) ? fs.readdirSync(cacheDir).filter((f) => f.endsWith(".json")).length : 0;
   const byEmail = new Map(
     deps.db.select({ email: applicants.email, id: cases.id, risk: cases.riskResult }).from(cases).innerJoin(applicants, eq(cases.applicantId, applicants.id)).orderBy(desc(cases.createdAt)).all().map((r) => [r.email, r]),
   );
@@ -24,21 +25,25 @@ export default function DemoPage() {
     { id: personas.company.id, name: String(personas.company.company.legalName), email: personas.company.representative.email, expect: personas.company.expect.band, story: personas.company.story },
   ];
   return (
-    <div className="stack">
-      <div className="card wide">
-        <h1>Demo controls</h1>
-        <p className="lede">Illustrative demo on synthetic data. Not a regulated compliance system. See docs/DEMO-SCRIPT.md for the 5-minute walkthrough.</p>
+    <>
+      <header className="head" style={{ gap: 10 }}>
+        <span className="eyebrow">Illustrative demo</span>
+        <h1 className="title">Demo controls</h1>
+        <p className="lede" style={{ fontSize: 15 }}>Synthetic data only. Not a regulated compliance system. See docs/DEMO-SCRIPT.md for the 5-minute walkthrough.</p>
+      </header>
+      <section className="card">
+        <div className="card-head"><div><span className="eyebrow">Claude</span><h2 className="card-title">Where answers come from</h2></div></div>
         <dl className="kv">
-          <dt>Claude</dt>
-          <dd>{env.DEMO_MODE === "replay" ? <>Replay: recorded responses only, no API calls ({recorded} recorded). Missing recordings show as &quot;not recorded&quot;; record them once with <code>npm run demo:record</code>.</> : <>Live API calls ({env.CLAUDE_MODEL}); responses are recorded for replay.</>}</dd>
+          <dt>Mode</dt>
+          <dd>{env.DEMO_MODE === "replay" ? <>Replay: recorded responses only, no API calls ({recorded} recorded). Missing recordings show as &quot;not recorded&quot;; record them once with <code>npm run demo:record</code>.</> : <>Live API calls; responses are recorded for replay.</>}</dd>
           <dt>Model</dt>
           <dd>{env.CLAUDE_MODEL}</dd>
         </dl>
-      </div>
-      <div className="card wide">
-        <h2 style={{ marginTop: 0 }}>Personas</h2>
+      </section>
+      <section className="card">
+        <div className="card-head"><div><span className="eyebrow">Synthetic cases</span><h2 className="card-title">Personas</h2></div></div>
         <div className="table-scroll">
-          <table>
+          <table className="tbl" style={{ minWidth: 640 }}>
             <thead><tr><th>Persona</th><th>Expected</th><th>Story</th><th>Case</th></tr></thead>
             <tbody>
               {rows.map((r) => {
@@ -46,22 +51,22 @@ export default function DemoPage() {
                 const band = (c?.risk as { band?: string } | null)?.band;
                 return (
                   <tr key={r.id}>
-                    <td>{r.name}<br /><span className="muted">{r.email}</span></td>
-                    <td><span className={`pill ${r.expect}`}>{BAND_LABEL[r.expect]}</span></td>
-                    <td>{r.story}</td>
-                    <td>{c ? <Link href={`/analyst/cases/${c.id}`}>{band ? BAND_LABEL[band] : "open"}</Link> : <span className="muted">not seeded</span>}</td>
+                    <th scope="row">{r.name}<span className="sub">{r.email}</span></th>
+                    <td><Band band={r.expect} /></td>
+                    <td style={{ lineHeight: 1.55 }}>{r.story}</td>
+                    <td>{c ? <Link className="link" href={`/analyst/cases/${c.id}`}>{band ? "Open" : "Open (not scored)"}</Link> : <span className="muted">Not seeded</span>}{band && <><br /><Band band={band} /></>}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
-      </div>
-      <div className="card wide">
-        <h2 style={{ marginTop: 0 }}>Reset</h2>
+      </section>
+      <section className="card">
+        <div className="card-head"><div><span className="eyebrow">Start over</span><h2 className="card-title">Reset</h2></div></div>
         <p className="muted">Deletes every case, upload and audit entry in the local demo database, then seeds the personas again through the real portal services. Mode returns to MVP 1.</p>
         <ResetForm />
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

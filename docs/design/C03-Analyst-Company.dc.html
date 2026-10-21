@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Analyst company case</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:hover{opacity:.88}
+input:focus-visible,a:focus-visible,button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #0A0A0A;outline-offset:2px}
+.th{padding:10px 12px 10px 0;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-align:left;border-bottom:2px solid #0A0A0A}
+.td{padding:12px 12px 12px 0;font-size:14px;border-bottom:1px solid #D4D4D4;vertical-align:top}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#595959}
+.card{box-sizing:border-box;border:1px solid #D4D4D4;border-radius:2px;padding:28px;display:flex;flex-direction:column;gap:18px;background:#FFFFFF}
+</style>
+</helmet>
+<div style="display:flex; flex-wrap:wrap; min-height:1300px; background:#FFFFFF; color:#0A0A0A; font-family:'Alexandria',system-ui,sans-serif;">
+  <dc-import name="AnalystNav" active="cases" minh="1300" hint-size="260px,1300px"></dc-import>
+  <main style="flex:999 1 600px; min-width:0; box-sizing:border-box; padding:40px 48px 72px; display:flex; flex-direction:column; gap:36px;">
+
+    <nav aria-label="Breadcrumb" style="font-size:13px; color:#595959;">
+      <a href="C01-Analyst-Queue.dc.html" style="text-decoration:underline; text-underline-offset:4px;">Cases</a>
+      <span aria-hidden="true"> / </span><span>Sample Holdings B.V.</span>
+    </nav>
+
+    <header style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <span class="eyebrow">Company · business review</span>
+        <h1 style="margin:0; font-size:36px; line-height:1.1; font-weight:700; letter-spacing:-.01em;">Sample Holdings B.V.</h1>
+        <p style="margin:0; font-size:15px; color:#595959;">Registered in the Netherlands · 2 people · submitted 21 Oct 2026 · Mode: MVP 2, Claude pre-review on</p>
+      </div>
+      <span style="display:inline-block; padding:8px 14px; border-radius:2px; background:#E5E5E5; font-size:13px; font-weight:600;">In review</span>
+    </header>
+
+    <section aria-label="Summary" style="display:flex; flex-wrap:wrap; gap:16px;">
+      <sc-for list="{{tiles}}" as="t" hint-placeholder-count="4">
+        <div style="{{t.style}}">
+          <span style="{{t.labelStyle}}">{{t.label}}</span>
+          <span style="font-size:34px; line-height:1.05; font-weight:700; letter-spacing:-.02em;">{{t.value}}</span>
+          <span style="{{t.noteStyle}}">{{t.note}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:stretch;">
+      <section class="card" aria-labelledby="h-band" style="flex:1 1 360px; min-width:0;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <span class="eyebrow">Rules engine</span>
+          <h2 id="h-band" style="margin:0; font-size:22px; font-weight:600;">Why the company is Auto-High</h2>
+        </div>
+        <p style="margin:0; font-size:14px; line-height:1.7; color:#262626;">The company takes the highest band among its people, combined with the country check. Bo Sample lives in Kenya, which is on the FATF increased monitoring list, so the whole company is Auto-High. Auto-High means enhanced due diligence and a $40,000 cap on the initial threshold.</p>
+        <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column;">
+          <sc-for list="{{why}}" as="w" hint-placeholder-count="3">
+            <li style="display:flex; justify-content:space-between; gap:16px; padding:12px 0; border-top:1px solid #D4D4D4; font-size:14px;">
+              <span>{{w.k}}</span><span style="font-weight:600; text-align:right;">{{w.v}}</span>
+            </li>
+          </sc-for>
+        </ul>
+        <p style="margin:0; font-size:12px; line-height:1.6; color:#595959;">Demo default for company scoring. To be confirmed with compliance. Country level: FATF, as of 2026-06-19.</p>
+      </section>
+
+      <section class="card" aria-labelledby="h-people" style="flex:1 1 520px; min-width:0;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <span class="eyebrow">Ownership and control</span>
+          <h2 id="h-people" style="margin:0; font-size:22px; font-weight:600;">People linked to the company</h2>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; min-width:460px; border-collapse:collapse;">
+            <caption style="position:absolute; left:-9999px;">People linked to the company</caption>
+            <thead><tr><th class="th" scope="col">Person</th><th class="th" scope="col">Roles</th><th class="th" scope="col">Shares</th><th class="th" scope="col">Residence</th><th class="th" scope="col" style="padding-right:0;">Band</th></tr></thead>
+            <tbody>
+              <sc-for list="{{people}}" as="p" hint-placeholder-count="2">
+                <tr>
+                  <th class="td" scope="row" style="text-align:left; font-weight:600;">{{p.name}}<span style="display:block; font-size:12px; font-weight:400; color:#595959; margin-top:2px;">{{p.status}}</span></th>
+                  <td class="td">{{p.roles}}</td>
+                  <td class="td" style="font-weight:600;">{{p.shares}}</td>
+                  <td class="td">{{p.country}}</td>
+                  <td class="td" style="padding-right:0;"><span style="{{p.chip}}">{{p.band}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:14px 16px; background:#F5F5F5; border-radius:2px;">
+          <span style="font-size:14px; font-weight:500;">Shareholdings add up: 60% + 40% = 100%</span>
+          <span style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Pass</span>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="h-docs" style="gap:22px;">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <span class="eyebrow">Business documents</span>
+          <h2 id="h-docs" style="margin:0; font-size:22px; font-weight:600;">What we have and what is missing</h2>
+        </div>
+        <span style="font-size:14px; font-weight:600;">4 of 10 received</span>
+      </div>
+      <div style="height:8px; background:#E5E5E5; border-radius:2px; overflow:hidden;" role="img" aria-label="4 of 10 documents received"><div style="width:40%; height:100%; background:#0A0A0A;"></div></div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; min-width:520px; border-collapse:collapse;">
+          <caption style="position:absolute; left:-9999px;">Company document checklist</caption>
+          <thead><tr><th class="th" scope="col">Document</th><th class="th" scope="col">Status</th><th class="th" scope="col" style="padding-right:0;">Note</th></tr></thead>
+          <tbody>
+            <sc-for list="{{docs}}" as="d" hint-placeholder-count="10">
+              <tr>
+                <th class="td" scope="row" style="text-align:left; font-weight:500;">{{d.name}}</th>
+                <td class="td"><span style="{{d.chip}}">{{d.status}}</span></td>
+                <td class="td" style="padding-right:0; color:#595959; font-size:13px;">{{d.note}}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px; padding:24px; background:#F5F5F5; border-radius:2px;">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <h3 style="margin:0; font-size:15px; font-weight:600;">Classification check</h3>
+          <span style="font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;">MVP 2 · Advisory</span>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:24px;">
+          <div style="flex:1 1 200px; display:flex; flex-direction:column; gap:4px;"><span style="font-size:12px; color:#595959;">Uploaded as</span><span style="font-size:15px; font-weight:600;">Certificate of shareholders</span><span style="font-size:12px; color:#595959;">shareholders-final.pdf</span></div>
+          <div style="flex:1 1 200px; display:flex; flex-direction:column; gap:4px;"><span style="font-size:12px; color:#595959;">Claude reads it as</span><span style="font-size:15px; font-weight:600;">Register of members</span><span style="font-size:12px; color:#595959;">Matches the layout of the register already received. Sample data.</span></div>
+        </div>
+        <p style="margin:0; font-size:13px; line-height:1.65; color:#262626;">If you confirm this, the certificate of shareholders is still missing and the count becomes 3 of 10 received. Advisory only. The decision rests with the analyst.</p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-dec" style="gap:22px;">
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <span class="eyebrow">Analyst decision</span>
+        <h2 id="h-dec" style="margin:0; font-size:22px; font-weight:600;">Next step for this company</h2>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <label for="reason" style="font-size:13px; font-weight:500;">Message to the company contact <span style="font-weight:400; color:#595959;">(neutral wording, kept in the audit trail)</span></label>
+        <textarea id="reason" rows="3" style="box-sizing:border-box; padding:14px 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 15px/1.5 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF; resize:vertical;">Please upload the six remaining company documents listed in your portal so we can continue the review.</textarea>
+      </div>
+      <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+        <button type="button" style="display:inline-flex; align-items:center; gap:12px; height:52px; padding:0 32px; background:#0A0A0A; color:#FFFFFF; border:0; border-radius:2px; font:600 15px 'Alexandria',system-ui,sans-serif; letter-spacing:.02em; cursor:pointer;">
+          Request missing documents
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <button type="button" style="height:52px; padding:0 28px; background:#FFFFFF; color:#0A0A0A; border:1.5px solid #0A0A0A; border-radius:2px; font:600 15px 'Alexandria',system-ui,sans-serif; cursor:pointer;">Reject</button>
+        <button type="button" disabled aria-describedby="approve-note" style="height:52px; padding:0 28px; background:#F5F5F5; color:#8A8A8A; border:1.5px solid #D4D4D4; border-radius:2px; font:600 15px 'Alexandria',system-ui,sans-serif; cursor:not-allowed;">Approve</button>
+        <span id="approve-note" style="font-size:12px; color:#595959; line-height:1.5; flex:1 1 220px;">Approve becomes available once all ten documents are received and checked.</span>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-audit" style="display:flex; flex-direction:column; gap:16px;">
+      <h2 id="h-audit" style="margin:0; font-size:22px; font-weight:600;">Audit trail</h2>
+      <ol style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column;">
+        <sc-for list="{{audit}}" as="a" hint-placeholder-count="4">
+          <li style="display:flex; gap:24px; padding:14px 0; border-top:1px solid #D4D4D4; flex-wrap:wrap;">
+            <span style="flex:0 0 150px; font-size:13px; color:#595959;">{{a.time}}</span>
+            <span style="flex:0 0 130px; font-size:13px; font-weight:600;">{{a.actor}}</span>
+            <span style="flex:1 1 300px; min-width:0; font-size:14px; line-height:1.55;">{{a.what}}</span>
+          </li>
+        </sc-for>
+      </ol>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tileBase = 'flex:1 1 200px; box-sizing:border-box; padding:22px 24px; border-radius:2px; display:flex; flex-direction:column; gap:8px; ';
+    const light = tileBase + 'border:1px solid #D4D4D4; background:#FFFFFF; color:#0A0A0A;';
+    const dark = tileBase + 'background:#0A0A0A; color:#FFFFFF;';
+    const lab = 'font-size:12px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:#595959;';
+    const labDark = 'font-size:12px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:#A3A3A3;';
+    const note = 'font-size:13px; color:#595959; line-height:1.5;';
+    const noteDark = 'font-size:13px; color:#BDBDBD; line-height:1.5;';
+
+    const chipBase = 'display:inline-block; padding:5px 10px; border-radius:2px; font-size:12px; font-weight:600; letter-spacing:.04em; ';
+    const low = chipBase + 'border:1px solid #0A0A0A; color:#0A0A0A; background:#FFFFFF;';
+    const auto = chipBase + 'background:#0A0A0A; color:#FFFFFF;';
+
+    const got = 'display:inline-block; padding:4px 10px; border:1px solid #0A0A0A; border-radius:2px; font-size:12px; font-weight:600; background:#FFFFFF;';
+    const miss = 'display:inline-block; padding:4px 10px; border-radius:2px; font-size:12px; font-weight:600; background:#0A0A0A; color:#FFFFFF;';
+
+    return {
+      tiles: [
+        { style: dark, labelStyle: labDark, label: 'Company band', value: 'Auto-High', noteStyle: noteDark, note: 'Enhanced due diligence applies' },
+        { style: light, labelStyle: lab, label: 'Documents', value: '4 of 10', noteStyle: note, note: 'Six still to be received' },
+        { style: light, labelStyle: lab, label: 'People', value: '2', noteStyle: note, note: 'One representative and UBO, two directors' },
+        { style: light, labelStyle: lab, label: 'Initial threshold', value: 'Not set', noteStyle: note, note: 'Set after documents are complete, capped at $40,000' },
+      ],
+      why: [
+        { k: 'Company country: Netherlands', v: 'Low' },
+        { k: 'Ada Sample, Greece', v: 'Low' },
+        { k: 'Bo Sample, Kenya (FATF increased monitoring)', v: 'Auto-High' },
+      ],
+      people: [
+        { name: 'Ada Sample', status: 'Identity verified', roles: 'Representative, UBO, director', shares: '60%', country: 'Greece', band: 'Low', chip: low },
+        { name: 'Bo Sample', status: 'Identity not yet submitted', roles: 'Shareholder, director', shares: '40%', country: 'Kenya', band: 'Auto-High', chip: auto },
+      ],
+      docs: [
+        { name: 'Certificate of incorporation', status: 'Received', chip: got, note: '' },
+        { name: 'Articles of association', status: 'Received', chip: got, note: '' },
+        { name: 'Register of members', status: 'Received', chip: got, note: '' },
+        { name: 'Certificate of shareholders', status: 'Received', chip: got, note: 'Classification to check, see below' },
+        { name: 'Evidence of beneficial ownership', status: 'Missing', chip: miss, note: 'Required for the UBO' },
+        { name: 'Certificate of registered address', status: 'Missing', chip: miss, note: '' },
+        { name: 'Evidence of current address', status: 'Missing', chip: miss, note: '' },
+        { name: 'Certificate of good standing', status: 'Missing', chip: miss, note: '' },
+        { name: 'Resolution of directors', status: 'Missing', chip: miss, note: '' },
+        { name: 'Corporate questionnaire', status: 'Missing', chip: miss, note: '' },
+      ],
+      audit: [
+        { time: '21 Oct 2026, 10:02', actor: 'Applicant', what: 'Company application submitted by Ada Sample with four documents.' },
+        { time: '21 Oct 2026, 10:02', actor: 'Rules engine', what: 'Company band Auto-High, driven by Bo Sample residing in Kenya. Shareholdings checked: 100%.' },
+        { time: '21 Oct 2026, 10:04', actor: 'Claude pre-review', what: 'Advisory classification check completed. One document may be filed under the wrong type.' },
+        { time: '21 Oct 2026, 10:04', actor: 'System', what: 'Case placed in the review queue. Six documents missing. Awaiting analyst decision.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

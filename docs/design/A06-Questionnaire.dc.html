@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Questionnaire</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:hover{opacity:.88}
+input:focus-visible,a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid #0A0A0A;outline-offset:2px}
+</style>
+</helmet>
+<div style="display:flex; flex-wrap:wrap; min-height:1500px; background:#FFFFFF; color:#0A0A0A; font-family:'Alexandria',system-ui,sans-serif;">
+  <dc-import name="LeftPanel" current="6" minh="1500" title="A few questions" body="Financial regulations require us to ask these. Answer as accurately as you can." hint-size="440px,1500px"></dc-import>
+  <main style="flex:999 1 560px; min-width:0; box-sizing:border-box; padding:72px 64px; display:flex; flex-direction:column;">
+    <div style="max-width:640px; display:flex; flex-direction:column; gap:40px;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <span style="font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#595959;">Step 6 of 8</span>
+        <h1 style="margin:0; font-size:36px; line-height:1.15; font-weight:700; letter-spacing:-.01em;">Questionnaire</h1>
+      </div>
+
+      <section style="display:flex; flex-direction:column; gap:20px;">
+        <h2 style="margin:0; font-size:18px; font-weight:600;">About you</h2>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1 1 240px; display:flex; flex-direction:column; gap:8px;">
+            <label for="dob" style="font-size:13px; font-weight:500;">Date of birth</label>
+            <input id="dob" type="date" value="1990-05-01" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+            <span style="font-size:13px; color:#595959;">Must match the date on your ID.</span>
+          </div>
+          <div style="flex:1 1 240px; display:flex; flex-direction:column; gap:8px;">
+            <label for="nat" style="font-size:13px; font-weight:500;">Nationality</label>
+            <select id="nat" style="box-sizing:border-box; height:52px; padding:0 12px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;"><option>Greek</option><option>Dutch</option><option>British</option></select>
+          </div>
+        </div>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1 1 240px; display:flex; flex-direction:column; gap:8px;">
+            <label for="lang" style="font-size:13px; font-weight:500;">Preferred language</label>
+            <select id="lang" style="box-sizing:border-box; height:52px; padding:0 12px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;"><option>English</option><option>Greek</option><option>Dutch</option></select>
+          </div>
+          <div style="flex:1 1 240px; display:flex; flex-direction:column; gap:8px;">
+            <label for="ph" style="font-size:13px; font-weight:500;">Phone number with country code</label>
+            <input id="ph" type="tel" value="+30 690 000 0000" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-size:13px; font-weight:500;">Email address</span>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; box-sizing:border-box; min-height:52px; padding:0 16px; background:#F5F5F5; border-radius:2px; font-size:15px;">
+            <span>ada.sample@demo.test</span>
+            <span style="display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Verified</span>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label for="tin" style="font-size:13px; font-weight:500;">Tax identification number (TIN)</label>
+          <input id="tin" type="text" value="" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          <label style="display:flex; align-items:center; gap:12px; font-size:14px; cursor:pointer;"><input type="checkbox" style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">I do not have a TIN</label>
+          <label for="tinwhy" style="font-size:13px; font-weight:500; color:#595959;">If you do not have one, tell us why</label>
+          <select id="tinwhy" style="box-sizing:border-box; height:52px; padding:0 12px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;"><option>My income is too low to have a TIN</option><option>My country issues TINs only for companies</option><option>Other reason</option></select>
+        </div>
+      </section>
+
+      <section style="display:flex; flex-direction:column; gap:24px; padding-top:32px; border-top:1px solid #D4D4D4;">
+        <h2 style="margin:0; font-size:18px; font-weight:600;">Tax and public roles</h2>
+        <fieldset style="border:0; margin:0; padding:0; display:flex; flex-direction:column; gap:12px;">
+          <legend style="padding:0; margin-bottom:12px; font-size:14px; font-weight:500; line-height:1.5;">Are you a United States resident for tax purposes?</legend>
+          <div style="display:flex; gap:28px;">
+            <label style="display:flex; align-items:center; gap:10px; font-size:15px; cursor:pointer;"><input type="radio" name="us" value="yes" style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">Yes</label>
+            <label style="display:flex; align-items:center; gap:10px; font-size:15px; cursor:pointer;"><input type="radio" name="us" value="no" checked style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">No</label>
+          </div>
+        </fieldset>
+        <fieldset style="border:0; margin:0; padding:0; display:flex; flex-direction:column; gap:12px;">
+          <legend style="padding:0; margin-bottom:6px; font-size:14px; font-weight:500; line-height:1.5;">Are you currently, or have you previously been, a politically exposed person (PEP)?</legend>
+          <span style="font-size:13px; line-height:1.55; color:#595959; margin-bottom:6px;">Someone who holds or held a prominent public function, or a close family member or associate of such a person.</span>
+          <div style="display:flex; gap:28px;">
+            <label style="display:flex; align-items:center; gap:10px; font-size:15px; cursor:pointer;"><input type="radio" name="pep" value="yes" style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">Yes</label>
+            <label style="display:flex; align-items:center; gap:10px; font-size:15px; cursor:pointer;"><input type="radio" name="pep" value="no" checked style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">No</label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section style="display:flex; flex-direction:column; gap:20px; padding-top:32px; border-top:1px solid #D4D4D4;">
+        <h2 style="margin:0; font-size:18px; font-weight:600;">Your finances</h2>
+        <sc-for list="{{finance}}" as="f" hint-placeholder-count="6">
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <label for="{{f.id}}" style="font-size:13px; font-weight:500;">{{f.label}}</label>
+            <select id="{{f.id}}" style="box-sizing:border-box; height:52px; padding:0 12px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+              <sc-for list="{{f.options}}" as="o" hint-placeholder-count="4">
+                <option selected="{{o.selected}}">{{o.text}}</option>
+              </sc-for>
+            </select>
+          </div>
+        </sc-for>
+      </section>
+
+      <section style="display:flex; flex-direction:column; gap:16px; padding-top:32px; border-top:1px solid #D4D4D4;">
+        <label style="display:flex; align-items:flex-start; gap:14px; font-size:14px; line-height:1.65; cursor:pointer;">
+          <input type="checkbox" style="flex:0 0 18px; width:18px; height:18px; margin:3px 0 0; accent-color:#0A0A0A;">
+          <span>I declare that I have carefully read, accept and fully understood the entire content of the Terms and Conditions, Order Execution Policy, Risk Disclosure, Conflicts of Interest Policy, Privacy Policy and any other legal documentation. I understand that every investment involves risk.</span>
+        </label>
+      </section>
+
+      <div style="display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
+        <a href="A07-Check.dc.html" style="display:inline-flex; align-items:center; gap:12px; height:52px; padding:0 32px; background:#0A0A0A; color:#FFFFFF; border-radius:2px; font-size:15px; font-weight:600; letter-spacing:.02em;">
+          Submit for review
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="A05-Proof-Of-Residence.dc.html" style="font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:4px;">Back</a>
+        <a href="#" style="font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:4px;">Save and finish later</a>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const mk = (id, label, options, sel) => ({ id, label, options: options.map((text) => ({ text, selected: text === sel })) });
+    const bands = ['Less than $50,000', '$50,001 to $100,000', '$100,001 to $500,000', '$500,001 to $1,000,000', 'More than $1,000,000'];
+    return {
+      finance: [
+        mk('dep', 'Amount you expect to deposit or invest in the next 12 months', ['Less than $20,000', '$20,000 to $50,000', '$50,001 to $250,000', '$250,001 to $500,000', '$500,001 to $1,000,000', 'More than $1,000,000'], 'Less than $20,000'),
+        mk('sof', 'Source of funds for this deposit', ['Salary', 'Savings', 'Investment', 'Inheritance', 'Pension', 'Other'], 'Salary'),
+        mk('emp', 'Employment status', ['Employed', 'Self-employed', 'Unemployed', 'Retired', 'Student', 'Other'], 'Employed'),
+        mk('ind', 'Industry of occupation', ['Information technology', 'Education', 'Financial services', 'Other'], 'Information technology'),
+        mk('inc', 'Total estimated annual income', bands, 'Less than $50,000'),
+        mk('nw', 'Estimated net worth', bands, 'Less than $50,000'),
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

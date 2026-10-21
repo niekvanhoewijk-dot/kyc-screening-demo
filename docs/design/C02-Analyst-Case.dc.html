@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Analyst case</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:hover{opacity:.88}
+input:focus-visible,a:focus-visible,button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #0A0A0A;outline-offset:2px}
+.th{padding:10px 12px 10px 0;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-align:left;border-bottom:2px solid #0A0A0A}
+.td{padding:12px 12px 12px 0;font-size:14px;border-bottom:1px solid #D4D4D4;vertical-align:top}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#595959}
+.card{box-sizing:border-box;border:1px solid #D4D4D4;border-radius:2px;padding:28px;display:flex;flex-direction:column;gap:18px;background:#FFFFFF}
+</style>
+</helmet>
+<div style="display:flex; flex-wrap:wrap; min-height:1600px; background:#FFFFFF; color:#0A0A0A; font-family:'Alexandria',system-ui,sans-serif;">
+  <dc-import name="AnalystNav" active="cases" minh="1600" hint-size="260px,1600px"></dc-import>
+  <main style="flex:999 1 600px; min-width:0; box-sizing:border-box; padding:40px 48px 72px; display:flex; flex-direction:column; gap:36px;">
+
+    <nav aria-label="Breadcrumb" style="font-size:13px; color:#595959;">
+      <a href="C01-Analyst-Queue.dc.html" style="text-decoration:underline; text-underline-offset:4px;">Cases</a>
+      <span aria-hidden="true"> / </span><span>Tom Example</span>
+    </nav>
+
+    <header style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <span class="eyebrow">Individual · case review</span>
+        <h1 style="margin:0; font-size:36px; line-height:1.1; font-weight:700; letter-spacing:-.01em;">Tom Example</h1>
+        <p style="margin:0; font-size:15px; color:#595959;">United Kingdom · self-employed · submitted 21 Oct 2026 · Mode: MVP 2, Claude pre-review on</p>
+      </div>
+      <span style="display:inline-block; padding:8px 14px; border-radius:2px; background:#E5E5E5; font-size:13px; font-weight:600;">In review</span>
+    </header>
+
+    <section aria-label="Summary" style="display:flex; flex-wrap:wrap; gap:16px;">
+      <sc-for list="{{tiles}}" as="t" hint-placeholder-count="4">
+        <div style="{{t.style}}">
+          <span style="{{t.labelStyle}}">{{t.label}}</span>
+          <span style="font-size:34px; line-height:1.05; font-weight:700; letter-spacing:-.02em;">{{t.value}}</span>
+          <span style="{{t.noteStyle}}">{{t.note}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:stretch;">
+      <section class="card" aria-labelledby="h-score" style="flex:1 1 440px; min-width:0;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <span class="eyebrow">Rules engine</span>
+          <h2 id="h-score" style="margin:0; font-size:22px; font-weight:600;">Score breakdown</h2>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; min-width:380px; border-collapse:collapse;">
+            <caption style="position:absolute; left:-9999px;">Risk score by factor</caption>
+            <thead><tr><th class="th" scope="col">Factor</th><th class="th" scope="col">Answer</th><th class="th" scope="col">Level</th><th class="th" scope="col" style="text-align:right; padding-right:0;">Points</th></tr></thead>
+            <tbody>
+              <sc-for list="{{score}}" as="s" hint-placeholder-count="7">
+                <tr><th class="td" scope="row" style="font-weight:500; text-align:left;">{{s.factor}}</th><td class="td">{{s.answer}}</td><td class="td">{{s.level}}</td><td class="td" style="text-align:right; padding-right:0; font-weight:600;">{{s.points}}</td></tr>
+              </sc-for>
+              <tr><th class="td" scope="row" colspan="3" style="text-align:left; font-weight:700; border-bottom:0;">Total · band Medium (10 to 15)</th><td class="td" style="text-align:right; padding-right:0; font-weight:700; font-size:18px; border-bottom:0;">15</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin:0; font-size:13px; line-height:1.6; color:#595959;">No hard rules fired: not a US tax resident, no PEP, no prohibited country. Country level: FATF, as of 2026-06-19.</p>
+      </section>
+
+      <section class="card" aria-labelledby="h-thr" style="flex:1 1 360px; min-width:0;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <span class="eyebrow">Rules engine</span>
+          <h2 id="h-thr" style="margin:0; font-size:22px; font-weight:600;">How the threshold is set</h2>
+        </div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#595959;">The initial threshold is the lowest of four limits. The lowest one binds.</p>
+        <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column;">
+          <sc-for list="{{limits}}" as="l" hint-placeholder-count="4">
+            <li style="{{l.style}}">
+              <div style="display:flex; flex-direction:column; gap:3px; min-width:0;">
+                <span style="font-size:14px; font-weight:600;">{{l.name}}</span>
+                <span style="font-size:12px; color:#595959; line-height:1.5;">{{l.how}}</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex:0 0 auto;">
+                <span style="font-size:15px; font-weight:600;">{{l.value}}</span>
+                <span style="{{l.tagStyle}}">{{l.tag}}</span>
+              </div>
+            </li>
+          </sc-for>
+        </ul>
+        <p style="margin:0; font-size:12px; line-height:1.6; color:#595959;">Source-of-funds percentage and caps come from config/risk-matrix.yaml. The $100,000 ceiling applies to the initial threshold only.</p>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="h-claude" style="gap:24px;">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <span class="eyebrow">MVP 2 · Claude pre-review</span>
+          <h2 id="h-claude" style="margin:0; font-size:22px; font-weight:600;">Document checks and case memo</h2>
+        </div>
+        <span style="display:inline-block; padding:6px 12px; border:1.5px solid #0A0A0A; border-radius:2px; font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;">Advisory</span>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:32px;">
+        <div style="flex:1 1 380px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+          <h3 style="margin:0; font-size:15px; font-weight:600;">Checks</h3>
+          <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column;">
+            <sc-for list="{{checks}}" as="c" hint-placeholder-count="5">
+              <li style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:12px 0; border-bottom:1px solid #D4D4D4;">
+                <div style="display:flex; flex-direction:column; gap:3px; min-width:0;">
+                  <span style="font-size:14px; font-weight:500;">{{c.name}}</span>
+                  <span style="font-size:12px; color:#595959; line-height:1.5;">{{c.detail}}</span>
+                </div>
+                <span style="{{c.chip}}">{{c.result}}</span>
+              </li>
+            </sc-for>
+          </ul>
+        </div>
+
+        <div style="flex:1 1 380px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <h3 style="margin:0; font-size:15px; font-weight:600;">Fields read from the documents</h3>
+            <span style="font-size:12px; color:#595959;">Sample data</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table style="width:100%; min-width:340px; border-collapse:collapse;">
+              <caption style="position:absolute; left:-9999px;">Extracted fields with confidence</caption>
+              <thead><tr><th class="th" scope="col">Field</th><th class="th" scope="col">Read as</th><th class="th" scope="col" style="padding-right:0; text-align:right;">Confidence</th></tr></thead>
+              <tbody>
+                <sc-for list="{{fields}}" as="f" hint-placeholder-count="5">
+                  <tr><th class="td" scope="row" style="font-weight:500; text-align:left;">{{f.field}}</th><td class="td">{{f.value}}<span style="display:block; font-size:12px; color:#595959; margin-top:2px;">{{f.evidence}}</span></td><td class="td" style="text-align:right; padding-right:0;">{{f.conf}}</td></tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px; padding:24px; background:#F5F5F5; border-radius:2px;">
+        <h3 style="margin:0; font-size:15px; font-weight:600;">Case memo</h3>
+        <p style="margin:0; font-size:14px; line-height:1.7; color:#262626;">Identity checks passed. The selfie matches the passport photo, and name and date of birth agree across documents. One check failed: the proof of residence is a bank statement issued on 4 May 2026, which is older than three months. The scored risk is Medium (15) with a $50,000 threshold set by the stated deposit band. Suggested next step: ask the applicant for a more recent proof of residence before approval.</p>
+        <p style="margin:0; font-size:12px; font-weight:600; letter-spacing:.04em;">Advisory only. The decision rests with the analyst.</p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-dec" style="gap:22px;">
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <span class="eyebrow">Analyst decision</span>
+        <h2 id="h-dec" style="margin:0; font-size:22px; font-weight:600;">Record your decision</h2>
+      </div>
+      <fieldset style="border:0; margin:0; padding:0; min-width:0; display:flex; flex-wrap:wrap; gap:12px;">
+        <legend style="position:absolute; left:-9999px;">Decision</legend>
+        <label style="flex:1 1 200px; display:flex; align-items:flex-start; gap:12px; box-sizing:border-box; padding:16px; border:1.5px solid #6B6B6B; border-radius:2px; cursor:pointer;">
+          <input type="radio" name="decision" value="approve" style="margin:3px 0 0; accent-color:#0A0A0A;">
+          <span style="display:flex; flex-direction:column; gap:3px;"><span style="font-size:15px; font-weight:600;">Approve</span><span style="font-size:12px; color:#595959; line-height:1.5;">Open the account with a $50,000 threshold.</span></span>
+        </label>
+        <label style="flex:1 1 200px; display:flex; align-items:flex-start; gap:12px; box-sizing:border-box; padding:16px; border:1.5px solid #0A0A0A; border-radius:2px; background:#F5F5F5; cursor:pointer;">
+          <input type="radio" name="decision" value="edd" checked style="margin:3px 0 0; accent-color:#0A0A0A;">
+          <span style="display:flex; flex-direction:column; gap:3px;"><span style="font-size:15px; font-weight:600;">Request more information</span><span style="font-size:12px; color:#595959; line-height:1.5;">Ask for further documents. Wording shown to the applicant stays neutral.</span></span>
+        </label>
+        <label style="flex:1 1 200px; display:flex; align-items:flex-start; gap:12px; box-sizing:border-box; padding:16px; border:1.5px solid #6B6B6B; border-radius:2px; cursor:pointer;">
+          <input type="radio" name="decision" value="reject" style="margin:3px 0 0; accent-color:#0A0A0A;">
+          <span style="display:flex; flex-direction:column; gap:3px;"><span style="font-size:15px; font-weight:600;">Reject</span><span style="font-size:12px; color:#595959; line-height:1.5;">Applicant sees the neutral no-go message.</span></span>
+        </label>
+      </fieldset>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <label for="reason" style="font-size:13px; font-weight:500;">Reason for the decision <span style="font-weight:400; color:#595959;">(required, kept in the audit trail)</span></label>
+        <textarea id="reason" rows="4" required style="box-sizing:border-box; padding:14px 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 15px/1.5 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF; resize:vertical;">Proof of residence is older than three months. Requesting a more recent document before approval.</textarea>
+      </div>
+      <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+        <button type="button" style="display:inline-flex; align-items:center; gap:12px; height:52px; padding:0 32px; background:#0A0A0A; color:#FFFFFF; border:0; border-radius:2px; font:600 15px 'Alexandria',system-ui,sans-serif; letter-spacing:.02em; cursor:pointer;">
+          Record decision
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <a href="C01-Analyst-Queue.dc.html" style="font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:4px;">Back to cases</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-audit" style="display:flex; flex-direction:column; gap:16px;">
+      <h2 id="h-audit" style="margin:0; font-size:22px; font-weight:600;">Audit trail</h2>
+      <ol style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column;">
+        <sc-for list="{{audit}}" as="a" hint-placeholder-count="5">
+          <li style="display:flex; gap:24px; padding:14px 0; border-top:1px solid #D4D4D4; flex-wrap:wrap;">
+            <span style="flex:0 0 150px; font-size:13px; color:#595959;">{{a.time}}</span>
+            <span style="flex:0 0 130px; font-size:13px; font-weight:600;">{{a.actor}}</span>
+            <span style="flex:1 1 300px; min-width:0; font-size:14px; line-height:1.55;">{{a.what}}</span>
+          </li>
+        </sc-for>
+      </ol>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tileBase = 'flex:1 1 200px; box-sizing:border-box; padding:22px 24px; border-radius:2px; display:flex; flex-direction:column; gap:8px; ';
+    const light = tileBase + 'border:1px solid #D4D4D4; background:#FFFFFF; color:#0A0A0A;';
+    const dark = tileBase + 'background:#0A0A0A; color:#FFFFFF;';
+    const lab = 'font-size:12px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:#595959;';
+    const labDark = 'font-size:12px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:#A3A3A3;';
+    const note = 'font-size:13px; color:#595959; line-height:1.5;';
+    const noteDark = 'font-size:13px; color:#BDBDBD; line-height:1.5;';
+
+    const rowBase = 'display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:14px 0; border-top:1px solid #D4D4D4; ';
+    const tagBind = 'display:inline-block; padding:3px 8px; border-radius:2px; background:#0A0A0A; color:#FFFFFF; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;';
+    const tagOther = 'display:inline-block; padding:3px 8px; border-radius:2px; border:1px solid #6B6B6B; color:#595959; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;';
+
+    const pass = 'flex:0 0 auto; display:inline-block; padding:4px 10px; border:1px solid #0A0A0A; border-radius:2px; font-size:12px; font-weight:600; background:#FFFFFF;';
+    const fail = 'flex:0 0 auto; display:inline-block; padding:4px 10px; border-radius:2px; font-size:12px; font-weight:600; background:#0A0A0A; color:#FFFFFF;';
+
+    return {
+      tiles: [
+        { style: light, labelStyle: lab, label: 'Risk score', value: '15', noteStyle: note, note: 'Out of a possible 21 on seven factors' },
+        { style: light, labelStyle: lab, label: 'Risk band', value: 'Medium', noteStyle: note, note: 'Band range 10 to 15' },
+        { style: dark, labelStyle: labDark, label: 'Initial threshold', value: '$50,000', noteStyle: noteDark, note: 'Set by the stated deposit band' },
+        { style: light, labelStyle: lab, label: 'Screening', value: '0 matches', noteStyle: note, note: 'Sample provider, sanctions and PEP' },
+      ],
+      score: [
+        { factor: 'Country of residence', answer: 'United Kingdom', level: 'Low', points: '1' },
+        { factor: 'Planned deposit', answer: '$20,001 to $50,000', level: 'Low', points: '1' },
+        { factor: 'Source of funds', answer: 'Savings', level: 'Medium', points: '2' },
+        { factor: 'Employment', answer: 'Self-employed', level: 'Medium', points: '2' },
+        { factor: 'Industry', answer: 'Financial services', level: 'High', points: '3' },
+        { factor: 'Annual income', answer: '$500,001 to $1,000,000', level: 'High', points: '3' },
+        { factor: 'Net worth', answer: '$500,001 to $1,000,000', level: 'High', points: '3' },
+      ],
+      limits: [
+        { style: rowBase + 'background:#F5F5F5; padding-left:14px; padding-right:14px; border-top:1.5px solid #0A0A0A;', name: 'Stated deposit band', how: 'Top of the band the applicant chose: $20,001 to $50,000', value: '$50,000', tag: 'Binding', tagStyle: tagBind },
+        { style: rowBase, name: 'Source of funds share', how: 'Savings counts for 80% of income band top: 80% × $1,000,000', value: '$800,000', tag: 'Higher', tagStyle: tagOther },
+        { style: rowBase, name: 'Category cap', how: 'Standard cap for a Medium band applicant', value: '$100,000', tag: 'Higher', tagStyle: tagOther },
+        { style: rowBase + 'border-bottom:1px solid #D4D4D4;', name: 'Initial ceiling', how: 'Demo-wide limit on any initial threshold', value: '$100,000', tag: 'Higher', tagStyle: tagOther },
+      ],
+      checks: [
+        { name: 'Proof of identity is valid', detail: 'Passport, expires in 2031', result: 'Pass', chip: pass },
+        { name: 'Selfie matches the document photo', detail: 'Supplier match score above threshold (mock adapter)', result: 'Pass', chip: pass },
+        { name: 'Date of birth agrees across documents', detail: 'Passport and questionnaire show the same date', result: 'Pass', chip: pass },
+        { name: 'Name is consistent', detail: 'Passport, bank statement and form all read Tom Example', result: 'Pass', chip: pass },
+        { name: 'Proof of residence is recent', detail: 'POR_OLDER_THAN_3_MONTHS. Issued 4 May 2026, more than three months ago.', result: 'Fail', chip: fail },
+      ],
+      fields: [
+        { field: 'Full name', value: 'Tom Example', evidence: 'Passport, line 1', conf: '98%' },
+        { field: 'Date of birth', value: '14 Mar 1989', evidence: 'Passport, line 3', conf: '97%' },
+        { field: 'Document expiry', value: '30 Jun 2031', evidence: 'Passport, line 5', conf: '96%' },
+        { field: 'Address', value: '12 Sample Street, London', evidence: 'Bank statement, header', conf: '93%' },
+        { field: 'Issue date', value: '4 May 2026', evidence: 'Bank statement, top right', conf: '95%' },
+      ],
+      audit: [
+        { time: '21 Oct 2026, 09:12', actor: 'Applicant', what: 'Application submitted with identity document, selfie, proof of residence and questionnaire.' },
+        { time: '21 Oct 2026, 09:12', actor: 'Rules engine', what: 'Scored 15, band Medium. Initial threshold $50,000 set by the stated deposit band. No hard rules fired.' },
+        { time: '21 Oct 2026, 09:13', actor: 'Screening', what: 'Sanctions and PEP screening completed with the sample provider. No matches.' },
+        { time: '21 Oct 2026, 09:14', actor: 'Claude pre-review', what: 'Advisory review completed. Four checks passed, one failed (proof of residence older than three months). Memo drafted.' },
+        { time: '21 Oct 2026, 09:14', actor: 'System', what: 'Case placed in the review queue. Awaiting analyst decision.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

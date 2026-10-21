@@ -3,24 +3,33 @@
 import type { ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import type { FormState } from "@/app/apply/form-state";
+import { ArrowIcon, Ticked, UploadIcon } from "./icons";
 
 export function Field({
   name,
   label,
   hint,
+  optional,
   state,
   children,
 }: {
   name: string;
   label: string;
   hint?: string;
+  /** Adds the grey "(optional)" suffix from the boards. */
+  optional?: boolean;
   state: FormState;
   children: ReactNode;
 }) {
   const errors = state.fieldErrors?.[name];
   return (
     <div className="field" data-invalid={errors?.length ? "" : undefined}>
-      <label htmlFor={name}>{label}</label>
+      {label && (
+        <label htmlFor={name}>
+          {label}
+          {optional && <span className="optional"> (optional)</span>}
+        </label>
+      )}
       {hint && <span className="hint">{hint}</span>}
       {children}
       {errors?.map((e) => (
@@ -41,11 +50,26 @@ export function FormMessage({ state }: { state: FormState }) {
   );
 }
 
-export function Submit({ children, pending: pendingLabel = "Saving…" }: { children: ReactNode; pending?: string }) {
+export function Submit({
+  children,
+  pending: pendingLabel = "Saving…",
+  arrow = true,
+  variant,
+  name,
+  value,
+}: {
+  children: ReactNode;
+  pending?: string;
+  arrow?: boolean;
+  variant?: "outline";
+  name?: string;
+  value?: string;
+}) {
   const { pending } = useFormStatus();
   return (
-    <button className="btn" type="submit" disabled={pending}>
+    <button className={`btn${variant ? ` ${variant}` : ""}${pending ? " busy" : ""}`} type="submit" disabled={pending} name={name} value={value}>
       {pending ? pendingLabel : children}
+      {arrow && !pending && <ArrowIcon />}
     </button>
   );
 }
@@ -57,3 +81,33 @@ export const v = (state: FormState, saved: Record<string, unknown> | null | unde
   const s = saved?.[key];
   return s === undefined || s === null ? "" : String(s);
 };
+
+export const OnFile = ({ name }: { name?: string }) => (name ? <Ticked>On file: {name}. Choose a new file only to replace it.</Ticked> : null);
+
+/** Drop zone around a native file input (boards A04/A05/A08). */
+export function Dropzone({ name, label, hint, accept, multiple, capture, onFile, state, icon }: {
+  name: string;
+  label: string;
+  hint: string;
+  accept: string;
+  multiple?: boolean;
+  capture?: "user";
+  onFile?: string;
+  state: FormState;
+  icon?: boolean;
+}) {
+  const errors = state.fieldErrors?.[name];
+  return (
+    <div className="field" data-invalid={errors?.length ? "" : undefined}>
+      <div className="dropzone">
+        {icon && <UploadIcon />}
+        <label htmlFor={name} style={{ fontSize: 15, fontWeight: 500 }}>{label}</label>
+        <span className="hint">{hint}</span>
+        <input id={name} name={name} type="file" accept={accept} multiple={multiple} capture={capture} />
+        <OnFile name={onFile} />
+      </div>
+      {errors?.map((e) => <span key={e} className="error" role="alert">{e}</span>)}
+    </div>
+  );
+}
+

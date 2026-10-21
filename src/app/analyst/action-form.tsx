@@ -11,13 +11,20 @@ export function ActionForm({
   children,
   submit,
   pending,
+  arrow = false,
+  variant,
+  buttons,
   className = "stack",
 }: {
   action: (s: FormState, fd: FormData) => Promise<FormState>;
   hidden: Record<string, string>;
   children?: ReactNode;
-  submit: string;
+  submit?: string;
   pending?: string;
+  arrow?: boolean;
+  variant?: "outline";
+  /** Several submit buttons (e.g. name="action" values), replacing the single submit. */
+  buttons?: ReactNode;
   className?: string;
 }) {
   const [state, run] = useActionState(action, initialState);
@@ -27,9 +34,11 @@ export function ActionForm({
         <input key={k} type="hidden" name={k} value={v} />
       ))}
       {children}
-      <div>
-        <Submit pending={pending ?? "Working…"}>{submit}</Submit>
-      </div>
+      {buttons ?? (
+        <div>
+          <Submit pending={pending ?? "Working…"} arrow={arrow} variant={variant}>{submit}</Submit>
+        </div>
+      )}
       <FormMessage state={state} />
     </form>
   );

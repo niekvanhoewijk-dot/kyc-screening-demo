@@ -1,4 +1,4 @@
-import { Stepper } from "@/components/stepper";
+import { ApplicantShell, backPath } from "@/components/applicant-shell";
 import { COUNTRIES, countryName } from "@/lib/countries";
 import { stepCase, type ResidenceData } from "@/portal/cases";
 import { OTHER_OCCUPATION } from "@/portal/schemas";
@@ -7,17 +7,21 @@ import { requireStep } from "../session";
 
 const opts = (list: { id: string; label: string }[]) => list.map(({ id, label }) => ({ id, label }));
 
-// 2.1.6 Questionnaire. Options and labels come from config/risk-matrix.yaml; the score is never shown.
+// 2.1.6 Questionnaire (docs/design/A06-Questionnaire.dc.html). Options and labels come from config/risk-matrix.yaml; the score is never shown.
 export default async function QuestionnairePage() {
   const { deps, c, applicant } = await requireStep("questionnaire");
   const f = deps.engine.matrix.factors;
   const r = c.residence as ResidenceData;
   const address = [r.apartment, r.addressLine1, r.addressLine2, r.city, r.region, r.postcode, countryName(r.country)].filter(Boolean).join(", ");
+  const sc = stepCase(c);
   return (
-    <div className="card">
-      <Stepper current="questionnaire" c={stepCase(c)} />
-      <h1>A few questions</h1>
-      <p className="lede">Regulation requires us to ask these. It takes about 5 minutes.</p>
+    <ApplicantShell
+      panelTitle="A few questions"
+      panelBody="Financial regulations require us to ask these. Answer as accurately as you can."
+      c={sc}
+      current="questionnaire"
+      title="Questionnaire"
+    >
       <QuestionnaireForm
         saved={c.questionnaire as Record<string, unknown> | null}
         email={applicant.email}
@@ -32,7 +36,8 @@ export default async function QuestionnairePage() {
           annual_income: opts(f.annual_income),
           net_worth: opts(f.net_worth),
         }}
+        back={backPath("questionnaire", sc)}
       />
-    </div>
+    </ApplicantShell>
   );
 }

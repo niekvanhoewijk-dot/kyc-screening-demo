@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Applicant side panel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (max-width: 820px){ .lp{min-height:auto !important; padding-bottom:140px !important;} }
+</style>
+</helmet>
+<aside class="lp" style="position:relative; overflow:hidden; box-sizing:border-box; width:440px; max-width:100%; min-height:{{minh}}px; background:#0A0A0A; color:#FFFFFF; font-family:'Alexandria',system-ui,sans-serif; padding:48px 44px 200px; display:flex; flex-direction:column; gap:40px;">
+  <div style="display:flex; flex-direction:column; gap:24px; position:relative; z-index:2;">
+    <span style="font-size:12px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:#A3A3A3;">Demo Digital Assets Platform</span>
+    <h2 style="margin:0; font-size:38px; line-height:1.12; font-weight:700; letter-spacing:-.01em; color:#FFFFFF;">{{title}}</h2>
+    <p style="margin:0; font-size:15px; line-height:1.65; color:#BDBDBD;">{{body}}</p>
+  </div>
+
+  <sc-if value="{{showSteps}}" hint-placeholder-val="{{true}}">
+    <nav aria-label="Verification progress" style="position:relative; z-index:2;">
+      <ol style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px;">
+        <sc-for list="{{steps}}" as="step" hint-placeholder-count="8">
+          <li style="display:flex; align-items:center; gap:14px;">
+            <span style="{{step.circle}}">
+              <sc-if value="{{step.done}}" hint-placeholder-val="{{false}}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+              </sc-if>
+              <sc-if value="{{step.pending}}" hint-placeholder-val="{{true}}">
+                <span>{{step.n}}</span>
+              </sc-if>
+            </span>
+            <span style="{{step.label}}">{{step.name}}</span>
+          </li>
+        </sc-for>
+      </ol>
+    </nav>
+  </sc-if>
+
+  <svg viewBox="0 0 440 260" preserveAspectRatio="none" aria-hidden="true" style="position:absolute; left:0; right:0; bottom:0; width:100%; height:200px; z-index:1;">
+    <path d="M0 110 C 70 40, 150 100, 230 60 S 380 10, 440 60 L440 260 L0 260 Z" fill="#161616"/>
+    <path d="M0 170 C 90 110, 190 160, 290 120 S 400 110, 440 140 L440 260 L0 260 Z" fill="#212121"/>
+    <path d="M0 215 C 110 170, 210 215, 320 185 S 410 180, 440 195 L440 260 L0 260 Z" fill="#050505"/>
+  </svg>
+  <p style="position:absolute; left:44px; right:44px; bottom:24px; margin:0; z-index:2; font-size:11px; line-height:1.55; color:#A3A3A3;">Illustrative demo on synthetic data. Not a regulated compliance system.</p>
+</aside>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"current":{"editor":null,"default":1},"minh":{"editor":null,"default":1100},"title":{"editor":null,"default":"Open your account"},"body":{"editor":null,"default":"A few details first. You can leave at any time and come back exactly where you stopped."},"$preview":{"width":440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const current = Number(this.props.current ?? 1);
+    const minh = Number(this.props.minh ?? 1100);
+    const names = ['Create account', 'Verify email', 'Overview', 'Proof of identity', 'Proof of residence', 'Questionnaire', 'Check', 'Confirmation'];
+    const base = 'width:30px; height:30px; box-sizing:border-box; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; flex:0 0 30px; font-size:12px; font-weight:600;';
+    const steps = names.map((name, i) => {
+      const n = i + 1;
+      const done = n < current;
+      const now = n === current;
+      return {
+        n: String(n).padStart(2, '0'),
+        name,
+        done,
+        pending: !done,
+        circle: base + (done ? 'background:#FFFFFF;' : now ? 'border:1.5px solid #FFFFFF; color:#FFFFFF;' : 'border:1px solid #595959; color:#8A8A8A;'),
+        label: 'font-size:15px; ' + (now ? 'color:#FFFFFF; font-weight:600;' : done ? 'color:#BDBDBD; font-weight:400;' : 'color:#8A8A8A; font-weight:400;'),
+      };
+    });
+    return {
+      minh,
+      title: this.props.title ?? 'Open your account',
+      body: this.props.body ?? '',
+      showSteps: current > 0,
+      steps,
+    };
+  }
+}
+</script>
+</body>
+</html>

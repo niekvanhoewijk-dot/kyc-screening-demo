@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Proof of identity</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:hover{opacity:.88}
+input:focus-visible,a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid #0A0A0A;outline-offset:2px}
+</style>
+</helmet>
+<div style="display:flex; flex-wrap:wrap; min-height:1100px; background:#FFFFFF; color:#0A0A0A; font-family:'Alexandria',system-ui,sans-serif;">
+  <dc-import name="LeftPanel" current="4" minh="1100" title="Prove who you are" body="Upload a photo of your ID, then take a selfie. Both take under two minutes." hint-size="440px,1100px"></dc-import>
+  <main style="flex:999 1 560px; min-width:0; box-sizing:border-box; padding:72px 64px; display:flex; flex-direction:column;">
+    <div style="max-width:640px; display:flex; flex-direction:column; gap:36px;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <span style="font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#595959;">Step 4 of 8</span>
+        <h1 style="margin:0; font-size:36px; line-height:1.15; font-weight:700; letter-spacing:-.01em;">Proof of identity</h1>
+      </div>
+
+      <fieldset style="border:0; margin:0; padding:0;">
+        <legend style="padding:0; margin-bottom:12px; font-size:13px; font-weight:500;">Document type</legend>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <label style="flex:1 1 170px; display:flex; align-items:center; gap:12px; box-sizing:border-box; min-height:56px; padding:0 16px; border:2px solid #0A0A0A; background:#F5F5F5; border-radius:2px; font-size:15px; font-weight:600; cursor:pointer;">
+            <input type="radio" name="doc" value="passport" checked style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">Passport
+          </label>
+          <label style="flex:1 1 170px; display:flex; align-items:center; gap:12px; box-sizing:border-box; min-height:56px; padding:0 16px; border:1px solid #6B6B6B; background:#FFFFFF; border-radius:2px; font-size:15px; font-weight:500; cursor:pointer;">
+            <input type="radio" name="doc" value="id" style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">ID card
+          </label>
+          <label style="flex:1 1 170px; display:flex; align-items:center; gap:12px; box-sizing:border-box; min-height:56px; padding:0 16px; border:1px solid #6B6B6B; background:#FFFFFF; border-radius:2px; font-size:15px; font-weight:500; cursor:pointer;">
+            <input type="radio" name="doc" value="licence" style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">Driving licence
+          </label>
+        </div>
+      </fieldset>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <label for="poi-file" style="font-size:13px; font-weight:500;">Photo of your document</label>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; box-sizing:border-box; min-height:180px; padding:28px; border:1.5px dashed #6B6B6B; border-radius:2px; background:#FAFAFA; text-align:center;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+          <span style="font-size:15px; font-weight:500;">Drop your photo here or choose a file</span>
+          <span style="font-size:13px; color:#595959;">JPG, PNG or PDF, up to 10 MB</span>
+          <input id="poi-file" type="file" accept="image/*,.pdf" style="font:400 13px 'Alexandria',system-ui,sans-serif; max-width:100%;">
+        </div>
+        <div style="display:flex; gap:32px; flex-wrap:wrap;">
+          <div style="flex:1 1 240px;">
+            <h3 style="margin:0 0 10px; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;">A good photo</h3>
+            <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; font-size:14px; line-height:1.5; color:#262626;">
+              <li>All four corners are visible</li>
+              <li>Text is sharp and readable</li>
+              <li>The document is valid, not expired</li>
+            </ul>
+          </div>
+          <div style="flex:1 1 240px;">
+            <h3 style="margin:0 0 10px; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;">We cannot accept</h3>
+            <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; font-size:14px; line-height:1.5; color:#262626;">
+              <li>Edited, damaged or unclear documents</li>
+              <li>Photos with watermarks of any kind</li>
+              <li>Expired documents</li>
+            </ul>
+          </div>
+        </div>
+        <label style="display:flex; align-items:center; gap:12px; font-size:14px; cursor:pointer;">
+          <input type="checkbox" style="width:18px; height:18px; margin:0; accent-color:#0A0A0A;">
+          My document has no expiry date
+        </label>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px; padding:24px; background:#F5F5F5; border-radius:2px;">
+        <h2 style="margin:0; font-size:18px; font-weight:600;">Take a selfie</h2>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#262626;">Look straight at the camera in good light. Our verification partner compares your face with the photo on your document and does not keep it longer than the law requires.</p>
+        <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+          <a href="#" style="display:inline-flex; align-items:center; height:48px; padding:0 24px; border:1.5px solid #0A0A0A; border-radius:2px; font-size:14px; font-weight:600; background:#FFFFFF;">Open camera</a>
+          <span style="font-size:13px; color:#595959;">Not taken yet</span>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
+        <a href="A05-Proof-Of-Residence.dc.html" style="display:inline-flex; align-items:center; gap:12px; height:52px; padding:0 32px; background:#0A0A0A; color:#FFFFFF; border-radius:2px; font-size:15px; font-weight:600; letter-spacing:.02em;">
+          Continue
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="A03-Overview.dc.html" style="font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:4px;">Back</a>
+        <a href="#" style="font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:4px;">Save and finish later</a>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

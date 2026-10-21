@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Proof of residence</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:hover{opacity:.88}
+input:focus-visible,a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid #0A0A0A;outline-offset:2px}
+</style>
+</helmet>
+<div style="display:flex; flex-wrap:wrap; min-height:1100px; background:#FFFFFF; color:#0A0A0A; font-family:'Alexandria',system-ui,sans-serif;">
+  <dc-import name="LeftPanel" current="5" minh="1100" title="Where you live" body="Enter your address, then add one document that shows it. It must be issued in the last three months." hint-size="440px,1100px"></dc-import>
+  <main style="flex:999 1 560px; min-width:0; box-sizing:border-box; padding:72px 64px; display:flex; flex-direction:column;">
+    <div style="max-width:640px; display:flex; flex-direction:column; gap:36px;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <span style="font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#595959;">Step 5 of 8</span>
+        <h1 style="margin:0; font-size:36px; line-height:1.15; font-weight:700; letter-spacing:-.01em;">Proof of residence</h1>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <h2 style="margin:0; font-size:18px; font-weight:600;">Residential address</h2>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1 1 200px; display:flex; flex-direction:column; gap:8px;">
+            <label for="apt" style="font-size:13px; font-weight:500;">Apartment, flat or suite <span style="font-weight:400; color:#595959;">(optional)</span></label>
+            <input id="apt" type="text" value="" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+          <div style="flex:2 1 280px; display:flex; flex-direction:column; gap:8px;">
+            <label for="l1" style="font-size:13px; font-weight:500;">Address line 1</label>
+            <input id="l1" type="text" value="1 Sample Street" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+        </div>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1 1 240px; display:flex; flex-direction:column; gap:8px;">
+            <label for="l2" style="font-size:13px; font-weight:500;">Address line 2 <span style="font-weight:400; color:#595959;">(optional)</span></label>
+            <input id="l2" type="text" value="" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+          <div style="flex:1 1 240px; display:flex; flex-direction:column; gap:8px;">
+            <label for="city" style="font-size:13px; font-weight:500;">City, town or village</label>
+            <input id="city" type="text" value="Athens" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+        </div>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1 1 200px; display:flex; flex-direction:column; gap:8px;">
+            <label for="region" style="font-size:13px; font-weight:500;">County or region</label>
+            <input id="region" type="text" value="Attica" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+          <div style="flex:1 1 160px; display:flex; flex-direction:column; gap:8px;">
+            <label for="post" style="font-size:13px; font-weight:500;">Postcode</label>
+            <input id="post" type="text" value="10552" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+          <div style="flex:1 1 200px; display:flex; flex-direction:column; gap:8px;">
+            <label for="country" style="font-size:13px; font-weight:500;">Country</label>
+            <select id="country" style="box-sizing:border-box; height:52px; padding:0 12px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+              <option>Greece</option>
+              <option>Netherlands</option>
+              <option>United Kingdom</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1 1 240px; display:flex; flex-direction:column; gap:8px;">
+            <label for="mobile" style="font-size:13px; font-weight:500;">Mobile phone</label>
+            <input id="mobile" type="tel" value="+30 690 000 0000" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+          <div style="flex:1 1 240px; display:flex; flex-direction:column; gap:8px;">
+            <label for="landline" style="font-size:13px; font-weight:500;">Landline <span style="font-weight:400; color:#595959;">(optional)</span></label>
+            <input id="landline" type="tel" value="" style="box-sizing:border-box; height:52px; padding:0 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 16px 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF;">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:16px; padding-top:32px; border-top:1px solid #D4D4D4;">
+        <h2 style="margin:0; font-size:18px; font-weight:600;">One document, issued in the last 3 months</h2>
+        <div style="display:flex; gap:32px; flex-wrap:wrap;">
+          <div style="flex:1 1 280px;">
+            <h3 style="margin:0 0 10px; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;">Accepted</h3>
+            <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:8px; font-size:14px; line-height:1.5; color:#262626;">
+              <li>Utility bill: electricity, gas, water, sewage, internet, TV or home phone</li>
+              <li>Bank or credit card statement. You may hide transactions and amounts, but issuer, your name, address and issue date must stay visible</li>
+              <li>Official government, state or municipal document that states where you live, such as a tax declaration, stay permit or certificate of residence</li>
+            </ul>
+          </div>
+          <div style="flex:1 1 220px;">
+            <h3 style="margin:0 0 10px; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;">Not accepted</h3>
+            <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:8px; font-size:14px; line-height:1.5; color:#262626;">
+              <li>Photos of envelopes or parcels</li>
+              <li>Mobile phone bills</li>
+              <li>P.O. box addresses</li>
+            </ul>
+            <p style="margin:14px 0 0; font-size:13px; line-height:1.55; color:#595959;">A bill in joint names is fine if the other person also completes verification.</p>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; box-sizing:border-box; min-height:150px; padding:24px; border:1.5px dashed #6B6B6B; border-radius:2px; background:#FAFAFA; text-align:center;">
+          <label for="por-file" style="font-size:15px; font-weight:500;">Choose your document</label>
+          <span style="font-size:13px; color:#595959;">JPG, PNG or PDF, up to 10 MB. All four corners visible.</span>
+          <input id="por-file" type="file" accept="image/*,.pdf" style="font:400 13px 'Alexandria',system-ui,sans-serif; max-width:100%;">
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
+        <a href="A06-Questionnaire.dc.html" style="display:inline-flex; align-items:center; gap:12px; height:52px; padding:0 32px; background:#0A0A0A; color:#FFFFFF; border-radius:2px; font-size:15px; font-weight:600; letter-spacing:.02em;">
+          Continue
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="A04-Proof-Of-Identity.dc.html" style="font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:4px;">Back</a>
+        <a href="#" style="font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:4px;">Save and finish later</a>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

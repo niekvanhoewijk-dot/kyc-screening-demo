@@ -1,42 +1,62 @@
-import { Stepper } from "@/components/stepper";
+import { ApplicantShell } from "@/components/applicant-shell";
+import { ArrowIcon } from "@/components/icons";
 import { uploadableItems } from "@/engine";
 import { stepCase } from "@/portal/cases";
 import { startAction } from "../actions";
 import { requireStep } from "../session";
 
-// 2.1.3 Overview: what to have ready. Also the landing point for returning applicants.
+// Lowercase a leading capital only when a lowercase letter follows ("Passport" -> "passport", "ID card" stays).
+const lower = (s: string) => s.replace(/^([A-Z])(?=[a-z])/, (m) => m.toLowerCase());
+
+// 2.1.3 Overview (docs/design/A03-Overview.dc.html). Also the landing point for returning applicants.
 export default async function OverviewPage() {
   const { c, applicant, deps } = await requireStep("overview");
   const { poi, por } = deps.portal;
   const started = c.overviewSeenAt !== null;
+  const company = c.persona === "company";
+  const items = [
+    ...(company
+      ? [
+          { h: "Company details", p: "Registration number, registered address and what the company expects to deposit." },
+          { h: "The people involved", p: "An ID and a proof of residence for every ultimate beneficial owner, shareholder and board member." },
+        ]
+      : []),
+    {
+      h: company ? "Your own photo ID and a selfie" : "Photo ID and a selfie",
+      p: `A ${poi.document_types.map((d) => lower(d.label)).join(", ").replace(/, ([^,]*)$/, " or $1")}. It must be valid and show all four corners. The selfie confirms the photo is you and is handled by our verification partner.`,
+    },
+    {
+      h: company ? "Your own proof of address" : "Proof of address",
+      p: `One document issued in the last ${por.max_age_months} months: ${por.document_types.map((d) => lower(d.label.split(" (")[0]!)).join(", ").replace(/, ([^,]*)$/, ", or $1")} that shows where you live.`,
+    },
+    company
+      ? { h: "Company documents", p: `${uploadableItems(deps.kyb).map((i) => i.label.split(" (")[0]).slice(0, 3).join("; ")} and more: ${uploadableItems(deps.kyb).length} in total. Missing ones don't block you; we'll ask.` }
+      : { h: "A few questions about your finances", p: "Employment, income, source of funds and what you expect to deposit. We ask these to meet financial regulations." },
+  ];
   return (
-    <div className="card">
-      <Stepper current="overview" c={stepCase(c)} />
-      <h1>{started ? `Welcome back, ${applicant.firstName}` : `Hi ${applicant.firstName}, before you start`}</h1>
-      <p className="lede">Have these ready. Your progress is saved after each step, so you can stop and come back.</p>
-      <ol>
-        {c.persona === "company" && (
-          <>
-            <li><strong>Company details</strong>: registration number, registered address, expected deposits.</li>
-            <li><strong>The people involved</strong>: an ID and proof of residence for every ultimate beneficial owner, shareholder and board member.</li>
-          </>
-        )}
-        <li>
-          <strong>{c.persona === "company" ? "Your own proof of identity" : "Proof of identity"}</strong>: {poi.document_types.map((d) => d.label).join(", ")}. Valid, with all four corners visible.
-        </li>
-        <li><strong>A selfie</strong>{c.persona === "company" ? " of you, the representative" : ""}, taken in good light, facing the camera.</li>
-        <li>
-          <strong>{c.persona === "company" ? "Your own proof of residence" : "Proof of residence"}</strong> issued in the last {por.max_age_months} months, with all four corners visible: {por.document_types.map((d) => d.label.split(" (")[0]!.toLowerCase()).join("; ")}. Mobile phone bills, envelopes and P.O. boxes are not accepted.
-        </li>
-        {c.persona === "company" ? (
-          <li><strong>Company documents</strong>: {uploadableItems(deps.kyb).map((i) => i.label.toLowerCase()).slice(0, 3).join("; ")} and more ({uploadableItems(deps.kyb).length} in total).</li>
-        ) : (
-          <li><strong>A few questions</strong> about you, your tax residence and your expected deposits. About 5 minutes.</li>
-        )}
+    <ApplicantShell
+      panelTitle="What you will need"
+      panelBody="Have these ready and the rest takes about ten minutes. Your progress is saved as you go."
+      c={stepCase(c)}
+      current="overview"
+      title={started ? `Welcome back, ${applicant.firstName}` : "Before you start"}
+      lede={`${items.length === 3 ? "Three" : items.length} things are needed to open an account. You do not have to finish in one sitting.`}
+    >
+      <ol className="numbered">
+        {items.map((it, i) => (
+          <li key={it.h}>
+            <span className="num">{i + 1}</span>
+            <div>
+              <h2>{it.h}</h2>
+              <p>{it.p}</p>
+            </div>
+          </li>
+        ))}
       </ol>
       <form action={startAction} className="actions">
-        <button className="btn" type="submit">{started ? "Continue" : "Start"}</button>
+        <button className="btn" type="submit">{started ? "Continue" : "Start verification"} <ArrowIcon /></button>
+        <span className="muted">About 10 minutes. Save and return at any time.</span>
       </form>
-    </div>
+    </ApplicantShell>
   );
 }

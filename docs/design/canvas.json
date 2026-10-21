@@ -1,0 +1,36 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-21T13:40:00Z" },
+  "title": "KYC Screening Demo Screens",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1280, "h": 1000, "title": "2.1.1 Create account", "expand": "fill", "is_interactive": true },
+    "A02-Verify-Email.dc.html": { "x": 1360, "y": 0, "w": 1280, "h": 900, "title": "2.1.2 Verify email", "expand": "fill", "is_interactive": true },
+    "A03-Overview.dc.html": { "x": 2720, "y": 0, "w": 1280, "h": 1000, "title": "2.1.3 Overview", "expand": "fill", "is_interactive": true },
+    "A04-Proof-Of-Identity.dc.html": { "x": 4080, "y": 0, "w": 1280, "h": 1100, "title": "2.1.4 Proof of identity", "expand": "fill", "is_interactive": true },
+    "A05-Proof-Of-Residence.dc.html": { "x": 5440, "y": 0, "w": 1280, "h": 1100, "title": "2.1.5 Proof of residence", "expand": "fill", "is_interactive": true },
+    "A06-Questionnaire.dc.html": { "x": 0, "y": 1220, "w": 1280, "h": 1500, "title": "2.1.6 Questionnaire", "expand": "fill", "is_interactive": true },
+    "A07-Check.dc.html": { "x": 1360, "y": 1220, "w": 1280, "h": 900, "title": "2.1.7 Check", "expand": "fill", "is_interactive": true },
+    "A08-EDD-Request.dc.html": { "x": 2720, "y": 1220, "w": 1280, "h": 1000, "title": "EDD request", "expand": "fill", "is_interactive": true },
+    "A09-Confirmation.dc.html": { "x": 4080, "y": 1220, "w": 1280, "h": 900, "title": "2.1.8 Confirmation", "expand": "fill" },
+    "A10-Not-Approved.dc.html": { "x": 5440, "y": 1220, "w": 1280, "h": 800, "title": "Not approved", "expand": "fill" },
+    "C01-Analyst-Queue.dc.html": { "x": 0, "y": 3120, "w": 1280, "h": 900, "title": "Analyst · Queue", "expand": "fill", "is_interactive": true },
+    "C02-Analyst-Case.dc.html": { "x": 1360, "y": 3120, "w": 1280, "h": 1600, "title": "Analyst · Case, MVP 2", "expand": "fill" },
+    "C03-Analyst-Company.dc.html": { "x": 2720, "y": 3120, "w": 1280, "h": 1300, "title": "Analyst · Company KYB", "expand": "fill" },
+    "LeftPanel.dc.html": { "x": 4080, "y": 3120, "w": 440, "h": 1100, "title": "Component · Applicant side panel" },
+    "AnalystNav.dc.html": { "x": 4600, "y": 3120, "w": 260, "h": 1300, "title": "Component · Analyst navigation" }
+  },
+  "order": [
+    "Main.dc.html", "A02-Verify-Email.dc.html", "A03-Overview.dc.html", "A04-Proof-Of-Identity.dc.html", "A05-Proof-Of-Residence.dc.html",
+    "A06-Questionnaire.dc.html", "A07-Check.dc.html", "A08-EDD-Request.dc.html", "A09-Confirmation.dc.html", "A10-Not-Approved.dc.html",
+    "C01-Analyst-Queue.dc.html", "C02-Analyst-Case.dc.html", "C03-Analyst-Company.dc.html",
+    "LeftPanel.dc.html", "AnalystNav.dc.html"
+  ],
+  "notes": {
+    "n1": { "x": 0, "y": -300, "text": "Applicant portal · onboarding flow 2.1", "kind": "title1", "maxW": 6720 },
+    "n2": { "x": 0, "y": 2840, "text": "Analyst console · MVP 1 and MVP 2", "kind": "title1", "maxW": 3920 },
+    "n3": { "x": 4080, "y": 2840, "text": "Shared components", "kind": "title1", "maxW": 800 }
+  },
+  "designSystems": []
+}

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:hover{opacity:.88}
+input:focus-visible,a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid #0A0A0A;outline-offset:2px}
+</style>
+</helmet>
+<div style="display:flex; flex-wrap:wrap; min-height:1000px; background:#FFFFFF; color:#0A0A0A; font-family:'Alexandria',system-ui,sans-serif;">
+  <dc-import name="LeftPanel" current="3" minh="1000" title="What you will need" body="Have these ready and the rest takes about ten minutes. Your progress is saved as you go." hint-size="440px,1000px"></dc-import>
+  <main style="flex:999 1 560px; min-width:0; box-sizing:border-box; padding:72px 64px; display:flex; flex-direction:column;">
+    <div style="max-width:640px; display:flex; flex-direction:column; gap:36px;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <span style="font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#595959;">Step 3 of 8</span>
+        <h1 style="margin:0; font-size:36px; line-height:1.15; font-weight:700; letter-spacing:-.01em;">Before you start</h1>
+        <p style="margin:0; font-size:16px; line-height:1.6; color:#595959;">Three things are needed to open an account. You do not have to finish in one sitting.</p>
+      </div>
+
+      <ol style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column;">
+        <li style="display:flex; gap:28px; padding:28px 0; border-top:1px solid #0A0A0A;">
+          <span style="flex:0 0 48px; font-size:32px; font-weight:300; line-height:1;">1</span>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <h2 style="margin:0; font-size:20px; font-weight:600;">Photo ID and a selfie</h2>
+            <p style="margin:0; font-size:15px; line-height:1.65; color:#595959;">A passport, ID card or driving licence. It must be valid and show all four corners. The selfie confirms the photo is you and is handled by our verification partner.</p>
+          </div>
+        </li>
+        <li style="display:flex; gap:28px; padding:28px 0; border-top:1px solid #D4D4D4;">
+          <span style="flex:0 0 48px; font-size:32px; font-weight:300; line-height:1;">2</span>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <h2 style="margin:0; font-size:20px; font-weight:600;">Proof of address</h2>
+            <p style="margin:0; font-size:15px; line-height:1.65; color:#595959;">One document issued in the last three months: a utility bill, a bank or credit card statement, or an official government or municipal document that shows where you live.</p>
+          </div>
+        </li>
+        <li style="display:flex; gap:28px; padding:28px 0; border-top:1px solid #D4D4D4; border-bottom:1px solid #D4D4D4;">
+          <span style="flex:0 0 48px; font-size:32px; font-weight:300; line-height:1;">3</span>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <h2 style="margin:0; font-size:20px; font-weight:600;">A few questions about your finances</h2>
+            <p style="margin:0; font-size:15px; line-height:1.65; color:#595959;">Employment, income, source of funds and what you expect to deposit. We ask these to meet financial regulations.</p>
+          </div>
+        </li>
+      </ol>
+
+      <p style="margin:0; font-size:14px; line-height:1.65; color:#595959;">Opening for a company? You will also need the certificate of incorporation, articles of association, evidence of beneficial ownership, the register of members, and identity documents for every director and shareholder. <a href="#" style="color:#0A0A0A; font-weight:500; text-decoration:underline; text-underline-offset:4px;">See the full company list</a></p>
+
+      <div style="display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
+        <a href="A04-Proof-Of-Identity.dc.html" style="display:inline-flex; align-items:center; gap:12px; height:52px; padding:0 32px; background:#0A0A0A; color:#FFFFFF; border-radius:2px; font-size:15px; font-weight:600; letter-spacing:.02em;">
+          Start verification
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <span style="font-size:13px; color:#595959;">About 10 minutes. Save and return at any time.</span>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Stepper } from "@/components/stepper";
+import { ApplicantShell, backPath } from "@/components/applicant-shell";
+import { Ticked } from "@/components/icons";
 import { stepCase } from "@/portal/cases";
 import { applicantView } from "@/portal/decision";
 import { resumeStep, stepPath } from "@/portal/steps";
@@ -10,79 +12,142 @@ import { requireStep } from "../session";
 // D7: neutral, no reasons. Never reveals sanctions, PEP, watchlist or risk-score reasons.
 const NO_GO =
   "We're unable to open an account for you at this time. This follows from our regulatory requirements. If you think this is a mistake, contact support.";
+// The board (A10) shows the first sentence as the heading and the rest below it: same text, split.
+const [NO_GO_HEADING, ...NO_GO_REST] = NO_GO.split(/(?<=\.) /);
 
 const usd = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-// 2.1.7 Check, then the outcome screens: 2.1.8 Confirmation, EDD, no-go.
-export default async function StatusPage() {
-  const { c, deps } = await requireStep("check");
-  const view = applicantView(c);
-  if (view.kind === "draft" && resumeStep(stepCase(c)) !== "check") redirect(stepPath(resumeStep(stepCase(c))));
-
-  const body = (() => {
-    switch (view.kind) {
-      case "draft":
-        return (
-          <>
-            <h1>Ready to submit</h1>
-            <p className="lede">You can still go back to any step using the progress bar above. Once you submit, your answers can no longer be changed.</p>
-            <SubmitForm />
-          </>
-        );
-      case "check":
-        return (
-          <>
-            <h1>Thank you, we're checking your application</h1>
-            <p className="lede">We will confirm either way as soon as possible. You don't need to do anything now.</p>
-          </>
-        );
-      case "confirmation":
-        return (
-          <>
-            <h1>Your account is approved</h1>
-            <div className="banner ok" role="status">Welcome aboard. You can now make deposits.</div>
-            <p className="muted">Illustrative demo: no real account is opened and no money moves.</p>
-            {view.threshold !== null && (
-              <>
-                <p style={{ marginBottom: 4 }}>Your deposit limit</p>
-                <p className="amount" style={{ marginTop: 0 }}>{usd(view.threshold)}</p>
-                <p className="lede">If you'd like to deposit more later, we'll ask for proof of your source of funds.</p>
-              </>
-            )}
-          </>
-        );
-      case "edd":
-        return (
-          <>
-            <h1>We need a little more information</h1>
-            <p className="lede">To complete your application, please send proof of where your funds come from.</p>
-            <EddForm extraKyc={view.extraKyc} documentAccept={deps.portal.uploads.document_mime.join(",")} selfieAccept={deps.portal.uploads.selfie_mime.join(",")} />
-          </>
-        );
-      case "no_go":
-        return (
-          <>
-            <h1>Application update</h1>
-            <p>{NO_GO}</p>
-          </>
-        );
-      case "por_expired":
-        return (
-          <>
-            <h1>Please update your proof of residence</h1>
-            <p className="lede">Your proof of residence has expired. Deposits and withdrawals are paused until a new one is approved.</p>
-          </>
-        );
-    }
-  })();
-
+function SignOut() {
   return (
-    <div className="card">
-      {view.kind === "draft" && <Stepper current="check" c={stepCase(c)} />}
-      {body}
-      <form action={signOutAction} style={{ marginTop: 24 }}>
-        <button className="btn secondary" type="submit">Sign out</button>
-      </form>
-    </div>
+    <form action={signOutAction}>
+      <button className="link-btn" type="submit">Sign out</button>
+    </form>
   );
+}
+
+// 2.1.7 Check (A07), EDD request (A08), 2.1.8 Confirmation (A09), not approved (A10).
+export default async function StatusPage() {
+  const { c, deps, applicant } = await requireStep("check");
+  const view = applicantView(c);
+  const sc = stepCase(c);
+  if (view.kind === "draft" && resumeStep(sc) !== "check") redirect(stepPath(resumeStep(sc)));
+  const reference = c.id.slice(0, "xxxxxxxx".length).toUpperCase();
+  const company = c.persona === "company";
+
+  switch (view.kind) {
+    case "draft":
+      return (
+        <ApplicantShell
+          panelTitle="Almost there"
+          panelBody="Check that everything is right. Once you submit, your answers can no longer be changed."
+          c={sc}
+          current="check"
+          title="Ready to submit"
+          lede="You can still go back to any step in the panel. A member of our team reviews every application."
+          narrow
+        >
+          <SubmitForm />
+          <div className="actions">
+            {backPath("check", sc) && <Link href={backPath("check", sc)!} className="link">Back</Link>}
+            <Link href="/" className="link">Finish later</Link>
+          </div>
+        </ApplicantShell>
+      );
+    case "check":
+      return (
+        <ApplicantShell
+          panelTitle="We are reviewing your details"
+          panelBody="We will confirm either way as soon as we can. You do not need to do anything now."
+          c={sc}
+          current="check"
+          title={`Thank you, ${applicant.firstName}`}
+          lede="We have everything we need for now. A member of our team reviews every application, and we will confirm either way as soon as possible."
+          narrow
+        >
+          <ol className="numbered compact">
+            <li><span className="num">1</span><div><h2>We review your documents and answers</h2><p>This is done by a person, with checks that run alongside.</p></div></li>
+            <li><span className="num">2</span><div><h2>We may ask a follow-up question</h2><p>If something is unclear, you will see exactly what we need when you sign in again.</p></div></li>
+            <li><span className="num">3</span><div><h2>You hear from us</h2><p>With the outcome and what happens next.</p></div></li>
+          </ol>
+          <p className="banner">Your reference: <strong>{reference}</strong></p>
+          <div className="actions"><SignOut /></div>
+        </ApplicantShell>
+      );
+    case "edd":
+      return (
+        <ApplicantShell
+          panelTitle="One more thing"
+          panelBody="To continue we need to confirm where your funds come from. It is a standard request."
+          c={sc}
+          current="check"
+          eyebrow="Additional information"
+          title="We need a little more from you"
+          lede="Financial regulations ask us to confirm this from time to time. Once we have it, we can continue with your application."
+        >
+          <EddForm extraKyc={view.extraKyc} documentAccept={deps.portal.uploads.document_mime.join(",")} selfieAccept={deps.portal.uploads.selfie_mime.join(",")} />
+          <div className="actions"><SignOut /></div>
+        </ApplicantShell>
+      );
+    case "confirmation":
+      return (
+        <ApplicantShell
+          panelTitle="You are verified"
+          panelBody="Your details are confirmed and your account is ready."
+          c={sc}
+          current="confirmation"
+          title="Your account is approved"
+          lede={`Thank you for your patience, ${applicant.firstName}.`}
+          narrow
+        >
+          {view.threshold !== null && (
+            <div className="limit-box">
+              <span className="eyebrow">Your current deposit limit</span>
+              <span className="amount">{usd(view.threshold)}</span>
+              <p>You can deposit up to this amount. To go above it, we may ask for extra documents first.</p>
+            </div>
+          )}
+          <ul className="check-list">
+            <li><span>{company ? "Your identity and selfie" : "Proof of identity and selfie"}</span><Ticked>Verified</Ticked></li>
+            <li><span>{company ? "Your proof of residence" : "Proof of residence"}</span><Ticked>Verified</Ticked></li>
+            <li><span>{company ? "Company details, people and documents" : "Questionnaire"}</span><Ticked>Completed</Ticked></li>
+          </ul>
+          <p className="banner">Illustrative demo: no real account is opened and no money moves.</p>
+          <div className="actions"><SignOut /></div>
+        </ApplicantShell>
+      );
+    case "no_go":
+      return (
+        <ApplicantShell
+          panelTitle="Thank you for your interest"
+          panelBody="We appreciate the time you took to apply."
+          c={sc}
+          current={null}
+          eyebrow={null}
+          title={NO_GO_HEADING}
+          lede={NO_GO_REST.join(" ")}
+          narrow
+          center
+        >
+          <div className="actions">
+            <SignOut />
+            <Link href="/" className="link">Back to home</Link>
+          </div>
+        </ApplicantShell>
+      );
+    case "por_expired":
+      return (
+        <ApplicantShell
+          panelTitle="Time for an update"
+          panelBody="Your proof of residence has expired. Upload a new one to continue."
+          c={sc}
+          current={null}
+          eyebrow="Action needed"
+          title="Please update your proof of residence"
+          lede="Deposits and withdrawals are paused until a new one is approved."
+          narrow
+        >
+          <div className="actions"><SignOut /></div>
+        </ApplicantShell>
+      );
+  }
 }

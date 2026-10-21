@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Stepper } from "@/components/stepper";
+import { ApplicantShell, backPath } from "@/components/applicant-shell";
+import { Ticked } from "@/components/icons";
 import { COUNTRIES, countryName } from "@/lib/countries";
 import { stepCase } from "@/portal/cases";
 import { personDocs, personsOf } from "@/portal/company";
@@ -8,7 +9,7 @@ import { ConfirmPersonsForm, PersonForm } from "../_forms/company-forms";
 import { requireStep } from "../session";
 
 // Representative, UBOs, shareholders and board members (spec 03). KYC is done on each of them.
-export default async function PersonsPage({ searchParams }: { searchParams: Promise<{ edit?: string; add?: string }> }) {
+export default async function PersonsPage({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
   const { deps, c, applicant } = await requireStep("persons");
   const sp = await searchParams;
   const persons = personsOf(deps, c.id);
@@ -19,58 +20,77 @@ export default async function PersonsPage({ searchParams }: { searchParams: Prom
   const totalShares = persons.reduce((n, p) => n + (p.sharePercent ? Number(p.sharePercent) : 0), 0);
   const formProps = { countries: [...COUNTRIES], roles: deps.kyb.person_roles, documentAccept: deps.portal.uploads.document_mime.join(",") };
   const fileOf = (personId: string, kind: string) => docs.find((d) => d.personId === personId && d.kind === kind)?.originalName;
+  const sc = stepCase(c);
 
   return (
-    <div className="card">
-      <Stepper current="persons" c={stepCase(c)} />
-      <h1>People involved</h1>
-      <p className="lede">We verify everyone who represents, owns or directs the company: you, the ultimate beneficial owner(s), all shareholders and all board members. One person can have several roles.</p>
-
+    <ApplicantShell
+      panelTitle="The people involved"
+      panelBody="We verify everyone who represents, owns or directs the company. One person can have several roles."
+      c={sc}
+      current="persons"
+      title="People involved"
+      lede="You, the ultimate beneficial owner(s), all shareholders and all board members."
+    >
       {!me || editing?.isApplicant ? (
-        <>
-          <h2 className="section-title" style={{ borderTop: 0, paddingTop: 0 }}>About you</h2>
+        <section className="stack">
+          <h2 className="section-title">About you</h2>
           <PersonForm {...formProps} isApplicant saved={me ?? { fullName: `${applicant.firstName} ${applicant.lastName}` }} personId={me?.id} onFile={{}} />
-        </>
+        </section>
       ) : (
         <>
-          <table>
-            <thead><tr><th>Name</th><th>Roles</th><th>Documents</th><th /></tr></thead>
-            <tbody>
-              {persons.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.fullName}{p.isApplicant && " (you)"}<br /><span className="muted">{countryName(p.countryOfResidence)}</span></td>
-                  <td>{(p.roles as string[]).map(roleLabel).join(", ")}{p.sharePercent && ` · ${p.sharePercent}%`}</td>
-                  <td>{p.isApplicant ? <span className="muted">Next steps</span> : <>{fileOf(p.id, "person_poi") ? "ID ✓" : "ID missing"} · {fileOf(p.id, "person_por") ? "Address ✓" : "Address missing"}</>}</td>
-                  <td style={{ whiteSpace: "nowrap" }}>
-                    <Link href={`/apply/persons?edit=${p.id}`}>Edit</Link>
-                    {!p.isApplicant && (
-                      <form action={removePersonAction} style={{ display: "inline", marginLeft: 8 }}>
-                        <input type="hidden" name="personId" value={p.id} />
-                        <button type="submit" className="btn small secondary">Remove</button>
-                      </form>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="table-scroll">
+            <table className="tbl" style={{ minWidth: 520 }}>
+              <thead><tr><th>Name</th><th>Roles</th><th>Documents</th><th><span className="sr-only">Actions</span></th></tr></thead>
+              <tbody>
+                {persons.map((p) => (
+                  <tr key={p.id}>
+                    <th scope="row">{p.fullName}{p.isApplicant && " (you)"}<span className="sub">{countryName(p.countryOfResidence)}</span></th>
+                    <td>{(p.roles as string[]).map(roleLabel).join(", ")}{p.sharePercent && ` · ${p.sharePercent}%`}</td>
+                    <td>
+                      {p.isApplicant ? (
+                        <span className="muted">In the next steps</span>
+                      ) : (
+                        <>
+                          {fileOf(p.id, "person_poi") ? <Ticked>ID</Ticked> : <span className="chip flag">ID missing</span>}{" "}
+                          {fileOf(p.id, "person_por") ? <Ticked>Address</Ticked> : <span className="chip flag">Address missing</span>}
+                        </>
+                      )}
+                    </td>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <Link href={`/apply/persons?edit=${p.id}`} className="link">Edit</Link>
+                      {!p.isApplicant && (
+                        <form action={removePersonAction} style={{ display: "inline", marginLeft: 12 }}>
+                          <input type="hidden" name="personId" value={p.id} />
+                          <button type="submit" className="link-btn">Remove</button>
+                        </form>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {totalShares > 0 && totalShares !== deps.kyb.shareholding_total_percent && (
-            <div className="banner info" style={{ marginTop: 12 }}>Declared shareholdings add up to {totalShares}%. Please list every shareholder, so they add up to {deps.kyb.shareholding_total_percent}%.</div>
+            <div className="banner">Declared shareholdings add up to {totalShares}%. Please list every shareholder, so they add up to {deps.kyb.shareholding_total_percent}%.</div>
           )}
-          <h2 className="section-title">{editing ? `Edit ${editing.fullName}` : "Add a person"}</h2>
-          <PersonForm
-            key={editing?.id ?? "new"}
-            {...formProps}
-            isApplicant={false}
-            personId={editing?.id}
-            saved={editing ?? null}
-            onFile={editing ? { poi: fileOf(editing.id, "person_poi"), por: fileOf(editing.id, "person_por") } : {}}
-          />
-          {editing && <p><Link href="/apply/persons">Cancel editing</Link></p>}
-          <h2 className="section-title">Done?</h2>
-          <ConfirmPersonsForm />
+          <section className="stack divider">
+            <h2 className="section-title">{editing ? `Edit ${editing.fullName}` : "Add a person"}</h2>
+            <PersonForm
+              key={editing?.id ?? "new"}
+              {...formProps}
+              isApplicant={false}
+              personId={editing?.id}
+              saved={editing ?? null}
+              onFile={editing ? { poi: fileOf(editing.id, "person_poi"), por: fileOf(editing.id, "person_por") } : {}}
+            />
+            {editing && <p><Link href="/apply/persons" className="link">Cancel editing</Link></p>}
+          </section>
+          <section className="stack divider">
+            <h2 className="section-title">Done?</h2>
+            <ConfirmPersonsForm back={backPath("persons", sc)} />
+          </section>
         </>
       )}
-    </div>
+    </ApplicantShell>
   );
 }

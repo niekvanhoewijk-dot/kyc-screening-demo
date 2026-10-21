@@ -1,15 +1,20 @@
-import Link from "next/link";
+import { ApplicantShell } from "@/components/applicant-shell";
 import { SignInForm } from "../_forms/account-forms";
 
+// Returning applicant (no board): same frame as 2.1.1.
 export default function ContinuePage() {
   return (
-    <div className="card">
-      <h1>Continue your application</h1>
-      <p className="lede">Enter the email you signed up with and we'll send you a code.</p>
+    <ApplicantShell
+      panelTitle="Welcome back"
+      panelBody="Your progress is saved. Confirm your email and you continue exactly where you stopped."
+      c={null}
+      current={null}
+      eyebrow="Resume"
+      title="Continue your application"
+      lede="Enter the email you signed up with and we'll send you a code."
+      narrow
+    >
       <SignInForm />
-      <p style={{ marginTop: 24 }}>
-        New here? <Link href="/apply">Create an account</Link>
-      </p>
-    </div>
+    </ApplicantShell>
   );
 }

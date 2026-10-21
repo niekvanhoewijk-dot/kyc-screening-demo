@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>More information needed</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:hover{opacity:.88}
+input:focus-visible,a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid #0A0A0A;outline-offset:2px}
+</style>
+</helmet>
+<div style="display:flex; flex-wrap:wrap; min-height:1000px; background:#FFFFFF; color:#0A0A0A; font-family:'Alexandria',system-ui,sans-serif;">
+  <dc-import name="LeftPanel" current="7" minh="1000" title="One more thing" body="To continue we need to confirm where your funds come from. It is a standard request." hint-size="440px,1000px"></dc-import>
+  <main style="flex:999 1 560px; min-width:0; box-sizing:border-box; padding:72px 64px; display:flex; flex-direction:column;">
+    <div style="max-width:640px; display:flex; flex-direction:column; gap:36px;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <span style="font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#595959;">Additional information</span>
+        <h1 style="margin:0; font-size:36px; line-height:1.15; font-weight:700; letter-spacing:-.01em;">We need a little more from you</h1>
+        <p style="margin:0; font-size:16px; line-height:1.65; color:#595959;">Financial regulations ask us to confirm this from time to time. Once we have it, we can continue with your account.</p>
+      </div>
+
+      <section style="display:flex; flex-direction:column; gap:16px;">
+        <div style="display:flex; gap:24px; padding-top:24px; border-top:1px solid #0A0A0A;">
+          <span style="flex:0 0 40px; font-size:26px; font-weight:300; line-height:1;">1</span>
+          <div style="display:flex; flex-direction:column; gap:10px; flex:1 1 auto; min-width:0;">
+            <h2 style="margin:0; font-size:19px; font-weight:600;">Proof of source of funds</h2>
+            <p style="margin:0; font-size:14px; line-height:1.65; color:#595959;">A document that shows where the money you deposit comes from, for example a recent tax report, payslips, a sale contract or a statement of the account it comes from.</p>
+            <div style="display:flex; flex-direction:column; gap:10px; box-sizing:border-box; padding:22px; border:1.5px dashed #6B6B6B; border-radius:2px; background:#FAFAFA;">
+              <label for="sof-file" style="font-size:15px; font-weight:500;">Choose one or more documents</label>
+              <span style="font-size:13px; color:#595959;">JPG, PNG or PDF, up to 10 MB each.</span>
+              <input id="sof-file" type="file" multiple accept="image/*,.pdf" style="font:400 13px 'Alexandria',system-ui,sans-serif; max-width:100%;">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label for="note" style="font-size:13px; font-weight:500;">Anything we should know? <span style="font-weight:400; color:#595959;">(optional)</span></label>
+              <textarea id="note" rows="3" style="box-sizing:border-box; padding:14px 16px; border:1px solid #6B6B6B; border-radius:2px; font:400 15px/1.5 'Alexandria',system-ui,sans-serif; color:#0A0A0A; background:#FFFFFF; resize:vertical;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:24px; padding:24px 0; border-top:1px solid #D4D4D4; border-bottom:1px solid #D4D4D4;">
+          <span style="flex:0 0 40px; font-size:26px; font-weight:300; line-height:1;">2</span>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <h2 style="margin:0; font-size:19px; font-weight:600;">Extra identity confirmation</h2>
+            <p style="margin:0; font-size:14px; line-height:1.65; color:#595959;">Already done. The selfie you took earlier covers this, so there is nothing more to upload.</p>
+            <span style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Completed</span>
+          </div>
+        </div>
+      </section>
+
+      <div style="display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
+        <a href="A07-Check.dc.html" style="display:inline-flex; align-items:center; gap:12px; height:52px; padding:0 32px; background:#0A0A0A; color:#FFFFFF; border-radius:2px; font-size:15px; font-weight:600; letter-spacing:.02em;">
+          Send to review
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#" style="font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:4px;">Contact support</a>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
