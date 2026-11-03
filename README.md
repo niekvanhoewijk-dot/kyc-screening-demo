@@ -1,4 +1,4 @@
-# KYC/KYB Screening Demo (private)
+# KYC/KYB Screening Demo
 
 An illustrative onboarding and compliance-screening demo built from the Ateaya KYC-KYB-AML requirements (Full v3) and the DVAULT onboarding flow, using Claude for document reading and case preparation and a deterministic rules engine for every decision number.
 
@@ -34,5 +34,5 @@ Claude's pre-review and memos replay recorded responses. Record them once with a
 | `tests/golden/*.json` | 18 cases: 8 from the requirements doc, 10 derived |
 | `tools/verify_golden.py` | Reference oracle for the rules |
 
-## Before sharing this with anyone
-The logic is derived from documents confidential to Ateaya / Omikron Financial Holdings Europe LTD. Keep this folder private until you have cleared what may be reused; the demo uses generic branding and synthetic data only. See `docs/spec/07-open-questions.md` O-13.
+## About this demo
+This is an illustrative demo, not a regulated compliance system. It follows a KYC/KYB/AML onboarding design the author produced at Ateaya in 2024. The original requirements documents are not included in this repository. The demo uses generic branding and synthetic data only; every sample document is watermarked SAMPLE.
