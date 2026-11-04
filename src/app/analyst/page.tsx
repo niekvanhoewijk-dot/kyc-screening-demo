@@ -33,7 +33,8 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
   const ids = rows.map((r) => r.caseId);
   const caseRows = ids.length ? deps.db.select({ id: cases.id, risk: cases.riskResult, questionnaire: cases.questionnaire }).from(cases).where(inArray(cases.id, ids)).all() : [];
   const hits = ids.length ? deps.db.select().from(screeningHits).where(inArray(screeningHits.caseId, ids)).all() : [];
-  const meta = deps.engine.countries.meta;
+  const inForce = deps.policies.inForce(deps.now().toISOString());
+  const meta = inForce.countries.meta;
 
   const flagsFor = (r: (typeof rows)[number]) => {
     const c = caseRows.find((x) => x.id === r.caseId);
@@ -150,7 +151,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
           </tbody>
         </table>
       </div>
-      <p className="muted">Country data: FATF lists, as of {meta.as_of} ({meta.list_version}). Sample cases, all fictional.</p>
+      <p className="muted">Policy in force: {inForce.policy.id}, {inForce.policy.label}. Country data: FATF lists, as of {meta.as_of} ({meta.list_version}). Sample cases, all fictional.</p>
     </>
   );
 }

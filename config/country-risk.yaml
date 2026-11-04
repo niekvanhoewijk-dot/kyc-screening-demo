@@ -20,10 +20,11 @@ meta:
 #  4 demo_seed_low            -> low (1)
 #  5 default_tier             -> medium (2), flagged "unassessed" in the analyst view
 
-fatf_call_for_action:            # 3
-  - {code: KP, name: "Democratic People's Republic of Korea"}
-  - {code: IR, name: "Iran"}
-  - {code: MM, name: "Myanmar"}
+fatf_call_for_action:            # 3. `action` = what FATF asks (countermeasures | edd); used by the policy
+                                 # setting call_for_action_treatment (spec 08 section 3.3). Unchanged in October 2026.
+  - {code: KP, name: "Democratic People's Republic of Korea", action: countermeasures}
+  - {code: IR, name: "Iran",                                   action: countermeasures}
+  - {code: MM, name: "Myanmar",                                action: edd}
 
 fatf_increased_monitoring:       # 22
   - {code: AO, name: "Angola"}

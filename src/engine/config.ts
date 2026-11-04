@@ -80,6 +80,8 @@ const countryEntry = z.object({
   name: z.string().min(1),
   added: z.string().optional(),
   removed: z.string().optional(),
+  /** fatf_call_for_action only: what FATF asks for (spec 08 3.2, the Myanmar knob). */
+  action: z.enum(["countermeasures", "edd"]).optional(),
 });
 
 export const COUNTRY_LISTS = [
@@ -119,7 +121,14 @@ export const countryRiskSchema = z
 
 export type RiskMatrix = z.infer<typeof riskMatrixSchema>;
 export type CountryRisk = z.infer<typeof countryRiskSchema>;
-export type EngineConfig = { matrix: RiskMatrix; countries: CountryRisk };
+export type PolicySettings = {
+  call_for_action_treatment: "all_prohibited" | "follow_fatf";
+  recently_delisted_treatment: "normal_with_note" | "hold_auto_high";
+  periodic_review: { enabled: boolean; regulatory_effective_from: string; interval_months: { edd: number; standard: number } };
+};
+/** The policy version an EngineConfig belongs to (spec 08). Absent only for configs built directly in tests. */
+export type PolicyMeta = { id: string; label: string; effective_from: string; hash: string; settings: PolicySettings };
+export type EngineConfig = { matrix: RiskMatrix; countries: CountryRisk; policy?: PolicyMeta };
 
 export function parseEngineConfig(rawMatrix: unknown, rawCountries: unknown): EngineConfig {
   const matrix = riskMatrixSchema.parse(rawMatrix);
@@ -129,13 +138,8 @@ export function parseEngineConfig(rawMatrix: unknown, rawCountries: unknown): En
   return { matrix, countries };
 }
 
-let cached: EngineConfig | undefined;
-
-/** Reads and validates config/*.yaml. Throws on any schema violation, so a bad config never scores. */
-export function loadEngineConfig(configDir = path.resolve(/* turbopackIgnore: true */ process.cwd(), "config")): EngineConfig {
-  if (cached && configDir === path.resolve(/* turbopackIgnore: true */ process.cwd(), "config")) return cached;
-  const read = (f: string) => parse(fs.readFileSync(path.join(configDir, f), "utf8"));
-  const config = parseEngineConfig(read("risk-matrix.yaml"), read("country-risk.yaml"));
-  if (configDir === path.resolve(/* turbopackIgnore: true */ process.cwd(), "config")) cached = config;
-  return config;
+export function readConfigYaml(configDir: string, file: string): unknown {
+  return parse(fs.readFileSync(path.join(configDir, file), "utf8"));
 }
+
+export const CONFIG_DIR = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "config");

@@ -7,7 +7,7 @@ import { MockFaceMatchProvider } from "@/adapters/face-match";
 import { LocalFileStore } from "@/adapters/file-store";
 import { MockScreeningProvider } from "@/adapters/screening";
 import { loadConsoleConfig } from "@/console/config";
-import { loadEngineConfig, loadKybConfig } from "@/engine";
+import { loadEngineConfig, loadKybConfig, loadPolicies } from "@/engine";
 import { loadPortalConfig } from "@/portal/config";
 import type { PortalDeps } from "@/portal/deps";
 import type { UploadInput } from "@/portal/cases";
@@ -22,6 +22,7 @@ export function makeDeps(start = "2026-10-18T10:00:00Z") {
     screening: new MockScreeningProvider(),
     files: new LocalFileStore(fs.mkdtempSync(path.join(os.tmpdir(), "kyc-uploads-"))),
     engine: loadEngineConfig(),
+    policies: loadPolicies(),
     portal: loadPortalConfig(),
     kyb: loadKybConfig(),
     consoleConfig: loadConsoleConfig(),

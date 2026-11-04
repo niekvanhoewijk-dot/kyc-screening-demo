@@ -27,6 +27,10 @@ Source of logic: Ateaya KYC-KYB-AML Requirements **Full v3** (13 Jun 2024). Flow
 | D8 | Decision node (corrected after reading the flow image) | Three outcomes: **Yes** (approved) -> 2.1.8 Confirmation; **Have further questions** -> EDD, then back to 2.1.8; **No** -> no-go message (D7) |
 | D9 | PEP | PEP = band at least High (doc: "PEPs are High-Risk"). Acceptance is the analyst's call (doc: "depends on the company") |
 | D10 | POR | One document, issued within 3 months, four corners visible; P.O. box, mobile phone bill and envelope/parcel photos rejected |
+| D12 | Policy and decision records (Phase 8) | Policy is versioned data; every outcome writes a replayable, hash-chained decision record (policy version, inputs, reason codes, timestamps). Spec 08 |
+| D13 | Policy change (Phase 8) | Dry run by default. A policy change never auto-rejects or terminates an existing customer: affected customers are routed to analyst review |
+| D14 | Call-for-action treatment (Phase 8) | Policy setting. Default `all_prohibited` (Full v3, D4). `follow_fatf` accepts Myanmar-type entries (FATF: enhanced due diligence) through EDD only |
+| D15 | AMLR periodic review (Phase 8) | Modelled with the effective date 10 Jul 2027; earlier results are labelled preview. EDD customers 12 months, others 60 months (outer limits of Art. 26(2)) |
 
 ## Resolved doc ambiguities
 - Selfie "TBC" -> required (D5).

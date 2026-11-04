@@ -166,3 +166,19 @@ export const casePersons = sqliteTable("case_persons", {
   isApplicant: integer("is_applicant", { mode: "boolean" }).notNull(), // the representative using the portal
   createdAt: text("created_at").notNull(),
 });
+
+/**
+ * Decision records (docs/spec/08 section 4): one row per outcome, hash-chained per subject (a case id, or a
+ * synthetic portfolio id in the simulator). `record` is the full validated DecisionRecord.
+ */
+export const decisionRecords = sqliteTable("decision_records", {
+  id: text("id").primaryKey(),
+  subject: text("subject").notNull(),
+  seq: integer("seq").notNull(),
+  kind: text("kind").notNull(),
+  policyId: text("policy_id").notNull(),
+  record: text("record", { mode: "json" }).notNull(),
+  hash: text("hash").notNull(),
+  prevHash: text("prev_hash"),
+  atWall: text("at_wall").notNull(),
+});

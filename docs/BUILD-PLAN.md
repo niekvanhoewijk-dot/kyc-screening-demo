@@ -11,6 +11,12 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 | 4 Analyst console | Queue, case view, score breakdown, mock screening hits, decision and EDD actions, audit trail, MVP 1/2 toggle | A case is decided with every action logged | 2-3 sessions |
 | 5 KYB + memo + evals | Company flow, KYB classifier and gap list, case memo, per-code precision/recall report | Company case shows missing persons/documents; eval report generated | 2-3 sessions |
 | 6 Demo hardening | Synthetic personas, `DEMO_MODE=replay`, 5-minute script, reset button, "illustrative demo" labelling | Runs offline from a cold start | 1 session |
+| 7 Design port | Ateaya-look screens in the app (done, commit "Phase 7") | Typecheck, build and tests pass | 1 session |
+| 8a Policy + decision records | Versioned policy bundle, country resolver reads policy settings, decision record on every outcome, hash chain, replay | Golden tests unchanged and green; replay and chain properties pass; every state change has a record | 1-2 sessions |
+| 8b Lifecycle engine | Pure `evaluateLifecycle`, `applyEvent`, `diffUnderPolicy`; synthetic book; scenarios S1-S5 derived in the Python oracle first | `tests/golden/scenarios.json` pinned from the oracle and passing in Vitest | 1-2 sessions |
+| 8c Simulator service | Simulated clock (separate from the wall clock), event injection, dry run and apply, analyst-review routing | Dry run writes only a summary record; apply is undone by reset; auth and intake unaffected by the clock | 1 session |
+| 8d Simulator UI | `/analyst/simulator` in the Phase 7 look, nav item, decision record drawer with verify and replay | Walk S1-S5 in the UI; keyboard and 390px width pass | 1-2 sessions |
+| 8e Demo hardening | Scenario presets, demo script update, README, preflight check for the new config | `npm run demo` runs S1 and S2 offline from a cold start | 1 session |
 
 ## Starter prompts
 
@@ -35,9 +41,26 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 **Phase 6**
 > Prepare the interview demo: 5 synthetic personas (low, medium, high, auto-high, prohibited), a replay mode that needs no API key, a reset button, and a one-page demo script.
 
+**Phase 8a**
+> Read docs/spec/08 sections 2 to 4, spec 04 and CLAUDE.md. Enter plan mode. Implement versioned policy and decision records: load config/policy/policies.yaml (wire config/policy/country-risk.2026-10.yaml as P2 and keep config/country-risk.yaml as P1), add the optional `action` field to fatf_call_for_action, make resolveCountry read call_for_action_treatment and recently_delisted_treatment, add src/engine/decision-record.ts with the schema, hash chain and reason codes, a decision_records table and migration, and write a record from scoreCase, recordDecision and the EDD recalculation. All existing golden tests must stay green with P1 as the default policy. Add tests for replay, hash chain, coverage and policy pinning. No numbers outside config/.
+
+**Phase 8b**
+> Read docs/spec/08 sections 5.2, 5.3 and 6. First extend tools/verify_golden.py with a scenarios mode and derive the expected results for S1 to S5 from the oracle, then pin them in tests/golden/scenarios.json. Then write fixtures/portfolio/book.json (about 18 synthetic customers, labelled Synthetic, covering the countries and dates listed in 5.2) and implement src/engine/lifecycle.ts as pure functions with no I/O. Tests first.
+
+**Phase 8c**
+> Read docs/spec/08 sections 5.1, 5.4 and 5.5. Build the simulator service: a simulated clock stored as setting sim.now that only the lifecycle evaluator and simulator read (OTP, sessions and intake checks must keep the wall clock, with a test that proves it), event injection, dry run (summary record only) and apply (writes engine.rescore records), and analyst-review routing instead of automatic termination. Every action is audited.
+
+**Phase 8d**
+> Read docs/spec/08 section 5.6 and the Phase 7 files in docs/design/ for the visual language. Build /analyst/simulator with the clock controls, policy controls and knobs, event injector, results tiles, before/after table, obligations list and the decision record drawer with Verify chain and Replay. Add the nav item. Check it at 1280px and 390px, keyboard only, and with the screen reader labels.
+
+**Phase 8e**
+> Add scenario presets for S1 to S5, update docs/DEMO-SCRIPT.md with a two-minute simulator segment (start with S1, then S2, then S3), update README and tools/preflight.mjs to check the policy files and the book, and make sure `npm run demo` works offline from a cold start.
+
 ## Interview talking points this build supports
 - Deterministic rules plus LLM assistance with a human decision, and why (auditability, regulators).
 - The "not out of the box" gap in vendor offerings: questionnaire, risk scoring, EDD orchestration.
 - MVP 1 to MVP 2: automation sequenced behind a manual process that already works.
 - Measured AI quality (eval report) instead of anecdotes.
 - Adapter boundaries that keep a vendor choice reversible.
+- Policy as data with replayable decision records, and a dry run that shows the blast radius of a policy change before it ships.
+- Why time alone does not change a risk band, and why a policy change routes people to a human instead of closing accounts.

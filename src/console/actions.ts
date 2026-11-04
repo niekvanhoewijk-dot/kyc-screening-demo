@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { cases, screeningHits } from "@/db/schema";
 import { recalculateEdd } from "@/engine";
 import { audit } from "@/lib/audit";
+import { appendRecord } from "@/records/store";
 import { scoreCase, type CaseRow, type IdentityData, type QuestionnaireData } from "@/portal/cases";
 import { recordDecision } from "@/portal/decision";
 import type { PortalDeps } from "@/portal/deps";
@@ -37,6 +38,9 @@ export function guardInput(c: CaseRow, hits: { status: string; category: string 
   };
 }
 
+/** Policy in force on the wall clock (spec 08 5.5). */
+const policyNow = (deps: PortalDeps) => deps.policies.inForce(deps.now().toISOString());
+
 function requireAllowed(deps: PortalDeps, caseId: string, action: Action) {
   const { c, hits } = load(deps, caseId);
   const a = availableActions(guardInput(c, hits))[action];
@@ -50,8 +54,9 @@ const requireReason = (reason: string) => {
 };
 
 export function startReview(deps: PortalDeps, caseId: string, analystId: string) {
-  requireAllowed(deps, caseId, "start_review");
+  const { c } = requireAllowed(deps, caseId, "start_review");
   deps.db.update(cases).set({ status: "in_review", updatedAt: deps.now().toISOString() }).where(eq(cases.id, caseId)).run();
+  appendRecord(deps, { subject: caseId, kind: "analyst.start_review", policy: policyNow(deps), inputs: { type: "status", status_from: c.status }, decided_by: `analyst:${analystId}` });
   audit(deps.db, deps.now(), `analyst:${analystId}`, "case.review_started", `case:${caseId}`);
 }
 
@@ -72,8 +77,9 @@ export function triageHit(deps: PortalDeps, caseId: string, hitId: string, verdi
     const confirmed = deps.db.select().from(screeningHits).where(eq(screeningHits.caseId, caseId)).all()
       .filter((h) => h.category === "pep" && (h.status === "true_match" || h.id === hitId) && h.subject && h.subject !== "company")
       .map((h) => h.subject!);
-    const { risk, threshold, engineVersions } = scoreCase(deps, c, { pepConfirmed: true, pepPersonIds: confirmed });
+    const { risk, threshold, engineVersions, policy, inputs } = scoreCase(deps, c, { pepConfirmed: true, pepPersonIds: confirmed });
     deps.db.update(cases).set({ riskResult: risk, thresholdResult: threshold, engineVersions, updatedAt: now }).where(eq(cases.id, caseId)).run();
+    appendRecord(deps, { subject: caseId, kind: "engine.rescore", policy, inputs, decided_by: "engine" });
     audit(deps.db, deps.now(), "engine", "engine.rescored", `case:${caseId}`, { cause: "pep_match_confirmed", hitId, risk, threshold });
   }
 }
@@ -123,15 +129,15 @@ export function recalculateEddForCase(
     throw new PortalError("VALIDATION", "Amounts must be whole dollars, zero or more.");
   const q = c.questionnaire as QuestionnaireData | null;
   const company = c.company as { source_of_funds: string } | null;
-  const result = recalculateEdd(
-    {
-      source_of_funds: q?.source_of_funds ?? company!.source_of_funds,
-      only_source_of_wealth: q?.onlySourceOfWealth ?? false,
-      documented_annual_amount: input.documentedAnnualAmount,
-      deposited_to_date: input.depositedToDate,
-    },
-    deps.engine,
-  );
+  const eddInputs = {
+    source_of_funds: q?.source_of_funds ?? company!.source_of_funds,
+    only_source_of_wealth: q?.onlySourceOfWealth ?? false,
+    documented_annual_amount: input.documentedAnnualAmount,
+    deposited_to_date: input.depositedToDate,
+  };
+  const policy = policyNow(deps);
+  const result = recalculateEdd(eddInputs, policy);
+  appendRecord(deps, { subject: caseId, kind: "engine.edd", policy, inputs: { type: "edd", ...eddInputs }, decided_by: "engine" });
   const record: EddResultRecord = { input, result, by: `analyst:${analystId}`, at: deps.now().toISOString() };
   deps.db.update(cases).set({ eddResult: record, updatedAt: deps.now().toISOString() }).where(eq(cases.id, caseId)).run();
   audit(deps.db, deps.now(), "engine", "engine.edd_recalculated", `case:${caseId}`, { input, result, enteredBy: `analyst:${analystId}` });

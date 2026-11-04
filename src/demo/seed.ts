@@ -5,6 +5,7 @@ import {
   auditLog,
   casePersons,
   cases,
+  decisionRecords,
   documentReadings,
   documents,
   faceMatches,
@@ -35,7 +36,7 @@ export type SeedResult = {
 /** Deletes every case, applicant, document, audit entry and setting (demo only). */
 export async function wipeDemoData(deps: PreReviewDeps) {
   deps.db.transaction((tx) => {
-    for (const t of [auditLog, documentReadings, faceMatches, screeningHits, documents, casePersons, otpChallenges, sessions, cases, applicants, settings]) tx.delete(t).run();
+    for (const t of [auditLog, decisionRecords, documentReadings, faceMatches, screeningHits, documents, casePersons, otpChallenges, sessions, cases, applicants, settings]) tx.delete(t).run();
   });
   await deps.files.clear();
 }

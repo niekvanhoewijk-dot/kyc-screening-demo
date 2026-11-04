@@ -6,7 +6,7 @@ import { MockScreeningProvider, type ScreeningProvider } from "@/adapters/screen
 import { loadConsoleConfig, type ConsoleConfig } from "@/console/config";
 import { checkRulesFromConfig, documentReaderFromEnv } from "@/documents/factory";
 import type { PreReviewDeps } from "@/documents/pre-review";
-import { loadEngineConfig, loadKybConfig, type EngineConfig, type KybConfig } from "@/engine";
+import { loadEngineConfig, loadKybConfig, loadPolicies, type EngineConfig, type KybConfig, type PolicySet } from "@/engine";
 import { loadPortalConfig, type PortalConfig } from "./config";
 
 export type PortalDeps = {
@@ -15,7 +15,9 @@ export type PortalDeps = {
   faceMatch: FaceMatchProvider;
   screening: ScreeningProvider;
   files: FileStore;
+  /** Default policy (P1): labels and options. Scoring uses `policies.inForce(now)` (spec 08 5.5). */
   engine: EngineConfig;
+  policies: PolicySet;
   portal: PortalConfig;
   kyb: KybConfig;
   consoleConfig: ConsoleConfig;
@@ -32,6 +34,7 @@ export function portalDeps(): PreReviewDeps {
     screening: new MockScreeningProvider(),
     files: new LocalFileStore(),
     engine: loadEngineConfig(),
+    policies: loadPolicies(),
     portal: loadPortalConfig(),
     kyb: loadKybConfig(),
     consoleConfig: loadConsoleConfig(),

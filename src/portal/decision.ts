@@ -1,12 +1,14 @@
 import { eq } from "drizzle-orm";
 import { cases } from "@/db/schema";
+import { DECISION_STATUS } from "@/engine";
 import { audit } from "@/lib/audit";
+import { appendRecord } from "@/records/store";
 import type { PortalDeps } from "./deps";
 import { PortalError } from "./errors";
 import type { CaseRow } from "./cases";
 
 export type Decision = "approve" | "reject" | "edd";
-const NEXT_STATUS = { approve: "approved", reject: "rejected", edd: "edd_requested" } as const;
+const NEXT_STATUS = DECISION_STATUS;
 const DECIDABLE = new Set(["submitted", "in_review", "edd_submitted"]);
 
 /** Human decision node (D8). Reason is mandatory. Call through src/console/actions.ts, which applies the guards. */
@@ -21,6 +23,14 @@ export function recordDecision(deps: PortalDeps, caseId: string, decision: Decis
     .set({ status: NEXT_STATUS[decision], decision, decisionReason: reason.trim(), decidedBy: `analyst:${analystId}`, decidedAt: now, updatedAt: now })
     .where(eq(cases.id, caseId))
     .run();
+  appendRecord(deps, {
+    subject: caseId,
+    kind: `analyst.${decision}`,
+    policy: deps.policies.inForce(deps.now().toISOString()),
+    inputs: { type: "status", status_from: c.status },
+    decided_by: `analyst:${analystId}`,
+    analyst_reason: reason.trim(),
+  });
   audit(deps.db, deps.now(), `analyst:${analystId}`, "case.decided", `case:${caseId}`, { decision, reason: reason.trim(), from: c.status });
 }
 

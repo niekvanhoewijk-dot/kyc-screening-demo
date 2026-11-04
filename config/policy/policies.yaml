@@ -1,0 +1,35 @@
+# Policy versions (spec 08 section 3). Loaded by src/engine/policy.ts (Phase 8a).
+# A version is immutable once published. Editing a knob in the simulator creates a draft, never changes a published version.
+# The content hash is computed at load time over the resolved risk matrix, country list and settings.
+# Paths are relative to config/.
+
+# Policy used when no date is given (tests, the oracle, labels). Scoring in the app uses the policy in force (spec 08 5.5).
+default_policy: P1
+
+# Outer limits from AMLR (EU) 2024/1624 Art. 26(2): settings may be shorter, never longer.
+legal_limits:
+  review_interval_max_months: { edd: 12, standard: 60 }
+
+policies:
+  - id: P1
+    label: "Full v3 baseline, FATF June 2026"
+    effective_from: "2026-06-19"
+    risk_matrix: "risk-matrix.yaml"
+    country_list: "country-risk.yaml"                 # list_version FATF-2026-06
+    settings: &baseline_settings
+      call_for_action_treatment: all_prohibited       # all_prohibited | follow_fatf   (D14: Full v3 stays the default)
+      recently_delisted_treatment: normal_with_note   # normal_with_note | hold_auto_high
+      periodic_review:
+        enabled: true
+        regulatory_effective_from: "2027-07-10"       # AMLR (EU) 2024/1624 applies from this date; earlier results are labelled preview
+        interval_months: { edd: 12, standard: 60 }    # schema rejects edd > 12 or standard > 60 (AMLR Art. 26(2) maxima)
+      # por.notice_days_before_expiry is read from config/portal.yaml (spec 02), not repeated here.
+
+  - id: P2
+    label: "FATF October 2026 plenary"
+    effective_from: "2026-10-30"
+    risk_matrix: "risk-matrix.yaml"
+    country_list: "policy/country-risk.2026-10.yaml"  # list_version FATF-2026-10
+    settings: *baseline_settings
+
+# Candidate drafts such as "P2 + follow_fatf" are created in the simulator and are not stored here.

@@ -6,3 +6,6 @@ export * from "./threshold";
 export * from "./edd";
 export * from "./kyb-config";
 export * from "./company";
+export * from "./policy";
+export * from "./canonical";
+export * from "./decision-record";

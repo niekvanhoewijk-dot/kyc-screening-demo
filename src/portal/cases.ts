@@ -1,6 +1,7 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { applicants, casePersons, cases, documents, faceMatches, screeningHits } from "@/db/schema";
-import { initialThreshold, scoreApplicant, scoreCompany } from "@/engine";
+import { initialThreshold, scoreApplicant, scoreCompany, type CompanyInputs, type DecisionInputs, type IndividualInputs, type Policy } from "@/engine";
+import { appendRecord } from "@/records/store";
 import { audit } from "@/lib/audit";
 import { newId, sha256 } from "@/lib/ids";
 import type { PortalDeps } from "./deps";
@@ -208,14 +209,15 @@ export function saveQuestionnaire(deps: PortalDeps, c: CaseRow, input: unknown) 
  * match (D9: PEP = band at least High) on top of the self-declaration.
  */
 export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: boolean; pepPersonIds?: string[] } = {}) {
-  if (c.persona === "company") return scoreCompanyCase(deps, c, opts.pepPersonIds ?? []);
+  // spec 08 5.5: scored under the policy in force on the wall clock at the time of scoring.
+  const policy = deps.policies.inForce(deps.now().toISOString());
+  if (c.persona === "company") return scoreCompanyCase(deps, c, policy, opts.pepPersonIds ?? []);
   const q = c.questionnaire as QuestionnaireData;
   const r = c.residence as ResidenceData;
-  const risk = scoreApplicant(
-    {
-      country: r.country,
-      pep: q.pep || opts.pepConfirmed === true,
-      us_tax_resident: q.usTaxResident,
+  const inputs: IndividualInputs = {
+    type: "individual",
+    country: r.country,
+    factor_answers: {
       deposit_12m: q.deposit_12m,
       source_of_funds: q.source_of_funds,
       employment_status: q.employment_status,
@@ -223,8 +225,11 @@ export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: b
       annual_income: q.annual_income,
       net_worth: q.net_worth,
     },
-    deps.engine,
-  );
+    pep: q.pep || opts.pepConfirmed === true,
+    us_tax_resident: q.usTaxResident,
+    only_source_of_wealth: q.onlySourceOfWealth,
+  };
+  const risk = scoreApplicant({ country: inputs.country, pep: inputs.pep, us_tax_resident: inputs.us_tax_resident, ...inputs.factor_answers }, policy);
   const threshold =
     "total" in risk && !risk.decision
       ? initialThreshold(
@@ -236,32 +241,39 @@ export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: b
             annual_income: q.annual_income,
             band: risk.band,
           },
-          deps.engine,
+          policy,
         )
       : null;
-  return { risk, threshold, engineVersions: versions(deps) };
+  return { risk, threshold, engineVersions: versions(deps, policy), policy, inputs: inputs as DecisionInputs };
 }
 
-const versions = (deps: PortalDeps) => ({
-  risk_matrix_version: deps.engine.matrix.version,
-  country_list_version: deps.engine.countries.meta.list_version,
-  country_as_of: deps.engine.countries.meta.as_of,
+const versions = (deps: PortalDeps, policy: Policy) => ({
+  policy_id: policy.policy.id,
+  policy_hash: policy.policy.hash,
+  risk_matrix_version: policy.matrix.version,
+  country_list_version: policy.countries.meta.list_version,
+  country_as_of: policy.countries.meta.as_of,
   kyb_version: deps.kyb.version,
 });
 
 /** Company: demo default (spec 03, O-8). No company threshold is defined (O-32). */
-function scoreCompanyCase(deps: PortalDeps, c: CaseRow, pepPersonIds: string[]) {
+function scoreCompanyCase(deps: PortalDeps, c: CaseRow, policy: Policy, pepPersonIds: string[]) {
   const company = c.company as { countryOfIncorporation: string };
   const persons = deps.db.select().from(casePersons).where(eq(casePersons.caseId, c.id)).all();
+  const inputs: CompanyInputs = {
+    type: "company",
+    country_of_incorporation: company.countryOfIncorporation,
+    persons: persons.map((p) => ({ ref: p.id, country_of_residence: p.countryOfResidence, pep: p.pep || pepPersonIds.includes(p.id) })),
+  };
   const risk = scoreCompany(
     {
-      countryOfIncorporation: company.countryOfIncorporation,
+      countryOfIncorporation: inputs.country_of_incorporation,
       persons: persons.map((p) => ({ id: p.id, name: p.fullName, countryOfResidence: p.countryOfResidence, pep: p.pep || pepPersonIds.includes(p.id) })),
     },
-    deps.engine,
+    policy,
     deps.kyb,
   );
-  return { risk, threshold: null, engineVersions: versions(deps) };
+  return { risk, threshold: null, engineVersions: versions(deps, policy), policy, inputs: inputs as DecisionInputs };
 }
 
 /** Who gets screened: the individual, or the company and every natural person on it (spec 03 item 14). */
@@ -287,7 +299,7 @@ async function screenCase(deps: PortalDeps, c: CaseRow) {
 export async function submitCase(deps: PortalDeps, c: CaseRow) {
   assertEditable(c, "check");
   const now = deps.now();
-  const { risk, threshold, engineVersions } = scoreCase(deps, c);
+  const { risk, threshold, engineVersions, policy, inputs } = scoreCase(deps, c);
   const screenings = await screenCase(deps, c);
 
   deps.db.transaction((tx) => {
@@ -301,6 +313,7 @@ export async function submitCase(deps: PortalDeps, c: CaseRow) {
           .values({ id: newId(), caseId: c.id, subject, provider: result.provider, listVersion: result.listVersion, entryId: h.entryId, entryName: h.entryName, category: h.category, program: h.program, match: h.match, strength: h.strength, status: "open", createdAt: now.toISOString() })
           .run();
   });
+  appendRecord(deps, { subject: c.id, kind: "engine.score", policy, inputs, decided_by: "engine" });
   const first = screenings[0]?.result;
   audit(deps.db, now, `applicant:${c.applicantId}`, "case.submitted", `case:${c.id}`);
   audit(deps.db, now, "engine", "engine.scored", `case:${c.id}`, { risk, threshold, engineVersions });

@@ -1,0 +1,65 @@
+# Country risk seed, FATF plenary of 28-30 October 2026. Loaded as policy P2 (config/policy/policies.yaml).
+# Same schema as config/country-risk.yaml, plus an optional `action` on fatf_call_for_action entries
+# (countermeasures | edd), used by the policy setting call_for_action_treatment.
+# NOT an LSEG rating. Do not present it as one.
+
+meta:
+  list_version: "FATF-2026-10"
+  as_of: "2026-10-30"
+  verified_on: "2026-11-04"
+  refresh_due: "after the FATF plenary expected in February 2027 (date unconfirmed)"
+  verification_note: >
+    The FATF pages could not be fetched by the research tool on 2026-11-04. The content below was confirmed by two
+    independent secondary sources (ComplyAdvantage, RegReportingDesk). Re-check against fatf-gafi.org before relying on it.
+  sources:
+    - https://www.fatf-gafi.org/en/publications/Fatfgeneral/outcomes-fatf-plenary-october-2026.html
+    - https://www.fatf-gafi.org/en/publications/High-risk-and-other-monitored-jurisdictions/increased-monitoring-october-2026.html
+    - https://www.fatf-gafi.org/en/publications/High-risk-and-other-monitored-jurisdictions/call-for-action-october-2026.html
+
+# Resolution order (first match wins), unchanged from spec 04 section 2, except that fatf_call_for_action
+# now resolves by the policy setting call_for_action_treatment (spec 08 section 3.3):
+#   all_prohibited -> every entry is prohibited (Full v3, default)
+#   follow_fatf    -> action: countermeasures -> prohibited; action: edd -> auto_high
+
+fatf_call_for_action:            # 3, unchanged since June 2026
+  - {code: KP, name: "Democratic People's Republic of Korea", action: countermeasures}
+  - {code: IR, name: "Iran",                                   action: countermeasures}
+  - {code: MM, name: "Myanmar",                                action: edd}   # FATF will consider countermeasures if no further progress by February 2027
+
+fatf_increased_monitoring:       # 18 (22 in June 2026 minus 4 removals; no additions)
+  - {code: AO, name: "Angola"}
+  - {code: BO, name: "Bolivia"}
+  - {code: BA, name: "Bosnia and Herzegovina", added: "2026-06"}
+  - {code: CM, name: "Cameroon"}
+  - {code: HT, name: "Haiti"}
+  - {code: IQ, name: "Iraq", added: "2026-06"}
+  - {code: KE, name: "Kenya"}
+  - {code: KW, name: "Kuwait"}
+  - {code: LA, name: "Lao PDR"}
+  - {code: LB, name: "Lebanon"}
+  - {code: NP, name: "Nepal"}
+  - {code: PG, name: "Papua New Guinea"}
+  - {code: SS, name: "South Sudan"}
+  - {code: SY, name: "Syria"}
+  - {code: VE, name: "Venezuela"}
+  - {code: VN, name: "Vietnam"}           # FATF: significant concern about pace of progress; next steps if no tangible improvement by February 2027
+  - {code: VG, name: "Virgin Islands (UK)"}
+  - {code: YE, name: "Yemen"}
+
+recently_delisted:               # normal tier with an analyst note, unless recently_delisted_treatment = hold_auto_high
+  - {code: DZ, name: "Algeria",                          removed: "2026-06"}
+  - {code: NA, name: "Namibia",                          removed: "2026-06"}
+  - {code: BG, name: "Bulgaria",                         removed: "2026-10"}
+  - {code: CI, name: "Côte d'Ivoire",                    removed: "2026-10"}
+  - {code: CD, name: "Democratic Republic of the Congo", removed: "2026-10"}
+  - {code: MC, name: "Monaco",                           removed: "2026-10"}
+
+eu_sanctions_map: []             # TODO: populate from primary source with as_of date
+
+# PLACEHOLDER, not a real assessment (see config/country-risk.yaml).
+demo_seed_low:
+  - {code: GB, name: "United Kingdom"}
+  - {code: GR, name: "Greece"}
+  - {code: NL, name: "Netherlands"}
+
+default_tier: medium             # conservative: unassessed countries are never silently Low
