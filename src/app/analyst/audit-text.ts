@@ -28,7 +28,10 @@ export function describe(e: Entry): string {
     case "email.verified": return "Email address verified.";
     case "session.started": return "Signed in again with a new code.";
     case "session.ended": return "Signed out.";
-    case "step.completed": return `Completed step: ${p.step}${p.selfie ? ` (selfie ${p.selfie})` : ""}.`;
+    case "step.completed": return `Completed step: ${p.step}${p.source === "wallet" ? " (shared from an ID wallet)" : p.selfie ? ` (selfie ${p.selfie})` : ""}.`;
+    case "wallet.session_started": return "ID wallet request opened (single-use nonce, expires soon).";
+    case "wallet.verified": return `ID wallet presentation verified: issuer ${p.issuer}, ${(p.checks as string[] | undefined)?.length ?? 0} checks passed${(p.ignoredClaims as string[] | undefined)?.length ? `; ignored unrequested claims: ${(p.ignoredClaims as string[]).join(", ")}` : ""}.`;
+    case "wallet.rejected": return `ID wallet presentation rejected: ${p.code}${p.detail ? ` (${p.detail})` : ""}. The applicant saw a neutral message.`;
     case "step.saved": return `Saved step: ${p.step}${p.selfie === "retry" ? ", selfie to retake" : ""}.`;
     case "document.uploaded": return `Uploaded ${KIND[String(p.kind)] ?? p.kind}${p.docType ? ` (${p.docType})` : ""}.`;
     case "face_match.result": return `Selfie checked by the face-match provider: liveness ${p.liveness}, match ${p.match}.`;

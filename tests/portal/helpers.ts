@@ -9,14 +9,16 @@ import { MockScreeningProvider } from "@/adapters/screening";
 import { loadConsoleConfig } from "@/console/config";
 import { loadEngineConfig, loadKybConfig, loadPolicies } from "@/engine";
 import { loadPortalConfig } from "@/portal/config";
+import { createWalletKit } from "@/wallet";
 import type { PortalDeps } from "@/portal/deps";
 import type { UploadInput } from "@/portal/cases";
 
 export function makeDeps(start = "2026-10-18T10:00:00Z") {
   const clock = { now: new Date(start) };
   const mailer = new MemoryMailer();
+  const db = createDb(":memory:");
   const deps: PortalDeps = {
-    db: createDb(":memory:"),
+    db,
     mailer,
     faceMatch: new MockFaceMatchProvider(),
     screening: new MockScreeningProvider(),
@@ -26,6 +28,7 @@ export function makeDeps(start = "2026-10-18T10:00:00Z") {
     portal: loadPortalConfig(),
     kyb: loadKybConfig(),
     consoleConfig: loadConsoleConfig(),
+    wallet: createWalletKit(db, () => clock.now),
     now: () => clock.now,
   };
   const advance = (ms: number) => (clock.now = new Date(clock.now.getTime() + ms));

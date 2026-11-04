@@ -15,6 +15,7 @@ import {
   sessions,
   settings,
   simCustomers,
+  walletSessions,
 } from "@/db/schema";
 import { ClaudeDocumentReader } from "@/documents/claude-reader";
 import { loadDocumentReadingConfig } from "@/documents/config";
@@ -38,7 +39,7 @@ export type SeedResult = {
 /** Deletes every case, applicant, document, audit entry and setting (demo only). */
 export async function wipeDemoData(deps: PreReviewDeps) {
   deps.db.transaction((tx) => {
-    for (const t of [auditLog, decisionRecords, simCustomers, policyDrafts, documentReadings, faceMatches, screeningHits, documents, casePersons, otpChallenges, sessions, cases, applicants, settings]) tx.delete(t).run();
+    for (const t of [auditLog, decisionRecords, simCustomers, policyDrafts, documentReadings, faceMatches, screeningHits, documents, casePersons, walletSessions, otpChallenges, sessions, cases, applicants, settings]) tx.delete(t).run();
   });
   await deps.files.clear();
 }

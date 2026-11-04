@@ -23,7 +23,7 @@ export default async function OverviewPage() {
       : []),
     {
       h: company ? "Your own photo ID and a selfie" : "Photo ID and a selfie",
-      p: `A ${poi.document_types.map((d) => lower(d.label)).join(", ").replace(/, ([^,]*)$/, " or $1")}. It must be valid and show all four corners. The selfie confirms the photo is you and is handled by our verification partner.`,
+      p: `A ${poi.document_types.map((d) => lower(d.label)).join(", ").replace(/, ([^,]*)$/, " or $1")}. It must be valid and show all four corners. The selfie confirms the photo is you and is handled by our verification partner.${company ? "" : " Or share your ID from an ID wallet instead: no photo and no selfie."}`,
     },
     {
       h: company ? "Your own proof of address" : "Proof of address",

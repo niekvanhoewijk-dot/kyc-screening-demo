@@ -16,12 +16,18 @@ import {
   type ResidenceFields,
 } from "./schemas";
 import { canOpen, type StepId } from "./steps";
+import { lockedFromWallet } from "./evidence";
+import type { WalletEvidence } from "@/wallet/types";
 
 export type CaseRow = typeof cases.$inferSelect;
 export type UploadInput = { name: string; type: string; size: number; bytes: Buffer };
 type DocKind = (typeof documents.$inferSelect)["kind"];
 
-export type IdentityData = IdentityFields & { selfie: "passed" | "retry" | "failed_flagged"; complete: boolean };
+/**
+ * `evidence` is present when the identity came from an ID wallet (docs/spec/09); the selfie is then
+ * "not_required". The evidence-assurance level is derived from this in portal/evidence.ts, never stored.
+ */
+export type IdentityData = IdentityFields & { selfie: "passed" | "retry" | "failed_flagged" | "not_required"; complete: boolean; evidence?: WalletEvidence };
 export type ResidenceData = ResidenceFields & { complete: boolean };
 export type QuestionnaireData = QuestionnaireAnswers & { complete: boolean };
 
@@ -94,7 +100,7 @@ export async function storeDoc(deps: PortalDeps, c: CaseRow, kind: DocKind, file
   return { id, name: file.name, bytes: file.bytes };
 }
 
-function touch(deps: PortalDeps, caseId: string, set: Partial<typeof cases.$inferInsert>) {
+export function touch(deps: PortalDeps, caseId: string, set: Partial<typeof cases.$inferInsert>) {
   deps.db.update(cases).set({ ...set, updatedAt: deps.now().toISOString() }).where(eq(cases.id, caseId)).run();
 }
 
@@ -140,7 +146,8 @@ export async function saveIdentity(
 
   // Face match runs whenever the selfie or the POI picture changed, or no result exists yet.
   const previous = c.identity as IdentityData | null;
-  let selfieState = previous?.selfie;
+  // A wallet identity has no selfie; switching to documents starts the face match from scratch.
+  let selfieState = previous?.selfie === "not_required" ? undefined : previous?.selfie;
   if (frontDoc || selfieDoc || !selfieState || selfieState === "retry") {
     const s = selfieDoc ?? currentDoc(deps, c.id, "selfie")!;
     const f = frontDoc ?? currentDoc(deps, c.id, "poi_front")!;
@@ -199,7 +206,13 @@ export async function saveResidence(deps: PortalDeps, c: CaseRow, input: unknown
 /** 2.1.6 Questionnaire. Scoring happens at submission and is never shown to the applicant. */
 export function saveQuestionnaire(deps: PortalDeps, c: CaseRow, input: unknown) {
   assertEditable(c, "questionnaire");
-  const answers = parseOrThrow(questionnaireSchema(deps.engine, deps.portal, today(deps.now())), input);
+  // Attributes the ID wallet attested are not the applicant's to retype (O-76): the server uses the verified values.
+  const locked = lockedFromWallet(c.identity as IdentityData | null);
+  const posted = (input ?? {}) as Record<string, unknown>;
+  const merged = locked
+    ? { ...posted, dateOfBirth: locked.birthDate, nationality: locked.nationalities.includes(String(posted.nationality)) ? posted.nationality : locked.nationalities[0] }
+    : input;
+  const answers = parseOrThrow(questionnaireSchema(deps.engine, deps.portal, today(deps.now())), merged);
   touch(deps, c.id, { questionnaire: { ...answers, complete: true } satisfies QuestionnaireData });
   audit(deps.db, deps.now(), `applicant:${c.applicantId}`, "step.completed", `case:${c.id}`, { step: "questionnaire" });
 }

@@ -217,6 +217,8 @@ export function QuestionnaireForm(props: {
   address: string;
   countries: Country[];
   languages: Option[];
+  /** Attested by the ID wallet: shown read-only; the server ignores any other posted value (O-76). */
+  locked?: { birthDate: string; nationalities: string[] } | null;
   factors: Record<"deposit_12m" | "source_of_funds" | "employment_status" | "occupation_industry" | "annual_income" | "net_worth", Option[]>;
   back?: string;
 }) {
@@ -234,11 +236,27 @@ export function QuestionnaireForm(props: {
       <section className="stack" style={{ gap: 20 }}>
         <h2 className="section-title">About you</h2>
         <div className="row">
-          <Field name="dateOfBirth" label="Date of birth" state={state}>
-            <input id="dateOfBirth" name="dateOfBirth" type="date" defaultValue={v(state, props.saved, "dateOfBirth")} aria-describedby="dob-hint" />
-            <span className="hint" id="dob-hint">Must match the date on your ID.</span>
-          </Field>
-          {select("nationality", "Nationality", countryOptions(props.countries))}
+          {props.locked ? (
+            <div className="field">
+              <span className="label">Date of birth</span>
+              <div className="readonly"><span>{props.locked.birthDate}</span><Ticked>From your ID wallet</Ticked></div>
+              <input type="hidden" name="dateOfBirth" value={props.locked.birthDate} />
+            </div>
+          ) : (
+            <Field name="dateOfBirth" label="Date of birth" state={state}>
+              <input id="dateOfBirth" name="dateOfBirth" type="date" defaultValue={v(state, props.saved, "dateOfBirth")} aria-describedby="dob-hint" />
+              <span className="hint" id="dob-hint">Must match the date on your ID.</span>
+            </Field>
+          )}
+          {props.locked && props.locked.nationalities.length === 1 ? (
+            <div className="field">
+              <span className="label">Nationality</span>
+              <div className="readonly"><span>{props.countries.find((c) => c.code === props.locked!.nationalities[0])?.name}</span><Ticked>From your ID wallet</Ticked></div>
+              <input type="hidden" name="nationality" value={props.locked.nationalities[0]} />
+            </div>
+          ) : (
+            select("nationality", "Nationality", countryOptions(props.locked ? props.countries.filter((c) => props.locked!.nationalities.includes(c.code)) : props.countries))
+          )}
         </div>
         <div className="row">
           {select("preferredLanguage", "Preferred language", props.languages)}

@@ -7,7 +7,7 @@ Source of logic: Ateaya KYC-KYB-AML Requirements **Full v3** (13 Jun 2024). Flow
 - Steps: account creation, email OTP, overview, POI, POR, questionnaire and risk scoring, check, decision, EDD, confirmation.
 - Two views: **Applicant portal** and **Analyst console**.
 - Two modes (flow "Operational Orchestration" lane): **MVP 1** manual checks by designated people; **MVP 2** automated checks with Claude pre-review. A toggle in the demo.
-- Out of scope: wallet connection (flow 2.2, "KYC/KYB on wallet vendor side"), investing (4), customer support, CRM, channels, real vendor integrations, real payments.
+- Out of scope: crypto wallet connection (flow 2.2, "KYC/KYB on wallet vendor side"; not the ID wallet of Phase 9), investing (4), customer support, CRM, channels, real vendor integrations, real payments.
 - Deployment: **private, runs locally** on the laptop.
 
 ## Confirmed by Niek
@@ -31,6 +31,9 @@ Source of logic: Ateaya KYC-KYB-AML Requirements **Full v3** (13 Jun 2024). Flow
 | D13 | Policy change (Phase 8) | Dry run by default. A policy change never auto-rejects or terminates an existing customer: affected customers are routed to analyst review |
 | D14 | Call-for-action treatment (Phase 8) | Policy setting. Default `all_prohibited` (Full v3, D4). `follow_fatf` accepts Myanmar-type entries (FATF: enhanced due diligence) through EDD only |
 | D15 | AMLR periodic review (Phase 8) | Modelled with the effective date 10 Jul 2027; earlier results are labelled preview. EDD customers 12 months, others 60 months (outer limits of Art. 26(2)) |
+| D16 | Wallet-first intake (Phase 9) | An ID wallet presentation (SD-JWT VC PID, test mode) can replace document capture and the selfie for individuals. Documents stay available. Spec 09 |
+| D17 | Evidence-assurance level (Phase 9) | Derived by code from stored evidence, recorded and shown to the analyst. It is not an engine input and never changes the score, threshold or decision |
+| D18 | What the wallet does not replace (Phase 9) | Questionnaire, screening, risk score, source of funds and EDD still run. Proof of residence is still required |
 
 ## Resolved doc ambiguities
 - Selfie "TBC" -> required (D5).

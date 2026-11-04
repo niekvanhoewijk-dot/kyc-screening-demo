@@ -7,6 +7,7 @@ import { loadConsoleConfig, type ConsoleConfig } from "@/console/config";
 import { checkRulesFromConfig, documentReaderFromEnv } from "@/documents/factory";
 import type { PreReviewDeps } from "@/documents/pre-review";
 import { loadEngineConfig, loadKybConfig, loadPolicies, type EngineConfig, type KybConfig, type PolicySet } from "@/engine";
+import { createWalletKit, type WalletKit } from "@/wallet";
 import { loadPortalConfig, type PortalConfig } from "./config";
 
 export type PortalDeps = {
@@ -21,14 +22,18 @@ export type PortalDeps = {
   portal: PortalConfig;
   kyb: KybConfig;
   consoleConfig: ConsoleConfig;
+  /** ID wallet intake (spec 09): verifier plus the built-in test wallet. */
+  wallet: WalletKit;
   now: () => Date;
 };
 
 let deps: PreReviewDeps | undefined;
 
 export function portalDeps(): PreReviewDeps {
+  const db = getDb();
+  const now = () => new Date();
   deps ??= {
-    db: getDb(),
+    db,
     mailer: new ConsoleMailer(),
     faceMatch: new MockFaceMatchProvider(),
     screening: new MockScreeningProvider(),
@@ -38,7 +43,8 @@ export function portalDeps(): PreReviewDeps {
     portal: loadPortalConfig(),
     kyb: loadKybConfig(),
     consoleConfig: loadConsoleConfig(),
-    now: () => new Date(),
+    wallet: createWalletKit(db, now),
+    now,
     documentReader: (log) => documentReaderFromEnv(log),
     checkRules: checkRulesFromConfig(),
   };

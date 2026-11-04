@@ -1,6 +1,7 @@
 import { ApplicantShell, backPath } from "@/components/applicant-shell";
 import { COUNTRIES, countryName } from "@/lib/countries";
-import { stepCase, type ResidenceData } from "@/portal/cases";
+import { stepCase, type IdentityData, type ResidenceData } from "@/portal/cases";
+import { lockedFromWallet } from "@/portal/evidence";
 import { OTHER_OCCUPATION } from "@/portal/schemas";
 import { QuestionnaireForm } from "../_forms/step-forms";
 import { requireStep } from "../session";
@@ -24,6 +25,7 @@ export default async function QuestionnairePage() {
     >
       <QuestionnaireForm
         saved={c.questionnaire as Record<string, unknown> | null}
+        locked={lockedFromWallet(c.identity as IdentityData | null)}
         email={applicant.email}
         address={address}
         countries={[...COUNTRIES]}

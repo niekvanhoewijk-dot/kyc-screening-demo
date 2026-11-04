@@ -6,6 +6,7 @@ import { audit } from "@/lib/audit";
 import { newId } from "@/lib/ids";
 import type { PortalDeps } from "@/portal/deps";
 import type { IdentityData, QuestionnaireData, ResidenceData } from "@/portal/cases";
+import { walletEvidenceOf } from "@/portal/evidence";
 import { runChecks, type Check, type CheckRules } from "./checks";
 import type { CallLog, DocumentReader, MemoWriter, ReadOutcome } from "./reader";
 
@@ -78,14 +79,18 @@ export async function runPreReview(deps: PreReviewDeps, caseId: string): Promise
     return { doc, outcome };
   };
 
-  const [poi, por] = [await read("poi"), await read("por")];
+  // An ID wallet identity has no document to read: code checks the attested attributes instead (spec 09).
+  const wallet = walletEvidenceOf(identity);
+  const [poi, por] = [wallet ? undefined : await read("poi"), await read("por")];
   const { checks, porValidUntil } = runChecks(
     {
       today: deps.now().toISOString().slice(0, "yyyy-mm-dd".length),
       applicant: rep ? { firstName: applicant.firstName, lastName: applicant.lastName } : applicant,
       declared: { dateOfBirth, address: residence, selfie: identity.selfie },
-      poi: poi.outcome as Parameters<typeof runChecks>[0]["poi"],
       por: por.outcome as Parameters<typeof runChecks>[0]["por"],
+      ...(wallet
+        ? { wallet: { attributes: wallet.attributes, credentialExpiresAt: wallet.credentialExpiresAt, issuerName: wallet.issuer.name, verifiedChecks: wallet.checks } }
+        : { poi: poi!.outcome as NonNullable<Parameters<typeof runChecks>[0]["poi"]> }),
     },
     deps.checkRules,
   );

@@ -17,6 +17,7 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 | 8c Simulator service | Simulated clock (separate from the wall clock), event injection, dry run and apply, analyst-review routing | Dry run writes only a summary record; apply is undone by reset; auth and intake unaffected by the clock | 1 session |
 | 8d Simulator UI | `/analyst/simulator` in the Phase 7 look, nav item, decision record drawer with verify and replay | Walk S1-S5 in the UI; keyboard and 390px width pass | 1-2 sessions |
 | 8e Demo hardening | Scenario presets, demo script update, README, preflight check for the new config | `npm run demo` runs S1 and S2 offline from a cold start | 1 session |
+| 9 Wallet-first intake | ID wallet (SD-JWT VC PID, test mode) as an identity route with an evidence-assurance level; documents stay as fallback | Verifier rejects every scenario in spec 09 section 9; wallet and document paths reach the same score for the same answers; golden tests unchanged | 2 sessions |
 
 ## Starter prompts
 
@@ -56,6 +57,9 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 **Phase 8e**
 > Add scenario presets for S1 to S5, update docs/DEMO-SCRIPT.md with a two-minute simulator segment (start with S1, then S2, then S3), update README and tools/preflight.mjs to check the policy files and the book, and make sure `npm run demo` works offline from a cold start.
 
+**Phase 9**
+> Read docs/spec/09, CLAUDE.md and docs/spec/07 (O-68 to O-76). Tests first. Build config/wallet.yaml with its Zod loader, the SD-JWT VC verifier and test ecosystem in src/wallet using node:crypto only (no new dependency), the wallet_sessions table and migration, src/portal/wallet.ts and src/portal/evidence.ts, the identity chooser, wallet page and test wallet panel, the questionnaire and residence pre-fill, the analyst evidence rows, and the wallet branch of pre-review. Every scenario in spec 09 section 9 needs a test. The engine, policies and golden cases must not change. Reason codes never reach the applicant.
+
 ## Interview talking points this build supports
 - Deterministic rules plus LLM assistance with a human decision, and why (auditability, regulators).
 - The "not out of the box" gap in vendor offerings: questionnaire, risk scoring, EDD orchestration.
@@ -64,3 +68,4 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 - Adapter boundaries that keep a vendor choice reversible.
 - Policy as data with replayable decision records, and a dry run that shows the blast radius of a policy change before it ships.
 - Why time alone does not change a risk band, and why a policy change routes people to a human instead of closing accounts.
+- Evidence has a grade: a wallet presentation, a document and a selfie are different strengths of proof, the grade is derived by code, audited and shown to the analyst, and it still never decides the case.

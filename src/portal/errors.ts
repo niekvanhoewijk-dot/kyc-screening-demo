@@ -9,7 +9,8 @@ export type PortalErrorCode =
   | "UPLOAD_REJECTED"
   | "STEP_LOCKED"
   | "NOT_EDITABLE"
-  | "NOT_FOUND";
+  | "NOT_FOUND"
+  | "WALLET_FAILED";
 
 export type FieldErrors = Record<string, string[] | undefined>;
 

@@ -7,6 +7,7 @@ import { scoreCase, type CaseRow, type IdentityData, type QuestionnaireData } fr
 import { recordDecision } from "@/portal/decision";
 import type { PortalDeps } from "@/portal/deps";
 import { PortalError } from "@/portal/errors";
+import { satisfiesExtraKyc } from "@/portal/evidence";
 import { availableActions, type Action } from "./guards";
 
 export type EddRequest = {
@@ -100,7 +101,7 @@ export function decide(deps: PortalDeps, caseId: string, action: "approve" | "re
   }
 }
 
-/** D8 "Have further questions": EDD asks for proof of source of funds and, unless the selfie already covered it, extra KYC (spec 05). */
+/** D8 "Have further questions": EDD asks for proof of source of funds and, unless the identity evidence already covered it (selfie passed; wallet per config, O-70), extra KYC (spec 05). */
 export function requestEdd(deps: PortalDeps, caseId: string, reason: string, analystId: string) {
   const why = requireReason(reason);
   const { c } = requireAllowed(deps, caseId, "request_edd");
@@ -109,7 +110,7 @@ export function requestEdd(deps: PortalDeps, caseId: string, reason: string, ana
     requestedAt: deps.now().toISOString(),
     requestedBy: `analyst:${analystId}`,
     reason: why,
-    items: { sourceOfFunds: "required", extraKyc: identity?.selfie === "passed" ? "already_satisfied" : "required" },
+    items: { sourceOfFunds: "required", extraKyc: satisfiesExtraKyc(identity, deps.wallet.config) ? "already_satisfied" : "required" },
   };
   recordDecision(deps, caseId, "edd", why, analystId);
   deps.db.update(cases).set({ eddRequest: request, eddSubmission: null, eddResult: null }).where(eq(cases.id, caseId)).run();

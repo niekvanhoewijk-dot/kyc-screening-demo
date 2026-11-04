@@ -40,6 +40,18 @@ Open **Simulator** in the nav. The **Scenarios** buttons set everything up; each
 
 S4 (proof of residence) and S5 (threshold reached) are there for questions. Afterwards: **Demo controls**, RESET, which also undoes everything applied in the simulator.
 
+## ID wallet segment (1 minute, when asked "what about eIDAS 2.0 / digital identity wallets?")
+Open `localhost:3000/apply`, create an account, and stop at step 4, **Proof of identity**. Test mode: a built-in test wallet with made-up data stands in for a real one (docs/spec/09).
+
+| Time | Show | Say |
+|---|---|---|
+| 0:00 | Step 4 offers **Use my ID wallet** and **Upload a document**. Open the wallet route: "What we ask for" and the test wallet panel | The wallet shares only the attributes we ask for, and the person approves them. No document photo, no selfie. The document route stays as a fallback. |
+| 0:15 | Choose **An attribute was changed after issuance**, Share. Then **Earlier presentation sent again**, Share | The applicant sees one neutral message either way (D7). The credential signature and the single-use nonce are checked in code, not by Claude. |
+| 0:30 | Choose **Share a valid ID**, Share: "Verified with your ID wallet". Continue: the residence form is pre-filled; date of birth and nationality are read-only in the questionnaire | The wallet replaces document capture only. Proof of residence, questionnaire, screening, score and threshold run exactly as before. |
+| 0:45 | As the analyst, open that case: **Evidence level** row, then the audit trail (`wallet.verified`, the checks that passed, claims we ignored) | Every case now carries a grade for how its identity was evidenced. The level never feeds the score (O-75); it only decides whether the EDD extra-KYC rule is met. A wallet alone does not meet it (O-70). |
+
+Pick **Valid ID, different family name** instead of the valid one to show the analyst-side name-mismatch flag.
+
 ## If something goes wrong
 - Anything odd on screen: **Demo controls** in the nav, type RESET (about 2 seconds, offline).
 - A Claude panel says "not recorded": the run is in replay without that recording. Say so and move on to the rules engine; it is the part that decides.

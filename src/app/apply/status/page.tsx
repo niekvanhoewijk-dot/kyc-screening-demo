@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ApplicantShell, backPath } from "@/components/applicant-shell";
 import { Ticked } from "@/components/icons";
-import { stepCase } from "@/portal/cases";
+import { stepCase, type IdentityData } from "@/portal/cases";
+import { walletEvidenceOf } from "@/portal/evidence";
 import { applicantView } from "@/portal/decision";
 import { resumeStep, stepPath } from "@/portal/steps";
 import { signOutAction } from "../actions";
@@ -107,7 +108,7 @@ export default async function StatusPage() {
             </div>
           )}
           <ul className="check-list">
-            <li><span>{company ? "Your identity and selfie" : "Proof of identity and selfie"}</span><Ticked>Verified</Ticked></li>
+            <li><span>{company ? "Your identity and selfie" : walletEvidenceOf(c.identity as IdentityData | null) ? "Proof of identity (ID wallet)" : "Proof of identity and selfie"}</span><Ticked>Verified</Ticked></li>
             <li><span>{company ? "Your proof of residence" : "Proof of residence"}</span><Ticked>Verified</Ticked></li>
             <li><span>{company ? "Company details, people and documents" : "Questionnaire"}</span><Ticked>Completed</Ticked></li>
           </ul>

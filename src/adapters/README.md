@@ -11,3 +11,4 @@ Vendor-style interfaces with mock implementations (no real vendors integrated). 
 | `ScreeningProvider` | `screening.ts` | Fictional watchlist (`fixtures/screening/watchlist.yaml`), fuzzy name + DOB + country | Phase 4 |
 | `IDVProvider` | — | — | later |
 | `DocumentReader` | `src/documents/reader.ts` | `ClaudeDocumentReader` (structured outputs, retry once, replay cache) | Phase 3 |
+| `WalletVerifier` | `src/wallet/verifier.ts` | `SdJwtWalletVerifier` checks an SD-JWT VC presentation with `node:crypto`; a built-in test wallet and demo issuer (`src/wallet/test-wallet.ts`) stand in for a real EU Digital Identity wallet. Test mode only | Phase 9 |

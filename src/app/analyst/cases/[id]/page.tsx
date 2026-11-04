@@ -17,6 +17,7 @@ import type { Gap } from "@/kyb/gaps";
 import { caseGaps } from "@/kyb/load";
 import { countryName } from "@/lib/countries";
 import type { IdentityData, QuestionnaireData, ResidenceData } from "@/portal/cases";
+import { evidenceLevelOf, levelConfig, walletEvidenceOf } from "@/portal/evidence";
 import type { CompanyData } from "@/portal/company";
 import { portalDeps } from "@/portal/deps";
 import type { EddSubmission } from "@/portal/edd";
@@ -753,6 +754,8 @@ function AnswersCard({ view }: { view: CaseView }) {
   const r = view.c.residence as ResidenceData | null;
   const i = view.c.identity as IdentityData | null;
   if (!q || !r || !i) return null;
+  const ev = walletEvidenceOf(i);
+  const level = evidenceLevelOf(i);
   const yes = (b: boolean) => (b ? "Yes" : "No");
   return (
     <div className="cards-row">
@@ -769,7 +772,16 @@ function AnswersCard({ view }: { view: CaseView }) {
       </Card>
       <Card id="h-id" eyebrow="Declared by the applicant" title="Identity and address">
         <KV rows={[
-          ["Document", `${humanize(i.docType)}, ${countryName(i.issuingCountry)}`], ["Expiry", i.noExpiry ? "No expiry date" : i.expiryDate], ["Selfie", i.selfie],
+          ...(level ? ([["Evidence level", `${levelConfig(deps.wallet.config, level).label}: ${levelConfig(deps.wallet.config, level).detail}`]] as [string, ReactNode][]) : []),
+          ...(ev
+            ? ([
+                ["Credential", `${ev.credentialType}, issued by ${ev.issuer.name}`],
+                ["Name in credential", `${ev.attributes.givenName} ${ev.attributes.familyName}`],
+                ["Valid until", ev.attributes.documentExpiry ?? ev.credentialExpiresAt.slice(0, "yyyy-mm-dd".length)],
+                ["Verified", `${ev.verifiedAt}. Passed: ${ev.checks.map((x) => x.replaceAll("_", " ")).join(", ")}`],
+                ["Selfie", "Not required (ID wallet)"],
+              ] as [string, ReactNode][])
+            : ([["Document", `${humanize(i.docType)}, ${countryName(i.issuingCountry)}`], ["Expiry", i.noExpiry ? "No expiry date" : i.expiryDate], ["Selfie", i.selfie]] as [string, ReactNode][])),
           ["Address", [r.apartment, r.addressLine1, r.addressLine2, r.city, r.region, r.postcode, countryName(r.country)].filter(Boolean).join(", ")],
           ["Mobile", r.mobilePhone], ["Landline", r.landlinePhone], ["Proof of residence", humanize(r.porType)],
         ]} />

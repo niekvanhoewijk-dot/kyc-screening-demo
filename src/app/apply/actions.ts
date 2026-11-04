@@ -20,6 +20,7 @@ import {
 } from "@/portal/cases";
 import { portalDeps } from "@/portal/deps";
 import { submitEdd } from "@/portal/edd";
+import { presentFromTestWallet, startWallet } from "@/portal/wallet";
 import { confirmPersons, removePerson, saveCompany, saveCompanyDocuments, savePerson } from "@/portal/company";
 import { PortalError } from "@/portal/errors";
 import { nextStep, resumeStep, stepPath } from "@/portal/steps";
@@ -125,6 +126,30 @@ export async function identityAction(_: FormState, fd: FormData): Promise<FormSt
   } catch (e) {
     // Valid files may have been stored before the error (e.g. a selfie retake): refresh "on file".
     revalidatePath("/apply/identity");
+    return failed(e, fd);
+  }
+  redirect(stepPath(nextStep("identity", c)));
+}
+
+// 2.1.4, ID wallet route (docs/spec/09)
+export async function startWalletAction(): Promise<void> {
+  const { deps, c } = await signedInCase();
+  try {
+    startWallet(deps, c);
+  } catch (e) {
+    if (e instanceof PortalError) redirect("/apply/identity?method=documents");
+    throw e;
+  }
+  redirect("/apply/identity/wallet");
+}
+
+/** Test mode only (O-68): the built-in test wallet answers the open request. */
+export async function presentTestWalletAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { deps, c } = await signedInCase();
+  try {
+    presentFromTestWallet(deps, c, textValues(fd).scenario ?? "");
+  } catch (e) {
+    revalidatePath("/apply/identity/wallet");
     return failed(e, fd);
   }
   redirect(stepPath(nextStep("identity", c)));

@@ -1,0 +1,84 @@
+# ID wallet intake (Phase 9, docs/spec/09). TEST MODE ONLY: the issuer and the wallet are built in.
+# Read by src/wallet/config.ts (Zod-validated). Never hard-code these in application code.
+# Credential type and attribute names: O-69 (verify against the PID Rulebook version in force).
+
+version: 1
+mode: test                         # only "test" is implemented (O-68)
+
+relying_party:
+  client_id: "x509_san_dns:kyc-demo.example.test"   # audience the key binding must name; synthetic, not a real certificate
+  name: "KYC screening demo"
+
+request:
+  credential_type: "urn:eudi:pid:1"        # SD-JWT VC "vct" we ask for
+  required_claims:                          # applicant cannot continue without these
+    given_name: given_name
+    family_name: family_name
+    birth_date: birthdate
+    nationalities: nationalities
+  optional_claims:
+    address: address                        # object: street_address, house_number, locality, region, postal_code, country
+    document_expiry: date_of_expiry         # administrative expiry of the PID
+    issuing_country: issuing_country
+  session_ttl_minutes: 10                   # how long a wallet session stays open
+  max_presentation_age_seconds: 300         # key binding "iat" freshness window
+
+limits:                                     # input hardening before any parsing work
+  max_token_bytes: 16384
+  max_disclosures: 64
+  max_claim_depth: 8                        # nesting of selectively disclosed objects and arrays
+  clock_skew_seconds: 60
+
+profile:
+  allowed_algs: [ES256]                     # ECDSA P-256 with SHA-256
+  allowed_credential_typ: [dc+sd-jwt, vc+sd-jwt]   # vc+sd-jwt kept for the transition period
+  key_binding_typ: kb+jwt
+  digest_alg: sha-256
+
+# Trusted PID issuers. In test mode the built-in demo issuer is added at start-up.
+# A real deployment reads the trusted lists of the Member States instead (O-68).
+trusted_issuers: []
+
+# Evidence-assurance ladder (spec 09 section 4). Lower rank = stronger evidence.
+# satisfies_extra_kyc: does this evidence cover the EDD "photo holding your ID" request? (spec 05, O-70)
+evidence_levels:
+  - id: wallet_pid
+    rank: 1
+    label: "ID wallet"
+    detail: "Issuer-signed credential presented with key binding"
+    satisfies_extra_kyc: false
+  - id: document_selfie
+    rank: 2
+    label: "Document and selfie"
+    detail: "Document photo; selfie passed liveness and face match"
+    satisfies_extra_kyc: true
+  - id: document_selfie_flagged
+    rank: 3
+    label: "Document, selfie not verified"
+    detail: "Document photo; selfie failed after the last attempt, flagged for the analyst"
+    satisfies_extra_kyc: false
+
+# Built-in test ecosystem: a demo PID issuer and a test wallet. Synthetic data only.
+test_ecosystem:
+  issuer:
+    iss: "https://pid-issuer.example.test"
+    kid: "demo-issuer-1"
+    name: "Demo PID provider (test)"
+    country: NL
+  untrusted_issuer:
+    iss: "https://other-issuer.example.test"
+    kid: "unlisted-issuer-1"
+  credential_validity_days: 1825             # how long a demo PID stays valid
+  expired_offset_days: 30                    # "expired_credential" scenario: expired this many days ago
+  document_validity_days: 1825
+  holder:                                    # attributes of the synthetic holder
+    birthdate: "1990-05-01"
+    nationalities: [NL]
+    address:
+      street_address: "Voorbeeldstraat"
+      house_number: "1"
+      locality: "Amsterdam"
+      region: "Noord-Holland"
+      postal_code: "1011 AA"
+      country: NL
+  name_differs_family_name: "Different"       # "name_differs" scenario

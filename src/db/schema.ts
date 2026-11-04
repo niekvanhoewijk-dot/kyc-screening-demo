@@ -202,3 +202,18 @@ export const policyDrafts = sqliteTable("policy_drafts", {
   createdAt: text("created_at").notNull(),
   createdBy: text("created_by").notNull(),
 });
+
+/** ID wallet sessions (docs/spec/09): one single-use nonce per presentation attempt. */
+export const walletSessions = sqliteTable("wallet_sessions", {
+  id: text("id").primaryKey(),
+  caseId: text("case_id").notNull().references(() => cases.id),
+  nonce: text("nonce").notNull(),
+  audience: text("audience").notNull(),
+  requested: text("requested", { mode: "json" }).notNull(), // the DCQL query that was shown to the wallet
+  status: text("status", { enum: ["pending", "verifying", "verified", "rejected"] }).notNull(),
+  resultCode: text("result_code"), // WalletRejectCode when rejected; audit only, never shown to the applicant
+  presentationSha256: text("presentation_sha256"),
+  expiresAt: text("expires_at").notNull(),
+  createdAt: text("created_at").notNull(),
+  completedAt: text("completed_at"),
+});
