@@ -187,6 +187,26 @@ export function eddOutcome(r: EddResult): { outcome: DecisionOutcome; reason_cod
   return { outcome: { edd_outcome: r.outcome, amount: r.amount_to_return }, reason_codes: ["RC_EDD_TERMINATED"] };
 }
 
+/** Score and initial threshold of an individual under a policy. Shared by decision records and the lifecycle. */
+export function evaluateIndividual(inputs: Omit<IndividualInputs, "type">, policy: Policy): { outcome: DecisionOutcome; reason_codes: ReasonCode[] } {
+  const risk = scoreApplicant({ country: inputs.country, pep: inputs.pep, us_tax_resident: inputs.us_tax_resident, ...inputs.factor_answers }, policy);
+  const threshold =
+    "total" in risk && !risk.decision
+      ? initialThreshold(
+          {
+            deposit_12m: inputs.factor_answers.deposit_12m,
+            source_of_funds: inputs.factor_answers.source_of_funds,
+            only_source_of_wealth: inputs.only_source_of_wealth,
+            employment_status: inputs.factor_answers.employment_status,
+            annual_income: inputs.factor_answers.annual_income,
+            band: risk.band,
+          },
+          policy,
+        )
+      : null;
+  return individualOutcome(risk, threshold);
+}
+
 /** Runs the engine on a record's inputs. The single evaluation path for writing and replaying records. */
 export function evaluateDecision(kind: DecisionKind, inputs: DecisionInputs, policy: Policy, kyb: KybConfig): { outcome: DecisionOutcome; reason_codes: ReasonCode[] } {
   const status = STATUS_KIND[kind];
@@ -206,22 +226,7 @@ export function evaluateDecision(kind: DecisionKind, inputs: DecisionInputs, pol
   if (kind === "engine.score" || kind === "engine.rescore") {
     const submitted = kind === "engine.score" ? { status_from: "draft", status_to: "submitted" } : {};
     if (inputs.type === "individual") {
-      const risk = scoreApplicant({ country: inputs.country, pep: inputs.pep, us_tax_resident: inputs.us_tax_resident, ...inputs.factor_answers }, policy);
-      const threshold =
-        "total" in risk && !risk.decision
-          ? initialThreshold(
-              {
-                deposit_12m: inputs.factor_answers.deposit_12m,
-                source_of_funds: inputs.factor_answers.source_of_funds,
-                only_source_of_wealth: inputs.only_source_of_wealth,
-                employment_status: inputs.factor_answers.employment_status,
-                annual_income: inputs.factor_answers.annual_income,
-                band: risk.band,
-              },
-              policy,
-            )
-          : null;
-      const r = individualOutcome(risk, threshold);
+      const r = evaluateIndividual(inputs, policy);
       return { outcome: { ...r.outcome, ...submitted }, reason_codes: r.reason_codes };
     }
     if (inputs.type === "company") {

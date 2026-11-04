@@ -9,3 +9,5 @@ export * from "./company";
 export * from "./policy";
 export * from "./canonical";
 export * from "./decision-record";
+export * from "./dates";
+export * from "./lifecycle";

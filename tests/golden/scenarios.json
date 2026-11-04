@@ -1,0 +1,2494 @@
+{
+  "description": "Lifecycle and policy-change scenarios S1 to S5 (docs/spec/08 section 6) over the synthetic book fixtures/portfolio/book.json. Every `expect` was derived by the Python oracle (tools/verify_golden.py --derive-scenarios) before the TypeScript existed, then pinned. Never edit an expected value to make a test pass. diff cases compare a baseline and a candidate policy for every book customer; lifecycle cases walk dated steps and injected events and list the obligations due after each step.",
+  "cases": [
+    {
+      "id": "S1-fatf-october-2026",
+      "source": "spec 08 S1: P1 (June list) to P2 (October list), delisted countries normal with note",
+      "input": {
+        "kind": "diff",
+        "book": "fixtures/portfolio/book.json",
+        "baseline": "P1",
+        "candidate": "P2"
+      },
+      "expect": {
+        "rows": [
+          {
+            "subject": "BK-01",
+            "before": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [
+              "band",
+              "edd",
+              "threshold",
+              "route"
+            ],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-02",
+            "before": {
+              "total": 36,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 8,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [
+              "band",
+              "edd",
+              "route"
+            ],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-03",
+            "before": {
+              "total": 40,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 50000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [
+              "band",
+              "edd",
+              "threshold",
+              "route"
+            ],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-04",
+            "before": {
+              "total": 42,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 14,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [
+              "band",
+              "edd",
+              "threshold",
+              "route"
+            ],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-05",
+            "before": {
+              "total": 37,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 37,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-06",
+            "before": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-07",
+            "before": {
+              "total": 108,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 108,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-08",
+            "before": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-09",
+            "before": {
+              "total": 106,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 106,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-10",
+            "before": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-11",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-12",
+            "before": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 39999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_SOF_OF_INCOME"
+              ]
+            },
+            "after": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 39999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_SOF_OF_INCOME"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-13",
+            "before": {
+              "total": 15,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 15,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-14",
+            "before": {
+              "total": 11,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 11,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-15",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-16",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-17",
+            "before": {
+              "total": 15,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 15,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-18",
+            "before": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 10000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 10000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          }
+        ],
+        "summary": {
+          "customers": 18,
+          "changed": 4,
+          "band_changed": 4,
+          "newly_edd": 0,
+          "no_longer_edd": 4,
+          "threshold_changed": 3,
+          "analyst_review": 0,
+          "unchanged": 14
+        }
+      }
+    },
+    {
+      "id": "S1b-delisted-held",
+      "source": "spec 08 S1: the delisted knob flipped to hold_auto_high; nobody changes",
+      "input": {
+        "kind": "diff",
+        "book": "fixtures/portfolio/book.json",
+        "baseline": "P1",
+        "candidate": {
+          "base": "P2",
+          "settings": {
+            "recently_delisted_treatment": "hold_auto_high"
+          }
+        }
+      },
+      "expect": {
+        "rows": [
+          {
+            "subject": "BK-01",
+            "before": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED_HELD",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-02",
+            "before": {
+              "total": 36,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 36,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED_HELD",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-03",
+            "before": {
+              "total": 40,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 40,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED_HELD",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-04",
+            "before": {
+              "total": 42,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 42,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED_HELD",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-05",
+            "before": {
+              "total": 37,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 37,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-06",
+            "before": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-07",
+            "before": {
+              "total": 108,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 108,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-08",
+            "before": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-09",
+            "before": {
+              "total": 106,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 106,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-10",
+            "before": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-11",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-12",
+            "before": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 39999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_SOF_OF_INCOME"
+              ]
+            },
+            "after": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 39999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_SOF_OF_INCOME"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-13",
+            "before": {
+              "total": 15,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 15,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-14",
+            "before": {
+              "total": 11,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 11,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-15",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-16",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-17",
+            "before": {
+              "total": 15,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 15,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-18",
+            "before": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 10000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 10000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          }
+        ],
+        "summary": {
+          "customers": 18,
+          "changed": 0,
+          "band_changed": 0,
+          "newly_edd": 0,
+          "no_longer_edd": 0,
+          "threshold_changed": 0,
+          "analyst_review": 0,
+          "unchanged": 18
+        }
+      }
+    },
+    {
+      "id": "S2-myanmar-follow-fatf",
+      "source": "spec 08 S2: P2 with call_for_action_treatment = follow_fatf",
+      "input": {
+        "kind": "diff",
+        "book": "fixtures/portfolio/book.json",
+        "baseline": "P2",
+        "candidate": {
+          "base": "P2",
+          "settings": {
+            "call_for_action_treatment": "follow_fatf"
+          }
+        }
+      },
+      "expect": {
+        "rows": [
+          {
+            "subject": "BK-01",
+            "before": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-02",
+            "before": {
+              "total": 8,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 8,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-03",
+            "before": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 50000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 50000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-04",
+            "before": {
+              "total": 14,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 14,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-05",
+            "before": {
+              "total": 37,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 37,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-06",
+            "before": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-07",
+            "before": {
+              "total": 108,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [
+              "band",
+              "edd",
+              "threshold",
+              "route"
+            ],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-08",
+            "before": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 40,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [
+              "band",
+              "edd",
+              "threshold",
+              "route"
+            ],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-09",
+            "before": {
+              "total": 106,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 106,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-10",
+            "before": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-11",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-12",
+            "before": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 39999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_SOF_OF_INCOME"
+              ]
+            },
+            "after": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 39999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_SOF_OF_INCOME"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-13",
+            "before": {
+              "total": 15,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 15,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-14",
+            "before": {
+              "total": 11,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 11,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-15",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-16",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-17",
+            "before": {
+              "total": 15,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 15,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-18",
+            "before": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 10000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 10000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          }
+        ],
+        "summary": {
+          "customers": 18,
+          "changed": 2,
+          "band_changed": 2,
+          "newly_edd": 2,
+          "no_longer_edd": 0,
+          "threshold_changed": 2,
+          "analyst_review": 0,
+          "unchanged": 16
+        }
+      }
+    },
+    {
+      "id": "S2b-myanmar-back-to-prohibited",
+      "source": "spec 08 5.5 (D13): customers who would become Prohibited go to analyst review, never automatic closure",
+      "input": {
+        "kind": "diff",
+        "book": "fixtures/portfolio/book.json",
+        "baseline": {
+          "base": "P2",
+          "settings": {
+            "call_for_action_treatment": "follow_fatf"
+          }
+        },
+        "candidate": "P2"
+      },
+      "expect": {
+        "rows": [
+          {
+            "subject": "BK-01",
+            "before": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-02",
+            "before": {
+              "total": 8,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 8,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-03",
+            "before": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 50000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 50000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-04",
+            "before": {
+              "total": 14,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 14,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_RECENTLY_DELISTED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-05",
+            "before": {
+              "total": 37,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 37,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-06",
+            "before": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 19999,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_INCREASED_MONITORING",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-07",
+            "before": {
+              "total": 38,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 108,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "analyst_review",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED",
+                "LC_POLICY_CHANGE_REVIEW"
+              ]
+            },
+            "changed": [
+              "band",
+              "edd",
+              "threshold",
+              "route"
+            ],
+            "analyst_review": true
+          },
+          {
+            "subject": "BK-08",
+            "before": {
+              "total": 40,
+              "band": "auto_high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "analyst_review",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_EDD",
+                "RC_BAND_PROHIBITED",
+                "LC_POLICY_CHANGE_REVIEW"
+              ]
+            },
+            "changed": [
+              "band",
+              "edd",
+              "threshold",
+              "route"
+            ],
+            "analyst_review": true
+          },
+          {
+            "subject": "BK-09",
+            "before": {
+              "total": 106,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 106,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-10",
+            "before": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "after": {
+              "total": 110,
+              "band": "prohibited",
+              "edd_required": false,
+              "threshold": null,
+              "route": "reject",
+              "reason_codes": [
+                "RC_COUNTRY_CALL_FOR_ACTION_COUNTERMEASURES",
+                "RC_BAND_PROHIBITED"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-11",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-12",
+            "before": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 39999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_SOF_OF_INCOME"
+              ]
+            },
+            "after": {
+              "total": 10,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 39999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_SOF_OF_INCOME"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-13",
+            "before": {
+              "total": 15,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 15,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-14",
+            "before": {
+              "total": 11,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 11,
+              "band": "high",
+              "edd_required": true,
+              "threshold": 40000,
+              "route": "edd_required",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_PEP_FORCES_HIGH",
+                "RC_BAND_EDD_REQUIRED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-15",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-16",
+            "before": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "after": {
+              "total": 7,
+              "band": "low",
+              "edd_required": false,
+              "threshold": 19999,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_DEMO_SEED_LOW",
+                "RC_THRESHOLD_DEPOSIT_BAND"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-17",
+            "before": {
+              "total": 15,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 15,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 100000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          },
+          {
+            "subject": "BK-18",
+            "before": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 10000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "after": {
+              "total": 12,
+              "band": "medium",
+              "edd_required": false,
+              "threshold": 10000,
+              "route": "standard",
+              "reason_codes": [
+                "RC_COUNTRY_UNASSESSED",
+                "RC_THRESHOLD_CATEGORY_CAP"
+              ]
+            },
+            "changed": [],
+            "analyst_review": false
+          }
+        ],
+        "summary": {
+          "customers": 18,
+          "changed": 2,
+          "band_changed": 2,
+          "newly_edd": 0,
+          "no_longer_edd": 2,
+          "threshold_changed": 2,
+          "analyst_review": 2,
+          "unchanged": 16
+        }
+      }
+    },
+    {
+      "id": "S3-amlr-switch-on",
+      "source": "spec 08 S3: reviews due the day before (preview) and on 10 Jul 2027 (in force)",
+      "input": {
+        "kind": "lifecycle",
+        "book": "fixtures/portfolio/book.json",
+        "policy": "in_force",
+        "subjects": "all",
+        "only": [
+          "review_due"
+        ],
+        "steps": [
+          {
+            "as_of": "2026-11-04"
+          },
+          {
+            "as_of": "2027-07-09"
+          },
+          {
+            "as_of": "2027-07-10"
+          }
+        ]
+      },
+      "expect": {
+        "steps": [
+          {
+            "as_of": "2026-11-04",
+            "policy": "P2",
+            "obligations": [
+              {
+                "subject": "BK-13",
+                "kind": "review_due",
+                "code": "LC_REVIEW_DUE_EDD_ANNUAL",
+                "due_on": "2026-10-15",
+                "basis": "amlr_26_2_a",
+                "flag": "preview",
+                "effect": null
+              }
+            ]
+          },
+          {
+            "as_of": "2027-07-09",
+            "policy": "P2",
+            "obligations": [
+              {
+                "subject": "BK-05",
+                "kind": "review_due",
+                "code": "LC_REVIEW_DUE_EDD_ANNUAL",
+                "due_on": "2027-05-20",
+                "basis": "amlr_26_2_a",
+                "flag": "preview",
+                "effect": null
+              },
+              {
+                "subject": "BK-11",
+                "kind": "review_due",
+                "code": "LC_REVIEW_DUE_STANDARD_5Y",
+                "due_on": "2027-03-01",
+                "basis": "amlr_26_2_b",
+                "flag": "preview",
+                "effect": null
+              },
+              {
+                "subject": "BK-13",
+                "kind": "review_due",
+                "code": "LC_REVIEW_DUE_EDD_ANNUAL",
+                "due_on": "2026-10-15",
+                "basis": "amlr_26_2_a",
+                "flag": "preview",
+                "effect": null
+              }
+            ]
+          },
+          {
+            "as_of": "2027-07-10",
+            "policy": "P2",
+            "obligations": [
+              {
+                "subject": "BK-05",
+                "kind": "review_due",
+                "code": "LC_REVIEW_DUE_EDD_ANNUAL",
+                "due_on": "2027-05-20",
+                "basis": "amlr_26_2_a",
+                "flag": "in_force",
+                "effect": null
+              },
+              {
+                "subject": "BK-11",
+                "kind": "review_due",
+                "code": "LC_REVIEW_DUE_STANDARD_5Y",
+                "due_on": "2027-03-01",
+                "basis": "amlr_26_2_b",
+                "flag": "in_force",
+                "effect": null
+              },
+              {
+                "subject": "BK-13",
+                "kind": "review_due",
+                "code": "LC_REVIEW_DUE_EDD_ANNUAL",
+                "due_on": "2026-10-15",
+                "basis": "amlr_26_2_a",
+                "flag": "in_force",
+                "effect": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "S4-por-lifecycle",
+      "source": "spec 08 S4: notice 14 days before expiry, expiry blocks the account, a new POR clears it",
+      "input": {
+        "kind": "lifecycle",
+        "book": "fixtures/portfolio/book.json",
+        "policy": "in_force",
+        "subjects": [
+          "BK-15"
+        ],
+        "facts": true,
+        "steps": [
+          {
+            "as_of": "2026-11-03"
+          },
+          {
+            "as_of": "2026-11-04"
+          },
+          {
+            "as_of": "2026-11-18"
+          },
+          {
+            "subject": "BK-15",
+            "event": {
+              "type": "por_replaced",
+              "issued_at": "2026-11-18"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "steps": [
+          {
+            "as_of": "2026-11-03",
+            "policy": "P2",
+            "obligations": [],
+            "facts": {
+              "BK-15": {
+                "country": "NL",
+                "pep": false,
+                "deposited_to_date": 6000,
+                "threshold": 19999,
+                "por_issued_at": "2026-05-18",
+                "por_expires_at": "2026-11-18"
+              }
+            }
+          },
+          {
+            "as_of": "2026-11-04",
+            "policy": "P2",
+            "obligations": [
+              {
+                "subject": "BK-15",
+                "kind": "por_notice",
+                "code": "LC_POR_EXPIRY_NOTICE",
+                "due_on": "2026-11-18",
+                "basis": "full_v3_por",
+                "flag": "in_force",
+                "effect": null
+              }
+            ],
+            "facts": {
+              "BK-15": {
+                "country": "NL",
+                "pep": false,
+                "deposited_to_date": 6000,
+                "threshold": 19999,
+                "por_issued_at": "2026-05-18",
+                "por_expires_at": "2026-11-18"
+              }
+            }
+          },
+          {
+            "as_of": "2026-11-18",
+            "policy": "P2",
+            "obligations": [
+              {
+                "subject": "BK-15",
+                "kind": "por_expired",
+                "code": "LC_POR_EXPIRED",
+                "due_on": "2026-11-18",
+                "basis": "full_v3_por",
+                "flag": "in_force",
+                "effect": {
+                  "status": "expired_por",
+                  "blocks": [
+                    "deposits",
+                    "withdrawals"
+                  ]
+                }
+              }
+            ],
+            "facts": {
+              "BK-15": {
+                "country": "NL",
+                "pep": false,
+                "deposited_to_date": 6000,
+                "threshold": 19999,
+                "por_issued_at": "2026-05-18",
+                "por_expires_at": "2026-11-18"
+              }
+            }
+          },
+          {
+            "as_of": "2026-11-18",
+            "policy": "P2",
+            "obligations": [],
+            "facts": {
+              "BK-15": {
+                "country": "NL",
+                "pep": false,
+                "deposited_to_date": 6000,
+                "threshold": 19999,
+                "por_issued_at": "2026-11-18",
+                "por_expires_at": "2027-05-18"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "S5-threshold-reached",
+      "source": "spec 08 S5: a deposit reaches the threshold, then EDD sets a new threshold (spec 05)",
+      "input": {
+        "kind": "lifecycle",
+        "book": "fixtures/portfolio/book.json",
+        "policy": "in_force",
+        "subjects": [
+          "BK-16"
+        ],
+        "facts": true,
+        "steps": [
+          {
+            "as_of": "2026-11-04"
+          },
+          {
+            "subject": "BK-16",
+            "event": {
+              "type": "deposit",
+              "amount": 700
+            }
+          },
+          {
+            "subject": "BK-16",
+            "event": {
+              "type": "edd_outcome",
+              "documented_annual_amount": 45000
+            }
+          }
+        ]
+      },
+      "expect": {
+        "steps": [
+          {
+            "as_of": "2026-11-04",
+            "policy": "P2",
+            "obligations": [],
+            "facts": {
+              "BK-16": {
+                "country": "GB",
+                "pep": false,
+                "deposited_to_date": 19400,
+                "threshold": 19999,
+                "por_issued_at": "2026-09-10",
+                "por_expires_at": "2027-03-10"
+              }
+            }
+          },
+          {
+            "as_of": "2026-11-04",
+            "policy": "P2",
+            "obligations": [
+              {
+                "subject": "BK-16",
+                "kind": "threshold_reached",
+                "code": "LC_THRESHOLD_REACHED",
+                "due_on": null,
+                "basis": "full_v3_edd",
+                "flag": "in_force",
+                "effect": {
+                  "status": "edd_requested",
+                  "route": "edd"
+                }
+              }
+            ],
+            "facts": {
+              "BK-16": {
+                "country": "GB",
+                "pep": false,
+                "deposited_to_date": 20100,
+                "threshold": 19999,
+                "por_issued_at": "2026-09-10",
+                "por_expires_at": "2027-03-10"
+              }
+            }
+          },
+          {
+            "as_of": "2026-11-04",
+            "policy": "P2",
+            "obligations": [],
+            "facts": {
+              "BK-16": {
+                "country": "GB",
+                "pep": false,
+                "deposited_to_date": 20100,
+                "threshold": 36000,
+                "por_issued_at": "2026-09-10",
+                "por_expires_at": "2027-03-10",
+                "last_edd": {
+                  "outcome": "new_threshold",
+                  "new_threshold": 36000,
+                  "headroom": 15900
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
