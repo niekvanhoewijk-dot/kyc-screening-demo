@@ -250,3 +250,26 @@ describe("demo reset undoes the simulator", () => {
     expect(bookCustomer(d, "BK-16")!.deposited_to_date).toBe(19400);
   });
 });
+
+describe("simulator page choice (URL state)", async () => {
+  const { readChoice } = await import("@/app/analyst/simulator/refs");
+  const { resolvePolicy } = await import("@/simulator/policies");
+
+  it("defaults to comparing the current book policy with itself, so nothing changes until a knob moves", async () => {
+    const { d } = await seeded();
+    const c = readChoice(d, () => undefined);
+    expect(c).toMatchObject({ baseline: "P2", baselineParam: "", candidateBase: "P2" });
+    expect(resolvePolicy(d, c.refs.candidate).policy.id).toBe("P2");
+    expect(simulatorView(d, c.refs).diff.summary.changed).toBe(0);
+  });
+
+  it("after an apply, the default baseline and candidate follow the applied draft", async () => {
+    const { d } = await seeded();
+    const applied = applyPolicy(d, { candidate: MYANMAR_FOLLOW_FATF }, "Compare", "analyst-1").record.policy.id;
+    const c = readChoice(d, () => undefined);
+    expect(c.baseline).toBe(applied);
+    expect(resolvePolicy(d, c.refs.candidate).policy.id).toBe(applied);
+    const back = readChoice(d, (k) => ({ candidate: "P2", cfa: "all_prohibited" })[k]);
+    expect(simulatorView(d, back.refs).diff.summary).toMatchObject({ changed: 2, analyst_review: 2 });
+  });
+});
