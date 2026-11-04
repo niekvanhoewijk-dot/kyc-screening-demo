@@ -273,3 +273,31 @@ describe("simulator page choice (URL state)", async () => {
     expect(simulatorView(d, back.refs).diff.summary).toMatchObject({ changed: 2, analyst_review: 2 });
   });
 });
+
+describe("scenario presets (spec 08 section 6)", async () => {
+  const { loadConsoleConfig } = await import("@/console/config");
+  const presets = loadConsoleConfig().simulator.presets;
+  type Input = { baseline?: string | { base: string; settings: Record<string, string> }; candidate?: string | { base: string; settings: Record<string, string> }; subjects?: string[] | "all"; steps?: { subject?: string; event?: { type: string; amount?: number } }[] };
+  const scenarios = (JSON.parse(fs.readFileSync(path.resolve("tests/golden/scenarios.json"), "utf8")) as { cases: { id: string; input: Input }[] }).cases;
+  const input = (id: string) => scenarios.find((c) => c.id.startsWith(`${id}-`))!.input;
+  const preset = (id: string) => presets.find((p) => p.id === id)!;
+
+  it("cover S1 to S5 and name only published policies and book customers", () => {
+    const policies = makeDeps(WALL).deps.policies;
+    expect(presets.map((p) => p.id)).toEqual(["S1", "S2", "S3", "S4", "S5"]);
+    for (const p of presets) {
+      for (const id of [p.baseline, p.candidate].filter(Boolean)) expect(() => policies.byId(id!)).not.toThrow();
+      if (p.subject) expect(bookFixture().customers.map((c) => c.id)).toContain(p.subject);
+    }
+  });
+
+  it("set up the same comparison, subject and event as the pinned scenarios", () => {
+    expect([preset("S1").baseline, preset("S1").candidate]).toEqual([input("S1").baseline, input("S1").candidate]);
+    expect({ base: preset("S2").candidate, settings: { call_for_action_treatment: preset("S2").cfa } }).toEqual(input("S2").candidate);
+    expect(preset("S2").baseline).toBe(input("S2").baseline);
+    expect(preset("S3").show).toBe("review_due");
+    expect(input("S4").subjects).toEqual([preset("S4").subject]);
+    const deposit = input("S5").steps!.find((s) => s.event?.type === "deposit")!;
+    expect({ subject: deposit.subject, type: deposit.event!.type, amount: deposit.event!.amount }).toEqual({ subject: preset("S5").subject, type: preset("S5").event, amount: preset("S5").amount });
+  });
+});

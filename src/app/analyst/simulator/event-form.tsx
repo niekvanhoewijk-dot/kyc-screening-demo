@@ -10,9 +10,20 @@ type Option = { id: string; label: string };
 type EventType = keyof typeof EVENT_LABEL;
 
 /** Event injector (spec 08 5.4, 5.6 item 4): pick a synthetic customer, an event and its fields. */
-export function EventForm({ customers, factors, simDate }: { customers: Option[]; factors: (Option & { options: Option[] })[]; simDate: string }) {
+export function EventForm({
+  customers,
+  factors,
+  simDate,
+  defaults = {},
+}: {
+  customers: Option[];
+  factors: (Option & { options: Option[] })[];
+  simDate: string;
+  /** Prefill from a scenario preset. */
+  defaults?: { subject?: string; type?: string; amount?: string };
+}) {
   const [state, run] = useActionState(eventAction, initialState);
-  const [type, setType] = useState<EventType>("deposit");
+  const [type, setType] = useState<EventType>(defaults.type && defaults.type in EVENT_LABEL ? (defaults.type as EventType) : "deposit");
   const [field, setField] = useState("country");
   const [noSof, setNoSof] = useState(false);
   const factor = factors.find((f) => f.id === field);
@@ -22,7 +33,7 @@ export function EventForm({ customers, factors, simDate }: { customers: Option[]
       <div className="row">
         <div className="field">
           <label htmlFor="ev-subject">Customer</label>
-          <select id="ev-subject" name="subject" defaultValue={customers[0]?.id}>
+          <select id="ev-subject" name="subject" defaultValue={customers.some((c) => c.id === defaults.subject) ? defaults.subject : customers[0]?.id}>
             {customers.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
         </div>
@@ -37,7 +48,7 @@ export function EventForm({ customers, factors, simDate }: { customers: Option[]
       {type === "deposit" && (
         <div className="field">
           <label htmlFor="ev-amount">Amount deposited (USD)</label>
-          <input id="ev-amount" name="amount" inputMode="decimal" required aria-describedby="ev-amount-hint" />
+          <input id="ev-amount" name="amount" inputMode="decimal" required aria-describedby="ev-amount-hint" defaultValue={defaults.amount} />
           <span className="hint" id="ev-amount-hint">Added to deposits to date. At or above the threshold, the customer goes to EDD.</span>
         </div>
       )}

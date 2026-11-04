@@ -2,7 +2,7 @@
 
 An illustrative onboarding and compliance-screening demo built from the Ateaya KYC-KYB-AML requirements (Full v3) and the DVAULT onboarding flow, using Claude for document reading and case preparation and a deterministic rules engine for every decision number.
 
-**Status:** Phases 0-6 done (demo-ready): scaffold, rules engine (`src/engine`), applicant portal for individuals and companies (`/apply`, steps 2.1.1-2.1.8 plus EDD and KYB), Claude document reading, KYB classification and case memo (`src/documents`), KYB gap list (`src/kyb`), analyst console (`/analyst`), eval report (`npm run eval`). OTP codes print in the `npm run dev` console.
+**Status:** Phases 0-8 done (demo-ready): scaffold, rules engine (`src/engine`), applicant portal for individuals and companies (`/apply`, steps 2.1.1-2.1.8 plus EDD and KYB), Claude document reading, KYB classification and case memo (`src/documents`), KYB gap list (`src/kyb`), analyst console (`/analyst`), eval report (`npm run eval`), Ateaya-look design (Phase 7), and the lifecycle and policy simulator (`/analyst/simulator`, Phase 8): versioned policies, hash-chained decision records, a synthetic book, scenarios S1-S5. OTP codes print in the `npm run dev` console.
 
 **Claude document reading:** put `ANTHROPIC_API_KEY=...` in `.env.local`, then `npm run docs:record` reads the labelled SAMPLE set in `fixtures/documents/` live and records the responses in `fixtures/claude-cache/`. After that, `npm run test` replays them offline and asserts the expected reason codes, `npm run eval` writes `reports/eval-<date>.md` (precision/recall per reason code, KYB classification accuracy, cost per case), and `DEMO_MODE=replay` runs the app without a key. `npm run docs:samples` regenerates the documents (macOS, uses `sips`).
 
@@ -13,7 +13,8 @@ Step by step:
 1. `npm install && cp .env.example .env.local` (`DEMO_MODE=replay`: no API key, no network calls)
 2. `npm run demo:reset` seeds 6 synthetic personas (Low, Medium, High, Auto-High, Prohibited, a company)
 3. `npm run dev`, open http://localhost:3000/analyst, choose an analyst
-4. Follow `docs/DEMO-SCRIPT.md` (5 minutes). Reset any time at `/analyst/demo`.
+4. Follow `docs/DEMO-SCRIPT.md` (5 minutes, plus a 2-minute simulator segment). Reset any time at `/analyst/demo`; it also undoes everything applied in the simulator.
+5. `npm run verify:records` recomputes every decision-record hash chain in the local database and replays every record.
 
 Claude's pre-review and memos replay recorded responses. Record them once with an API key in `.env.local`: `npm run demo:record` (persona cases) and `npm run docs:record` (labelled eval sets). Without recordings, MVP 1 runs fully and MVP 2 shows "not recorded".
 
@@ -30,8 +31,10 @@ Claude's pre-review and memos replay recorded responses. Record them once with a
 | `docs/spec/00-07` | Scope and decisions, flow mapping, requirements, scoring, EDD, Claude's role, open questions |
 | `docs/BUILD-PLAN.md` | Phases, acceptance criteria, starter prompts |
 | `config/risk-matrix.yaml` | Points, bands, tiers, threshold rules (single source of numbers) |
-| `config/country-risk.yaml` | FATF black/grey lists as of 19 Jun 2026, with sources |
-| `tests/golden/*.json` | 18 cases: 8 from the requirements doc, 10 derived |
+| `config/country-risk.yaml` | FATF black/grey lists as of 19 Jun 2026, with sources (policy P1) |
+| `config/policy/` | Policy versions (`policies.yaml`: P1, P2, knobs, AMLR review limits) and the October 2026 list (P2) |
+| `fixtures/portfolio/book.json` | 18 synthetic, engine-only customers for the simulator |
+| `tests/golden/*.json` | 18 rule cases (8 from the requirements doc, 10 derived) and the simulator scenarios S1-S5 (`scenarios.json`), all pinned from the oracle |
 | `tools/verify_golden.py` | Reference oracle for the rules |
 
 ## About this demo

@@ -68,14 +68,54 @@ try {
   }
 } catch (e) { fail(`Cannot read fixtures/personas/personas.json (${e.message})`); }
 
-// 6. Country data freshness (information, so you can say it correctly)
+// 6. Policy versions and their country lists (spec 08): every file present, and what to say about the data
+const today = new Date().toISOString().slice(0, 10);
 try {
-  const c = fs.readFileSync(at("config/country-risk.yaml"), "utf8");
-  const asOf = /as_of:\s*"?([\d-]+)/.exec(c)?.[1];
-  if (asOf) ok(`Country lists: FATF, as of ${asOf}. Say "as of ${asOf}", not "current"`);
-} catch {}
+  const file = fs.readFileSync(at("config/policy/policies.yaml"), "utf8");
+  const blocks = file.split(/\n\s*-\s+id:\s*/).slice(1);
+  const policies = blocks.map((b) => ({
+    id: /^"?([\w-]+)/.exec(b)?.[1],
+    from: /effective_from:\s*"?([\d-]+)/.exec(b)?.[1],
+    list: /country_list:\s*"?([^"\s#]+)/.exec(b)?.[1],
+  }));
+  if (!policies.length) fail("config/policy/policies.yaml lists no policies", "Restore it from git");
+  for (const pol of policies) {
+    const listFile = at(`config/${pol.list}`);
+    if (!pol.list || !fs.existsSync(listFile)) { fail(`Policy ${pol.id}: country list ${pol.list ?? "(none)"} is missing`, "Restore config/ from git"); continue; }
+    const c = fs.readFileSync(listFile, "utf8");
+    pol.asOf = /as_of:\s*"?([\d-]+)/.exec(c)?.[1];
+    pol.version = /list_version:\s*"?([\w-]+)/.exec(c)?.[1];
+    ok(`Policy ${pol.id}: in force from ${pol.from}, ${pol.version}, FATF lists as of ${pol.asOf}`);
+  }
+  const inForce = policies.filter((x) => x.from && x.from <= today).sort((a, b) => a.from.localeCompare(b.from)).at(-1);
+  if (inForce?.asOf) ok(`New applicants are scored under ${inForce.id}. Say "FATF, as of ${inForce.asOf}", not "current"`);
+} catch (e) { fail(`Cannot read config/policy/policies.yaml (${e.message})`, "Restore it from git"); }
 
-// 7. Port 3000
+// 7. Synthetic book and pinned scenarios for the simulator (spec 08 sections 5.2 and 6)
+try {
+  const book = JSON.parse(fs.readFileSync(at("fixtures/portfolio/book.json"), "utf8"));
+  const ids = (book.customers ?? []).map((c) => c.id);
+  const unlabelled = (book.customers ?? []).filter((c) => c.label !== "Synthetic").map((c) => c.id);
+  if (!ids.length) fail("fixtures/portfolio/book.json has no customers", "Restore it from git");
+  else if (unlabelled.length) fail(`Book customers not labelled Synthetic: ${unlabelled.join(", ")}`, "Every book row must carry label: Synthetic");
+  else if (new Set(ids).size !== ids.length) fail("fixtures/portfolio/book.json has duplicate customer ids", "Restore it from git");
+  else ok(`Simulator book: ${ids.length} synthetic customers; presets move the simulated clock to the book's demo date ${book.demo_date}`);
+} catch (e) { fail(`Cannot read fixtures/portfolio/book.json (${e.message})`, "Restore it from git"); }
+try {
+  const s = JSON.parse(fs.readFileSync(at("tests/golden/scenarios.json"), "utf8"));
+  const scen = (s.cases ?? []).map((c) => c.id.split("-")[0]);
+  const missing = ["S1", "S2", "S3", "S4", "S5"].filter((x) => !scen.includes(x));
+  missing.length ? warn(`Pinned scenarios missing: ${missing.join(", ")}`, "Restore tests/golden/scenarios.json from git") : ok(`Scenarios S1 to S5 pinned (${scen.length} cases in tests/golden/scenarios.json)`);
+} catch (e) { warn(`Cannot read tests/golden/scenarios.json (${e.message})`, "Restore it from git"); }
+
+// 8. Design font: next/font fetches Alexandria from Google Fonts on the first compile. Offline it falls back to a
+// system font (cosmetic only, the demo still runs), so start the app once while online before an interview.
+fs.existsSync(at(".next"))
+  ? ok("Build cache present (.next): fonts and pages compiled on an earlier start")
+  : warn("No build cache yet: the first start fetches the Alexandria font from Google Fonts; offline it uses a system font (cosmetic only)",
+      "Start the app once while online before the interview (npm run dev)");
+
+// 9. Port 3000
 const portFree = await new Promise((res) => {
   const s = net.createServer().once("error", () => res(false)).once("listening", () => s.close(() => res(true)));
   s.listen(3000, "127.0.0.1");

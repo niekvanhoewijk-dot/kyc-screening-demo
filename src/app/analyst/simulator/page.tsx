@@ -12,7 +12,7 @@ import { effectivePolicy, policySet } from "@/simulator/policies";
 import { portfolio, PORTFOLIO_SUBJECT, simulatorView } from "@/simulator/service";
 import { ActionForm } from "../action-form";
 import { answerLabel, BAND_LABEL, usd } from "../labels";
-import { applyAction, clockAction, dryRunAction } from "./actions";
+import { applyAction, clockAction, dryRunAction, presetAction } from "./actions";
 import { EventForm } from "./event-form";
 import { BASIS_LABEL, CHANGE_LABEL, KNOB_LABEL, OBLIGATION_LABEL, REASON_LABEL, ROUTE_LABEL } from "./labels";
 import { choiceQuery, readChoice } from "./refs";
@@ -46,6 +46,7 @@ export default async function SimulatorPage({ searchParams }: { searchParams: Pr
   const choice = readChoice(deps, (k) => sp[k]);
   const view = simulatorView(deps, choice.refs);
   const subjects = portfolio(deps);
+  const preset = deps.consoleConfig.simulator.presets.find((p) => p.id === sp.preset);
   const book = bookCustomers(deps);
   const inForce = deps.policies.inForce(view.clock.date);
   const effective = effectivePolicy(deps);
@@ -151,6 +152,17 @@ export default async function SimulatorPage({ searchParams }: { searchParams: Pr
         </div>
       </header>
 
+      {/* Scenario presets (spec 08 section 6) */}
+      <section className="stack" aria-labelledby="presets-h" style={{ gap: 12 }}>
+        <h2 className="mini-head" id="presets-h" style={{ margin: 0 }}>Scenarios</h2>
+        <form action={presetAction} className="actions tight">
+          {deps.consoleConfig.simulator.presets.map((p) => (
+            <button key={p.id} className={`btn small${sp.preset === p.id ? "" : " outline"}`} type="submit" name="preset" value={p.id} aria-pressed={sp.preset === p.id}>{p.label}</button>
+          ))}
+        </form>
+        {preset && <div className="banner" role="status"><strong>{preset.label}.</strong> {preset.note}</div>}
+      </section>
+
       {/* 5. Results tiles */}
       <section className="tiles" aria-label="Results">
         <div className="tile">
@@ -247,6 +259,8 @@ export default async function SimulatorPage({ searchParams }: { searchParams: Pr
       <section className="card" aria-labelledby="event-h">
         <div className="card-head"><div><span className="eyebrow">Events</span><h2 className="card-title" id="event-h">Inject an event</h2></div></div>
         <EventForm
+          key={`${sp.preset ?? ""}-${view.clock.date}`}
+          defaults={{ subject: sp.subject, type: sp.ev, amount: sp.amount }}
           simDate={view.clock.date}
           customers={book.map((c) => ({ id: c.id, label: `${c.id} · ${countryName(c.country)} · Synthetic` }))}
           factors={Object.entries(FACTOR_LABEL).map(([id, label]) => {

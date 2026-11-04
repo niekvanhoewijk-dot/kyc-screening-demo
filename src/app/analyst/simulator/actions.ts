@@ -1,8 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { audit } from "@/lib/audit";
 import { portalDeps } from "@/portal/deps";
 import { PortalError } from "@/portal/errors";
+import { bookFixture } from "@/simulator/book";
+import { effectivePolicy } from "@/simulator/policies";
 import { advanceClock, applyPolicy, dryRun, injectEvent, moveClock, resetClock } from "@/simulator/service";
 import type { FormState } from "../../apply/form-state";
 import { currentAnalyst } from "../analyst-session";
@@ -87,4 +91,23 @@ export async function eventAction(_: FormState, fd: FormData): Promise<FormState
     const due = r.obligations.length ? `Due now: ${r.obligations.length} obligation${r.obligations.length === 1 ? "" : "s"}.` : "No obligations due.";
     return `Event applied to ${subject}. ${due}${recorded(r.recorded)}`;
   });
+}
+
+/**
+ * Scenario preset (spec 08 section 6): moves the simulated clock to the preset's date and opens the panel on its setup.
+ * Changes no customer data; the clock move is audited like any other.
+ */
+export async function presetAction(fd: FormData) {
+  const a = await currentAnalyst();
+  if (!a) return;
+  const deps = portalDeps();
+  const p = deps.consoleConfig.simulator.presets.find((x) => x.id === str(fd, "preset"));
+  if (!p) return;
+  const date = p.clock === "amlr" ? effectivePolicy(deps).policy.settings.periodic_review.regulatory_effective_from : bookFixture().demo_date;
+  moveClock(deps, date, a.id);
+  audit(deps.db, deps.now(), `analyst:${a.id}`, "sim.preset", null, { preset: p.id, date });
+  const q = new URLSearchParams({ preset: p.id });
+  for (const [k, v] of Object.entries({ baseline: p.baseline, candidate: p.candidate, cfa: p.cfa, delisted: p.delisted, ob: p.show, subject: p.subject, ev: p.event, amount: p.amount?.toString() })) if (v) q.set(k, v);
+  revalidatePath("/analyst/simulator");
+  redirect(`/analyst/simulator?${q}${p.subject ? "#event-h" : ""}`);
 }

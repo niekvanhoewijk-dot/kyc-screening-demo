@@ -26,7 +26,23 @@ Fast path: `npm run demo` (runs `npm run preflight`, resets the 6 cases, starts 
 | 4:20 | **Sample Holdings B.V.**: "Why the company is Auto-High", people and bands, "What we have and what is missing" (4 of 10), the Classification check | Company risk is a stated demo default (O-8). The gap list is code over declared data and Claude's classifications. |
 | 4:40 | Audit trail at the bottom of a case (or **Audit trail** in the nav); **Evaluation report** in the nav (after `npm run eval`) | Precision and recall per reason code and cost per case, measured on a labelled synthetic set instead of anecdotes. Swapping a vendor touches an adapter, not the scoring. |
 
+## Simulator segment (2 minutes, after 4:40 or when asked "what about existing customers?")
+Open **Simulator** in the nav. The **Scenarios** buttons set everything up; each moves only the simulated clock (audited) and shows what to look for. Order: S1, then S2, then S3.
+
+| Time | Show | Say |
+|---|---|---|
+| 0:00 | **S1 FATF October 2026 plenary**: "Changes 4 of 24", BG, CI, CD, MC from Auto-High to Low or Medium, EDD Yes → No | Policy is data: P1 is the June list, P2 the October list, each with a content hash. Here is the blast radius before anything ships. |
+| 0:25 | Recently delisted: **Hold at Auto-High**, Compare: 0 changes | Delisting is a policy decision, not an automatic discount. |
+| 0:40 | **S2 Myanmar knob**: MM customers Prohibited → Auto-High, $40,000 cap; KP and IR unchanged. **Dry run** | A dry run writes one summary record and nothing else. |
+| 1:00 | Reason, **Apply to demo data**; then Myanmar rule back to Prohibit, Compare: "Analyst review" | A policy change never closes a relationship (D13); only a person does. |
+| 1:20 | **Records** on BK-07: **Verify chain**, **Replay** on the re-score | Every outcome is a hash-chained record that replays to the same result under the policy it is pinned to. |
+| 1:40 | **S3 AMLR switch-on**: reviews due "In force"; set the date to 9 Jul 2027: "Preview" | Time creates obligations, it does not change bands. AMLR Art. 26 limits are outer limits, labelled preview before 10 Jul 2027. |
+
+S4 (proof of residence) and S5 (threshold reached) are there for questions. Afterwards: **Demo controls**, RESET, which also undoes everything applied in the simulator.
+
 ## If something goes wrong
 - Anything odd on screen: **Demo controls** in the nav, type RESET (about 2 seconds, offline).
 - A Claude panel says "not recorded": the run is in replay without that recording. Say so and move on to the rules engine; it is the part that decides.
+- Headings in a plain system font: the app first started offline and could not fetch the Alexandria font. Cosmetic only; start it once online and it is used from then on.
+- Simulator numbers look different from the table above: something was applied or injected earlier. Reset (Demo controls), then use the Scenarios buttons. Presets move the simulated clock to the book's demo date (4 Nov 2026), so the simulator story does not depend on today's date.
 - Persona proof-of-residence dates are fixed (September 2026). After about 20 December 2026 the Low persona's POR also becomes older than 3 months: regenerate with `npm run docs:samples`, update `porIssued` in `fixtures/personas/personas.json`, then `npm run demo:record`.
