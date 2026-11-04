@@ -43,6 +43,13 @@
       "when": 1793798256880,
       "tag": "0005_deep_the_professor",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1793799968037,
+      "tag": "0006_faithful_robbie_robertson",
+      "breakpoints": true
     }
   ]
 }

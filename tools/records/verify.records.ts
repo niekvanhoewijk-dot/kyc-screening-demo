@@ -1,9 +1,11 @@
 // npm run verify:records -> recomputes every decision-record hash chain in the local database and replays every
-// engine and human record under the policy it is pinned to (spec 08 section 4.4). Fails on any problem.
+// record (engine, human, lifecycle and policy change) under the policy it is pinned to, simulator drafts included
+// (spec 08 section 4.4). Fails on any problem.
 import { expect, it } from "vitest";
 import { replayRecord, verifyChain, type DecisionRecord } from "@/engine";
 import { portalDeps } from "@/portal/deps";
 import { allRecords } from "@/records/store";
+import { policySet } from "@/simulator/policies";
 
 it("verifies decision records", () => {
   const deps = portalDeps();
@@ -12,10 +14,10 @@ it("verifies decision records", () => {
   for (const r of records) bySubject.set(r.subject, [...(bySubject.get(r.subject) ?? []), r]);
   const problems: string[] = [];
   for (const [subject, recs] of bySubject) for (const p of verifyChain(recs)) problems.push(`${subject} #${p.seq}: ${p.problem}`);
+  const policies = policySet(deps);
   let replayed = 0;
   for (const r of records) {
-    if (r.kind.startsWith("lifecycle.") || r.kind.startsWith("policy.")) continue;
-    const res = replayRecord(r, deps.policies, deps.kyb);
+    const res = replayRecord(r, policies, deps.kyb);
     replayed++;
     if (!res.reproduced) problems.push(`${r.subject} #${r.seq} ${r.kind}: ${res.differences.join("; ")}`);
   }

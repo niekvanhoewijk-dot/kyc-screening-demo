@@ -208,9 +208,10 @@ export function saveQuestionnaire(deps: PortalDeps, c: CaseRow, input: unknown) 
  * Rules engine over the stored answers. `pepConfirmed` applies an analyst-confirmed PEP screening
  * match (D9: PEP = band at least High) on top of the self-declaration.
  */
-export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: boolean; pepPersonIds?: string[] } = {}) {
-  // spec 08 5.5: scored under the policy in force on the wall clock at the time of scoring.
-  const policy = deps.policies.inForce(deps.now().toISOString());
+export function scoreCase(deps: PortalDeps, c: CaseRow, opts: { pepConfirmed?: boolean; pepPersonIds?: string[]; policy?: Policy } = {}) {
+  // spec 08 5.5: scored under the policy in force on the wall clock at the time of scoring,
+  // unless the simulator applies another policy to demo data.
+  const policy = opts.policy ?? deps.policies.inForce(deps.now().toISOString());
   if (c.persona === "company") return scoreCompanyCase(deps, c, policy, opts.pepPersonIds ?? []);
   const q = c.questionnaire as QuestionnaireData;
   const r = c.residence as ResidenceData;

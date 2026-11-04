@@ -182,3 +182,23 @@ export const decisionRecords = sqliteTable("decision_records", {
   prevHash: text("prev_hash"),
   atWall: text("at_wall").notNull(),
 });
+
+/**
+ * Simulator (docs/spec/08 section 5): synthetic book customers whose facts changed by an injected event.
+ * Rows overlay fixtures/portfolio/book.json; an empty table means the book as shipped. Wiped by the demo reset.
+ */
+export const simCustomers = sqliteTable("sim_customers", {
+  id: text("id").primaryKey(),
+  customer: text("customer", { mode: "json" }).notNull(), // BookCustomer, engine facts only
+  updatedAt: text("updated_at").notNull(),
+});
+
+/** Draft policy versions saved from the simulator, so decision records pinned to a draft can be replayed. */
+export const policyDrafts = sqliteTable("policy_drafts", {
+  id: text("id").primaryKey(),
+  base: text("base").notNull(),
+  settings: text("settings", { mode: "json" }).notNull(),
+  hash: text("hash").notNull(),
+  createdAt: text("created_at").notNull(),
+  createdBy: text("created_by").notNull(),
+});

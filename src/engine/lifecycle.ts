@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { addDays, addMonths } from "./dates";
-import { factorAnswersSchema, evaluateIndividual, type ReasonCode } from "./decision-record";
 import { recalculateEdd, depositTriggersEdd, type EddResult } from "./edd";
 import { SCORED_FACTORS } from "./factors";
+import type { KybConfig } from "./kyb-config";
+import { evaluateIndividual, evaluateSubject, factorAnswersSchema, policyChangeRouting, type Evaluated, type IndividualInputs, type ReasonCode, type SubjectInputs } from "./outcomes";
 import type { Policy } from "./policy";
 
 // Lifecycle of existing customers (docs/spec/08 sections 2 and 5.3). Pure: no I/O, no clock.
@@ -60,20 +61,28 @@ export type CustomerEvaluation = {
   reason_codes: ReasonCode[];
 };
 
+/** The engine inputs of a book customer: its facts, nothing else. */
+export const customerInputs = (c: BookCustomer): IndividualInputs => ({
+  type: "individual",
+  country: c.country,
+  factor_answers: c.factor_answers,
+  pep: c.pep,
+  us_tax_resident: c.us_tax_resident,
+  only_source_of_wealth: c.only_source_of_wealth,
+});
+
+const asEvaluation = ({ outcome, reason_codes }: Evaluated): CustomerEvaluation => ({
+  total: outcome.total ?? null,
+  band: outcome.band ?? null,
+  edd_required: outcome.edd_required ?? false,
+  threshold: outcome.threshold ?? null,
+  route: outcome.route as CustomerEvaluation["route"],
+  reason_codes,
+});
+
 /** Score, band, EDD requirement, initial threshold and route the policy gives this customer's facts. */
 export function evaluateCustomer(customer: BookCustomer, policy: Policy): CustomerEvaluation {
-  const { outcome, reason_codes } = evaluateIndividual(
-    { country: customer.country, factor_answers: customer.factor_answers, pep: customer.pep, us_tax_resident: customer.us_tax_resident, only_source_of_wealth: customer.only_source_of_wealth },
-    policy,
-  );
-  return {
-    total: outcome.total ?? null,
-    band: outcome.band ?? null,
-    edd_required: outcome.edd_required ?? false,
-    threshold: outcome.threshold ?? null,
-    route: outcome.route as CustomerEvaluation["route"],
-    reason_codes,
-  };
+  return asEvaluation(evaluateIndividual(customerInputs(customer), policy));
 }
 
 // ---------- Obligations (the clock) ----------
@@ -190,16 +199,15 @@ const CHANGE_FIELDS: [ChangeField, keyof CustomerEvaluation][] = [
   ["route", "route"],
 ];
 
-/** Every customer evaluated under a baseline and a candidate policy, with what would change. Writes nothing. */
-export function diffUnderPolicy(book: BookCustomer[], baseline: Policy, candidate: Policy): PolicyDiff {
-  const rows: Change[] = book.map((c) => {
-    const before = evaluateCustomer(c, baseline);
-    const raw = evaluateCustomer(c, candidate);
-    const changed = CHANGE_FIELDS.filter(([, key]) => before[key] !== raw[key]).map(([name]) => name);
-    const review = changed.length > 0 && raw.route === "reject";
-    const after: Change["after"] = review ? { ...raw, route: "analyst_review", reason_codes: [...raw.reason_codes, "LC_POLICY_CHANGE_REVIEW"] } : raw;
-    return { subject: c.id, before, after, changed, analyst_review: review };
-  });
+/** Before and after for one subject. Policy-change routing (D13) applies only where something changed. */
+export function compareEvaluations(subject: string, before: CustomerEvaluation, raw: CustomerEvaluation): Change {
+  const changed = CHANGE_FIELDS.filter(([, key]) => before[key] !== raw[key]).map(([name]) => name);
+  if (!changed.length) return { subject, before, after: raw, changed, analyst_review: false };
+  const routed = policyChangeRouting(raw, raw.reason_codes);
+  return { subject, before, after: { ...routed.outcome, reason_codes: routed.reason_codes } as Change["after"], changed, analyst_review: routed.review };
+}
+
+export function summarizeChanges(rows: Change[]): PolicyDiff {
   const count = (pred: (r: Change) => boolean) => rows.filter(pred).length;
   return {
     rows,
@@ -214,4 +222,15 @@ export function diffUnderPolicy(book: BookCustomer[], baseline: Policy, candidat
       unchanged: count((r) => r.changed.length === 0),
     },
   };
+}
+
+/** Every customer evaluated under a baseline and a candidate policy, with what would change. Writes nothing. */
+export function diffUnderPolicy(book: BookCustomer[], baseline: Policy, candidate: Policy): PolicyDiff {
+  return summarizeChanges(book.map((c) => compareEvaluations(c.id, evaluateCustomer(c, baseline), evaluateCustomer(c, candidate))));
+}
+
+/** The same diff over engine inputs of any subject (book rows and seeded individual or company cases). */
+export function diffSubjects(subjects: { subject: string; inputs: SubjectInputs }[], baseline: Policy, candidate: Policy, kyb: KybConfig): PolicyDiff {
+  const evaluate = (inputs: SubjectInputs, policy: Policy) => asEvaluation(evaluateSubject({ ...inputs, context: undefined }, policy, kyb));
+  return summarizeChanges(subjects.map((s) => compareEvaluations(s.subject, evaluate(s.inputs, baseline), evaluate(s.inputs, candidate))));
 }

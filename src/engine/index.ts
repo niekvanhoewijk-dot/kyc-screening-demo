@@ -8,6 +8,7 @@ export * from "./kyb-config";
 export * from "./company";
 export * from "./policy";
 export * from "./canonical";
+export * from "./outcomes";
 export * from "./decision-record";
 export * from "./dates";
 export * from "./lifecycle";

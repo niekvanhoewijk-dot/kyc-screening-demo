@@ -8,6 +8,7 @@ import {
   type DecisionKind,
   type DecisionRecord,
   type Policy,
+  type PolicyResolver,
 } from "@/engine";
 import { newId } from "@/lib/ids";
 import type { PortalDeps } from "@/portal/deps";
@@ -24,10 +25,12 @@ type AppendArgs = {
   analyst_reason?: string;
   /** Simulated time, for simulator runs only (spec 08 5.1). */
   at_sim?: string | null;
+  /** Resolves the baseline of a policy.* record (drafts included). */
+  resolve?: PolicyResolver;
 };
 
 export function appendRecord(deps: Pick<PortalDeps, "db" | "now" | "kyb">, args: AppendArgs): DecisionRecord {
-  const { outcome, reason_codes } = evaluateDecision(args.kind, args.inputs, args.policy, deps.kyb);
+  const { outcome, reason_codes } = evaluateDecision(args.kind, args.inputs, args.policy, deps.kyb, args.resolve);
   return deps.db.transaction((tx) => {
     const last = tx.select().from(decisionRecords).where(eq(decisionRecords.subject, args.subject)).orderBy(desc(decisionRecords.seq)).get();
     const record = sealRecord({

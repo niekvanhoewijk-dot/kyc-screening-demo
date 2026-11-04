@@ -98,6 +98,11 @@ export function parsePolicies(rawFile: unknown, read: (file: string) => unknown)
   };
 }
 
+/** The published set plus saved drafts, so records pinned to a draft still resolve. Drafts are never in force. */
+export function withDrafts(set: PolicySet, drafts: Policy[]): PolicySet {
+  return { ...set, byId: (id) => drafts.find((d) => d.policy.id === id) ?? set.byId(id) };
+}
+
 let cached: { dir: string; set: PolicySet } | undefined;
 
 export function loadPolicies(configDir = CONFIG_DIR()): PolicySet {

@@ -48,7 +48,7 @@ function requireAllowed(deps: PortalDeps, caseId: string, action: Action) {
   return { c, hits };
 }
 
-const requireReason = (reason: string) => {
+export const requireReason = (reason: string) => {
   if (!reason.trim()) throw new PortalError("VALIDATION", "A reason is required.", { reason: ["A reason is required"] });
   return reason.trim();
 };
