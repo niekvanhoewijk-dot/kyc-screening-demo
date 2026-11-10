@@ -29,6 +29,10 @@ export function describe(e: Entry): string {
     case "session.started": return "Signed in again with a new code.";
     case "session.ended": return "Signed out.";
     case "step.completed": return `Completed step: ${p.step}${p.source === "wallet" ? " (shared from an ID wallet)" : p.selfie ? ` (selfie ${p.selfie})` : ""}.`;
+    case "agent.tool_called": return `AI ${p.channel === "mcp" ? `client${p.clientName ? ` "${p.clientName}"` : ""} (MCP)` : "assistant (portal)"} used ${p.tool}${p.outcome === "ok" ? "" : ` (${p.outcome})`}.`;
+    case "agent.tool_denied": return `AI ${p.channel === "mcp" ? "client (MCP)" : "assistant (portal)"} was refused ${p.tool}: ${String(p.reason).replaceAll("_", " ")}.`;
+    case "agent.secure_step_requested": return `AI ${p.channel === "mcp" ? "client (MCP)" : "assistant (portal)"} sent the applicant a link to the ${p.step} page.`;
+    case "answers.confirmed": return `Applicant checked ${(p.fields as string[] | undefined)?.length ?? 0} answers drafted by ${((p.sources as string[] | undefined) ?? []).map((s) => (s === "mcp" ? "an AI client over MCP" : "the AI assistant in the portal")).join(" and ") || "an AI assistant"} on the review page: ${p.unchanged} kept, ${p.edited} edited.`;
     case "wallet.session_started": return "ID wallet request opened (single-use nonce, expires soon).";
     case "wallet.verified": return `ID wallet presentation verified: issuer ${p.issuer}, ${(p.checks as string[] | undefined)?.length ?? 0} checks passed${(p.ignoredClaims as string[] | undefined)?.length ? `; ignored unrequested claims: ${(p.ignoredClaims as string[]).join(", ")}` : ""}.`;
     case "wallet.rejected": return `ID wallet presentation rejected: ${p.code}${p.detail ? ` (${p.detail})` : ""}. The applicant saw a neutral message.`;

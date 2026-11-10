@@ -10,6 +10,7 @@ import { loadConsoleConfig } from "@/console/config";
 import { loadEngineConfig, loadKybConfig, loadPolicies } from "@/engine";
 import { loadPortalConfig } from "@/portal/config";
 import { createWalletKit } from "@/wallet";
+import { loadAgentConfig } from "@/agent/config";
 import type { PortalDeps } from "@/portal/deps";
 import type { UploadInput } from "@/portal/cases";
 
@@ -29,6 +30,7 @@ export function makeDeps(start = "2026-10-18T10:00:00Z") {
     kyb: loadKybConfig(),
     consoleConfig: loadConsoleConfig(),
     wallet: createWalletKit(db, () => clock.now),
+    agent: loadAgentConfig(),
     now: () => clock.now,
   };
   const advance = (ms: number) => (clock.now = new Date(clock.now.getTime() + ms));

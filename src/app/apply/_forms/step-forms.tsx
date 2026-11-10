@@ -6,6 +6,7 @@ import { Dropzone, Field, FormMessage, OnFile, Submit, v } from "@/components/fo
 import { Ticked } from "@/components/icons";
 import { eddAction, identityAction, questionnaireAction, residenceAction, submitAction } from "../actions";
 import { initialState, type FormState } from "../form-state";
+import { QUESTIONNAIRE_SECTIONS, QUESTIONNAIRE_TEXT as T } from "@/portal/fields";
 
 // Applicant step forms, ported to docs/design boards A04-A08. Field names, values and server
 // actions are unchanged; only the presentation follows the boards.
@@ -234,33 +235,33 @@ export function QuestionnaireForm(props: {
     <form action={action} noValidate className="stack-lg" style={{ gap: 40 }}>
       <FormMessage state={state} />
       <section className="stack" style={{ gap: 20 }}>
-        <h2 className="section-title">About you</h2>
+        <h2 className="section-title">{QUESTIONNAIRE_SECTIONS.about}</h2>
         <div className="row">
           {props.locked ? (
             <div className="field">
-              <span className="label">Date of birth</span>
+              <span className="label">{T.dateOfBirth.label}</span>
               <div className="readonly"><span>{props.locked.birthDate}</span><Ticked>From your ID wallet</Ticked></div>
               <input type="hidden" name="dateOfBirth" value={props.locked.birthDate} />
             </div>
           ) : (
-            <Field name="dateOfBirth" label="Date of birth" state={state}>
+            <Field name="dateOfBirth" label={T.dateOfBirth.label} state={state}>
               <input id="dateOfBirth" name="dateOfBirth" type="date" defaultValue={v(state, props.saved, "dateOfBirth")} aria-describedby="dob-hint" />
-              <span className="hint" id="dob-hint">Must match the date on your ID.</span>
+              <span className="hint" id="dob-hint">{T.dateOfBirth.hint}</span>
             </Field>
           )}
           {props.locked && props.locked.nationalities.length === 1 ? (
             <div className="field">
-              <span className="label">Nationality</span>
+              <span className="label">{T.nationality.label}</span>
               <div className="readonly"><span>{props.countries.find((c) => c.code === props.locked!.nationalities[0])?.name}</span><Ticked>From your ID wallet</Ticked></div>
               <input type="hidden" name="nationality" value={props.locked.nationalities[0]} />
             </div>
           ) : (
-            select("nationality", "Nationality", countryOptions(props.locked ? props.countries.filter((c) => props.locked!.nationalities.includes(c.code)) : props.countries))
+            select("nationality", T.nationality.label, countryOptions(props.locked ? props.countries.filter((c) => props.locked!.nationalities.includes(c.code)) : props.countries))
           )}
         </div>
         <div className="row">
-          {select("preferredLanguage", "Preferred language", props.languages)}
-          <Field name="phone" label="Phone number with country code" state={state}>
+          {select("preferredLanguage", T.preferredLanguage.label, props.languages)}
+          <Field name="phone" label={T.phone.label} state={state}>
             <input id="phone" name="phone" type="tel" autoComplete="tel" defaultValue={v(state, props.saved, "phone")} />
           </Field>
         </div>
@@ -272,43 +273,43 @@ export function QuestionnaireForm(props: {
           <span className="label">Address</span>
           <div className="readonly"><span>{props.address}</span><span className="muted">From the previous step</span></div>
         </div>
-        <Field name="tin" label="Tax identification number (TIN)" state={state}>
+        <Field name="tin" label={T.tin.label} state={state}>
           <input id="tin" name="tin" defaultValue={v(state, props.saved, "tin")} />
         </Field>
-        <Field name="tinMissingReason" label="If you do not have one, tell us why" hint="For example: income too low, or your country issues TINs only to companies." state={state}>
+        <Field name="tinMissingReason" label={T.tinMissingReason.label} hint={T.tinMissingReason.hint} state={state}>
           <input id="tinMissingReason" name="tinMissingReason" defaultValue={v(state, props.saved, "tinMissingReason")} />
         </Field>
       </section>
 
       <section className="stack divider" style={{ gap: 24 }}>
-        <h2 className="section-title">Tax and public roles</h2>
-        <YesNo name="usTaxResident" label="Are you a United States resident for tax purposes?" state={state} saved={props.saved} />
+        <h2 className="section-title">{QUESTIONNAIRE_SECTIONS.tax}</h2>
+        <YesNo name="usTaxResident" label={T.usTaxResident.label} state={state} saved={props.saved} />
         <YesNo
           name="pep"
-          label="Are you currently, or have you previously been, a politically exposed person (PEP)?"
-          hint="Someone who holds or held a prominent public function, or a close family member or associate of such a person."
+          label={T.pep.label}
+          hint={T.pep.hint}
           state={state}
           saved={props.saved}
         />
       </section>
 
       <section className="stack divider" style={{ gap: 20 }}>
-        <h2 className="section-title">Your finances</h2>
-        {select("deposit_12m", "Expected deposits in the next 12 months", f.deposit_12m)}
-        {select("source_of_funds", "Main source of funds", f.source_of_funds)}
+        <h2 className="section-title">{QUESTIONNAIRE_SECTIONS.finances}</h2>
+        {select("deposit_12m", T.deposit_12m.label, f.deposit_12m)}
+        {select("source_of_funds", T.source_of_funds.label, f.source_of_funds)}
         <label className="choice" style={{ fontSize: 14 }}>
           <input type="checkbox" name="onlySourceOfWealth" defaultChecked={checked("onlySourceOfWealth")} key={String(checked("onlySourceOfWealth"))} />
-          This is my only source of wealth
+          {T.onlySourceOfWealth.label}
         </label>
-        {select("employment_status", "Employment status", f.employment_status)}
+        {select("employment_status", T.employment_status.label, f.employment_status)}
         <div className="row">
-          {select("occupation_industry", "Industry of occupation", f.occupation_industry)}
-          <Field name="occupationDetail" label="Industry details (if Other)" state={state}>
+          {select("occupation_industry", T.occupation_industry.label, f.occupation_industry)}
+          <Field name="occupationDetail" label={T.occupationDetail.label} state={state}>
             <input id="occupationDetail" name="occupationDetail" defaultValue={v(state, props.saved, "occupationDetail")} />
           </Field>
         </div>
-        {select("annual_income", "Total estimated annual income", f.annual_income)}
-        {select("net_worth", "Estimated net worth", f.net_worth)}
+        {select("annual_income", T.annual_income.label, f.annual_income)}
+        {select("net_worth", T.net_worth.label, f.net_worth)}
       </section>
 
       <section className="stack divider">
@@ -316,7 +317,7 @@ export function QuestionnaireForm(props: {
           <label className="choice top">
             <input type="checkbox" name="declaration" defaultChecked={checked("declaration")} key={String(checked("declaration"))} />
             <span>
-              I declare that I have carefully read, accept and fully understood the risk disclosure and the terms and conditions. I understand that every investment involves risk.
+              {T.declaration.label}
             </span>
           </label>
         </Field>

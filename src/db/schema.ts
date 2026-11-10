@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // Every state change, Claude call and analyst action lands here (CLAUDE.md: audit trail on everything).
 export const auditLog = sqliteTable("audit_log", {
@@ -217,3 +217,23 @@ export const walletSessions = sqliteTable("wallet_sessions", {
   createdAt: text("created_at").notNull(),
   completedAt: text("completed_at"),
 });
+
+/**
+ * Answers an agent saved for the applicant to confirm (docs/spec/10 section 6). One current row per case, step and field;
+ * nothing here reaches the engine until the person confirms the answers on the review page. History is in the audit log.
+ */
+export const intakeDrafts = sqliteTable(
+  "intake_drafts",
+  {
+    id: text("id").primaryKey(),
+    caseId: text("case_id").notNull().references(() => cases.id),
+    step: text("step", { enum: ["questionnaire"] }).notNull(),
+    field: text("field").notNull(),
+    value: text("value", { mode: "json" }), // the per-field parsed value; null = answered as "none"
+    source: text("source", { enum: ["interviewer", "mcp"] }).notNull(),
+    clientId: text("client_id"),
+    clientName: text("client_name"),
+    savedAt: text("saved_at").notNull(),
+  },
+  (t) => [uniqueIndex("intake_drafts_case_step_field").on(t.caseId, t.step, t.field)],
+);

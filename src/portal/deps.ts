@@ -8,6 +8,7 @@ import { checkRulesFromConfig, documentReaderFromEnv } from "@/documents/factory
 import type { PreReviewDeps } from "@/documents/pre-review";
 import { loadEngineConfig, loadKybConfig, loadPolicies, type EngineConfig, type KybConfig, type PolicySet } from "@/engine";
 import { createWalletKit, type WalletKit } from "@/wallet";
+import { loadAgentConfig, type AgentConfig } from "@/agent/config";
 import { loadPortalConfig, type PortalConfig } from "./config";
 
 export type PortalDeps = {
@@ -24,6 +25,8 @@ export type PortalDeps = {
   consoleConfig: ConsoleConfig;
   /** ID wallet intake (spec 09): verifier plus the built-in test wallet. */
   wallet: WalletKit;
+  /** Agent access (spec 10): tool limits and the leak guard's word list. */
+  agent: AgentConfig;
   now: () => Date;
 };
 
@@ -44,6 +47,7 @@ export function portalDeps(): PreReviewDeps {
     kyb: loadKybConfig(),
     consoleConfig: loadConsoleConfig(),
     wallet: createWalletKit(db, now),
+    agent: loadAgentConfig(),
     now,
     documentReader: (log) => documentReaderFromEnv(log),
     checkRules: checkRulesFromConfig(),

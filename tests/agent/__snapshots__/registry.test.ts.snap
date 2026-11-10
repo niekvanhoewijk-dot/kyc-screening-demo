@@ -1,0 +1,48 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`applicant tool registry > keeps the output keys of each tool as published (a new key is a deliberate edit) 1`] = `
+{
+  "get_application_status": {
+    "message": true,
+    "nextAction": true,
+    "steps": [
+      "id",
+      "state",
+      "title",
+    ],
+  },
+  "get_next_questions": {
+    "questions": [
+      "hint",
+      "id",
+      "label",
+      "options",
+      "required",
+      "type",
+    ],
+    "remaining": true,
+  },
+  "get_review_summary": {
+    "items": [
+      "id",
+      "label",
+      "source",
+      "value",
+    ],
+    "missing": true,
+  },
+  "request_secure_step": {
+    "expiresAt": true,
+    "purpose": true,
+    "url": true,
+  },
+  "save_answers": {
+    "accepted": true,
+    "rejected": [
+      "field",
+      "message",
+    ],
+    "remaining": true,
+  },
+}
+`;
