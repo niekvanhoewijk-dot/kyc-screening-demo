@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
+import { env } from "@/lib/env";
 import { completedSteps, stepsFor, type StepCase, type StepId } from "@/portal/steps";
 import { LeftPanel, type PanelStep } from "./left-panel";
 
@@ -61,6 +63,11 @@ export function ApplicantShell({
             {lede && <p className="lede">{lede}</p>}
           </div>
           {children}
+          {env.AGENT_ENABLED && c?.persona === "individual" && c.status === "draft" && (current === "identity" || current === "residence" || current === "questionnaire") && (
+            <p className="hint">
+              Prefer to answer in a chat? <Link href="/apply/interview" className="link">Answer with an AI assistant</Link>
+            </p>
+          )}
         </div>
       </main>
     </div>

@@ -69,6 +69,10 @@ const openQuestions = (ctx: ToolContext, c: CaseRow) => {
   return askable(ctx, c).filter((f) => !(f.id in answers));
 };
 
+/** The ids of the questions still open (the interviewer uses it to offer the review page). Reads only, writes no audit. */
+export const openQuestionIdsFor = (deps: ToolContext["deps"], c: CaseRow) =>
+  openQuestions({ deps, actor: `applicant:${c.applicantId}`, caseId: c.id, channel: "portal" }, c).map((f) => f.id);
+
 /** The answer an agent sends, in the shape the form posts (so the form's own rule checks it). */
 function asFormValue(f: FieldDescription, raw: string | boolean | null): unknown {
   if (f.type === "checkbox") return raw === true || raw === "yes" || raw === "on" || raw === "true" ? "on" : "";

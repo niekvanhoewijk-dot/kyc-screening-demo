@@ -1,7 +1,23 @@
 # Agent access (Phase 10, docs/spec/10). Read by src/agent/config.ts (Zod-validated). Never hard-code these in application code.
-# Phase 10a holds only the keys the tool registry uses; 10b to 10f extend this file (interviewer, mcp, eval).
+# 10a added the tool registry keys; 10b the interviewer; 10c to 10f extend this file (mcp, eval).
 
 version: 1
+
+interviewer:                          # the chat at /apply/interview (spec 10 section 7). Values are proposals for 10f to tune.
+  prompt_version: interviewer-1       # one file per version in src/agent/prompts; part of the replay key
+  effort: low                         # output_config.effort. Spec 10 proposed medium; low is the API guidance for chat on this model (O-93)
+  max_tokens: 4096                    # per model request. Spec 10 proposed 1024; thinking counts toward it (O-93)
+  max_turns: 40                       # applicant messages per conversation
+  max_tool_calls_per_turn: 8          # spec 10 proposed 6; the history is text only, so each turn re-reads its state (O-93)
+  max_cost_usd_per_case: 0.50         # model spend per case, priced from config/claude-pricing.yaml
+  max_message_chars: 4000             # one message, applicant or assistant
+  refusal_fallbacks: default          # server-side fallback on a safety decline; set "off" to disable
+  greeting: "Hello. I can help you fill in your application, a few questions at a time. Say hello when you are ready."
+  disclosure: "You are chatting with an AI assistant. It helps you fill in the application. A person reviews it and decides. You can switch to the form at any time."
+  deflection: "I can't help with that here. I can help you complete the application."
+  capped: "Let's continue with the form from here. Your answers so far are saved."
+  not_recorded: "This offline demo has no recorded reply for that message. Please continue with the form."
+  failed: "Something went wrong on our side. Please try again, or continue with the form."
 
 guard:
   # Words no applicant-facing tool output, description, message or prompt may contain (spec 10 section 5.3).

@@ -7,8 +7,26 @@ import { z } from "zod";
 
 const positiveInt = z.number().int().positive();
 
+const text = z.string().min(1);
+
 export const agentConfigSchema = z.object({
   version: z.number().int(),
+  interviewer: z.object({
+    prompt_version: z.string().regex(/^interviewer-[a-z\d]+$/),
+    effort: z.enum(["low", "medium", "high", "xhigh", "max"]),
+    max_tokens: positiveInt,
+    max_turns: positiveInt,
+    max_tool_calls_per_turn: positiveInt,
+    max_cost_usd_per_case: z.number().positive(),
+    max_message_chars: positiveInt,
+    refusal_fallbacks: z.enum(["default", "off"]),
+    greeting: text,
+    disclosure: text,
+    deflection: text,
+    capped: text,
+    not_recorded: text,
+    failed: text,
+  }),
   guard: z.object({
     forbidden_terms: z.array(z.string().min(1)).min(1),
     exempt_label_sources: z.array(z.enum(["questionnaire"])),

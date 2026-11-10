@@ -64,6 +64,8 @@ export function IdentityForm(props: {
   selfieAccept: string;
   selfieRetry: boolean;
   back?: string;
+  /** Opened from the interviewer: go back to the chat after saving. */
+  returnTo?: boolean;
 }) {
   const [state, action] = useActionState(identityAction, initialState);
   const noExpiry = state.values ? state.values.noExpiry === "on" : props.saved?.noExpiry === true;
@@ -71,6 +73,7 @@ export function IdentityForm(props: {
   const needsBack = props.docTypes.filter((d) => d.needs_back).map((d) => d.label).join(" or ");
   return (
     <form action={action} noValidate className="stack-lg">
+      {props.returnTo && <input type="hidden" name="returnTo" value="interview" />}
       {props.selfieRetry && !state.message && (
         <div className="banner error" role="alert">We couldn&apos;t verify your last selfie. Please take a new one.</div>
       )}
@@ -150,6 +153,8 @@ export function ResidenceForm(props: {
   documentAccept: string;
   maxAgeMonths: number;
   back?: string;
+  /** Opened from the interviewer: go back to the chat after saving. */
+  returnTo?: boolean;
 }) {
   const [state, action] = useActionState(residenceAction, initialState);
   const text = (name: string, label: string, opts: { optional?: boolean; autoComplete?: string; type?: string; placeholder?: string } = {}) => (
@@ -159,6 +164,7 @@ export function ResidenceForm(props: {
   );
   return (
     <form action={action} noValidate className="stack-lg">
+      {props.returnTo && <input type="hidden" name="returnTo" value="interview" />}
       <FormMessage state={state} />
       <section className="stack" style={{ gap: 20 }}>
         <h2 className="section-title">Residential address</h2>

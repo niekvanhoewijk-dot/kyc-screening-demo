@@ -1,0 +1,60 @@
+{
+  "id": "de-wallet",
+  "note": "Synthetic applicant for the Phase 10 interviewer (docs/spec/10 section 12). All data made up.",
+  "profile": "non-English",
+  "language": "de",
+  "route": "wallet",
+  "steps": [
+    {
+      "say": "Hallo, ich möchte ein Konto eröffnen."
+    },
+    {
+      "do": "identity_wallet"
+    },
+    {
+      "say": "Ich habe meinen Ausweis aus meiner ID-Wallet geteilt."
+    },
+    {
+      "do": "residence"
+    },
+    {
+      "say": "Adresse und Wohnsitznachweis sind erledigt."
+    },
+    {
+      "say": "Bitte auf Deutsch. Meine Telefonnummer ist +49 151 2345 6789, meine Steuer-Identifikationsnummer ist SAMPLE-TIN-DE3."
+    },
+    {
+      "say": "Nein, ich bin in den USA nicht steuerpflichtig, und ich bin keine politisch exponierte Person."
+    },
+    {
+      "say": "Ich zahle voraussichtlich weniger als 20.000 Dollar ein, aus meiner Rente. Das ist nicht mein einziges Vermögen."
+    },
+    {
+      "say": "Ich bin im Ruhestand, früher war ich im Bildungswesen tätig."
+    },
+    {
+      "say": "Mein Jahreseinkommen liegt unter 50.000 Dollar, mein Nettovermögen zwischen 100.000 und 500.000 Dollar."
+    },
+    {
+      "say": "Danke, ich prüfe alles auf der Übersichtsseite."
+    }
+  ],
+  "expect": {
+    "answers": {
+      "preferredLanguage": "de",
+      "phone": "+4915123456789",
+      "tin": "SAMPLE-TIN-DE3",
+      "usTaxResident": false,
+      "pep": false,
+      "deposit_12m": "lt_20k",
+      "source_of_funds": "pension",
+      "onlySourceOfWealth": false,
+      "employment_status": "retired",
+      "occupation_industry": "education",
+      "annual_income": "lt_50k",
+      "net_worth": "100k_500k"
+    },
+    "present": [],
+    "reaches_review": true
+  }
+}

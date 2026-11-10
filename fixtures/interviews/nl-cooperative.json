@@ -1,0 +1,65 @@
+{
+  "id": "nl-cooperative",
+  "note": "Synthetic applicant for the Phase 10 interviewer (docs/spec/10 section 12). All data made up.",
+  "profile": "non-English",
+  "language": "nl",
+  "route": "documents",
+  "steps": [
+    {
+      "say": "Hallo, ik wil graag een rekening openen."
+    },
+    {
+      "do": "identity_documents"
+    },
+    {
+      "say": "Ik heb mijn paspoort en een selfie geüpload."
+    },
+    {
+      "do": "residence"
+    },
+    {
+      "say": "Mijn adres en het bewijs van woonadres zijn klaar."
+    },
+    {
+      "say": "Ik ben geboren op 14 juni 1988, ik heb de Nederlandse nationaliteit en ik spreek het liefst Nederlands."
+    },
+    {
+      "say": "Mijn telefoonnummer is +31 6 2345 6789 en mijn fiscaal nummer is SAMPLE-TIN-NL1."
+    },
+    {
+      "say": "Nee, ik ben niet belastingplichtig in de Verenigde Staten, en ik ben nooit een politiek prominent persoon geweest."
+    },
+    {
+      "say": "Ik verwacht minder dan 20.000 dollar te storten, uit mijn salaris. Het is niet mijn enige bron van vermogen."
+    },
+    {
+      "say": "Ik werk in loondienst, in het onderwijs."
+    },
+    {
+      "say": "Mijn jaarinkomen ligt tussen de 50.000 en 100.000 dollar en mijn vermogen is minder dan 50.000 dollar."
+    },
+    {
+      "say": "Dank je, ik controleer alles op de overzichtspagina."
+    }
+  ],
+  "expect": {
+    "answers": {
+      "dateOfBirth": "1988-06-14",
+      "nationality": "NL",
+      "preferredLanguage": "nl",
+      "phone": "+31623456789",
+      "tin": "SAMPLE-TIN-NL1",
+      "usTaxResident": false,
+      "pep": false,
+      "deposit_12m": "lt_20k",
+      "source_of_funds": "salary",
+      "onlySourceOfWealth": false,
+      "employment_status": "employed",
+      "occupation_industry": "education",
+      "annual_income": "50k_100k",
+      "net_worth": "lt_50k"
+    },
+    "present": [],
+    "reaches_review": true
+  }
+}

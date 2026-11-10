@@ -17,7 +17,8 @@ const ASKED: { key: "given_name" | "family_name" | "birth_date" | "nationalities
   { key: "issuing_country", label: "Country that issued it", why: "To record where it comes from", optional: true },
 ];
 
-export default async function WalletPage() {
+export default async function WalletPage({ searchParams }: { searchParams: Promise<{ via?: string }> }) {
+  const fromAssistant = (await searchParams).via === "assistant";
   const { deps, c } = await requireStep("identity");
   if (c.persona !== "individual") redirect("/apply/identity");
   const request = deps.wallet.verifier.openRequest(c.id);
@@ -41,15 +42,15 @@ export default async function WalletPage() {
             ))}
           </ul>
         </section>
-        <TestWalletPanel scenarios={TEST_SCENARIOS.map((s) => ({ id: s.id, label: s.label, outcome: s.outcome }))} />
+        <TestWalletPanel scenarios={TEST_SCENARIOS.map((s) => ({ id: s.id, label: s.label, outcome: s.outcome }))} returnTo={fromAssistant} />
         <details>
           <summary>Technical details of this request</summary>
           <pre style={{ overflowX: "auto", fontSize: 12, lineHeight: 1.5 }}>{JSON.stringify({ client_id: request.client_id, response_type: request.response_type, response_mode: request.response_mode, nonce: request.nonce, state: request.state, expires_at: request.expiresAt, dcql_query: request.dcql_query }, null, 2)}</pre>
           <p className="hint">Test mode: the issuer is a built-in demo issuer. Revocation status is not checked in test mode.</p>
         </details>
         <div className="actions">
-          <Link href="/apply/identity?method=documents" className="link">Upload a document instead</Link>
-          <Link href="/apply/identity" className="link">Back</Link>
+          <Link href={`/apply/identity?method=documents${fromAssistant ? "&via=assistant" : ""}`} className="link">Upload a document instead</Link>
+          <Link href={fromAssistant ? "/apply/interview" : "/apply/identity"} className="link">Back</Link>
         </div>
       </div>
     </ApplicantShell>
