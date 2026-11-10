@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ApplicantShell, backPath } from "@/components/applicant-shell";
 import { Ticked } from "@/components/icons";
 import { COUNTRIES, countryName } from "@/lib/countries";
+import { demoSampleInfo, demoSubject, nextSamplePerson, representativePrefill } from "@/demo/prefill";
 import { stepCase } from "@/portal/cases";
 import { personDocs, personsOf } from "@/portal/company";
 import { removePersonAction } from "../actions";
@@ -21,6 +22,8 @@ export default async function PersonsPage({ searchParams }: { searchParams: Prom
   const formProps = { countries: [...COUNTRIES], roles: deps.kyb.person_roles, documentAccept: deps.portal.uploads.document_mime.join(",") };
   const fileOf = (personId: string, kind: string) => docs.find((d) => d.personId === personId && d.kind === kind)?.originalName;
   const sc = stepCase(c);
+  const demo = demoSubject(deps, applicant.id);
+  const sampleNext = demo && !editing ? nextSamplePerson(deps, c.id, demo) : null;
 
   return (
     <ApplicantShell
@@ -34,7 +37,7 @@ export default async function PersonsPage({ searchParams }: { searchParams: Prom
       {!me || editing?.isApplicant ? (
         <section className="stack">
           <h2 className="section-title">About you</h2>
-          <PersonForm {...formProps} isApplicant saved={me ?? { fullName: `${applicant.firstName} ${applicant.lastName}` }} personId={me?.id} onFile={{}} />
+          <PersonForm {...formProps} isApplicant saved={me ?? (demo ? representativePrefill(demo) : null) ?? { fullName: `${applicant.firstName} ${applicant.lastName}` }} personId={me?.id} onFile={{}} />
         </section>
       ) : (
         <>
@@ -80,8 +83,9 @@ export default async function PersonsPage({ searchParams }: { searchParams: Prom
               {...formProps}
               isApplicant={false}
               personId={editing?.id}
-              saved={editing ?? null}
+              saved={editing ?? sampleNext?.prefill ?? null}
               onFile={editing ? { poi: fileOf(editing.id, "person_poi"), por: fileOf(editing.id, "person_por") } : {}}
+              samples={sampleNext ? { poi: demoSampleInfo(deps, c, "person_poi"), por: demoSampleInfo(deps, c, "person_por") } : undefined}
             />
             {editing && <p><Link href="/apply/persons" className="link">Cancel editing</Link></p>}
           </section>

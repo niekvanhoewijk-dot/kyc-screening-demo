@@ -7,9 +7,10 @@ import { createAccountAction, resendOtpAction, signInAction, verifyOtpAction } f
 import { initialState } from "../form-state";
 
 // 2.1.1 (docs/design/Main.dc.html)
-export function CreateAccountForm() {
+export function CreateAccountForm({ defaults }: { defaults?: { persona: string; firstName: string; lastName: string; email: string } | null }) {
   const [state, action] = useActionState(createAccountAction, initialState);
-  const persona = state.values?.persona ?? "individual";
+  const typed = (key: keyof NonNullable<typeof defaults>) => state.values?.[key] ?? defaults?.[key];
+  const persona = typed("persona") ?? "individual";
   return (
     <form action={action} noValidate className="stack-lg">
       <FormMessage state={state} />
@@ -28,14 +29,14 @@ export function CreateAccountForm() {
       <div className="stack" style={{ gap: 20 }}>
         <div className="row">
           <Field name="firstName" label="First name" state={state}>
-            <input id="firstName" name="firstName" autoComplete="given-name" defaultValue={state.values?.firstName} />
+            <input id="firstName" name="firstName" autoComplete="given-name" defaultValue={typed("firstName")} />
           </Field>
           <Field name="lastName" label="Last name" state={state}>
-            <input id="lastName" name="lastName" autoComplete="family-name" defaultValue={state.values?.lastName} />
+            <input id="lastName" name="lastName" autoComplete="family-name" defaultValue={typed("lastName")} />
           </Field>
         </div>
         <Field name="email" label="Email address" state={state}>
-          <input id="email" name="email" type="email" autoComplete="email" defaultValue={state.values?.email} aria-describedby="email-hint" />
+          <input id="email" name="email" type="email" autoComplete="email" defaultValue={typed("email")} aria-describedby="email-hint" />
           <span className="hint" id="email-hint">We will send a one-time code to this address.</span>
         </Field>
       </div>
@@ -69,7 +70,7 @@ export function SignInForm() {
 
 // 2.1.2 (docs/design/A02-Verify-Email.dc.html). One input keeps the existing `code` field; it is
 // styled as the board's digit boxes and accepts a pasted code.
-export function VerifyForm({ length }: { length: number }) {
+export function VerifyForm({ length, defaultCode }: { length: number; defaultCode?: string }) {
   const [state, action] = useActionState(verifyOtpAction, initialState);
   const [resendState, resend] = useActionState(resendOtpAction, initialState);
   return (
@@ -77,9 +78,9 @@ export function VerifyForm({ length }: { length: number }) {
       <form action={action} noValidate className="stack-lg" id="verify-form">
         <FormMessage state={state} />
         <Field name="code" label={`${length === 6 ? "Six" : length}-digit code`} state={state}>
-          <input id="code" name="code" className="otp" inputMode="numeric" autoComplete="one-time-code" maxLength={length} />
+          <input id="code" name="code" className="otp" inputMode="numeric" autoComplete="one-time-code" maxLength={length} defaultValue={defaultCode} />
         </Field>
-        <p className="banner"><strong>Demo only.</strong> No email is sent. The code appears in the Terminal window that is running the app.</p>
+        <p className="banner"><strong>Demo only.</strong> No email is sent. {defaultCode ? "Demo Mode filled in the code for you." : "The code appears in the Terminal window that is running the app."}</p>
         <div className="actions">
           <Submit pending="Checking…">Verify</Submit>
           <Link href="/apply/continue" className="link">Use a different email</Link>

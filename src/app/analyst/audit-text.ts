@@ -68,6 +68,11 @@ export function describe(e: Entry): string {
     case "memo.drafted": return `Case memo drafted (advisory: ${String(p.recommended_action).replaceAll("_", " ")}).`;
     case "memo.failed": return `Case memo not drafted: ${p.error}`;
     case "mode.changed": return `Mode changed from ${String(p.from).toUpperCase()} to ${String(p.to).toUpperCase()}.`;
+    case "demo_mode.changed": {
+      const to = (p.to ?? {}) as P;
+      const from = (p.from ?? {}) as P;
+      return from.on === to.on ? `Demo Mode sample applicant changed to ${String(to.persona)}.` : `Demo Mode turned ${to.on ? "on" : "off"} (sample applicant: ${String(to.persona)}).`;
+    }
     case "demo.reset": return `Demo reset: ${p.cases} synthetic cases seeded.`;
     default: return e.action;
   }

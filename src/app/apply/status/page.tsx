@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ApplicantShell, backPath } from "@/components/applicant-shell";
 import { Ticked } from "@/components/icons";
+import { demoSampleInfo } from "@/demo/prefill";
 import { stepCase, type IdentityData } from "@/portal/cases";
 import { walletEvidenceOf } from "@/portal/evidence";
 import { applicantView } from "@/portal/decision";
@@ -85,7 +86,7 @@ export default async function StatusPage() {
           title="We need a little more from you"
           lede="Financial regulations ask us to confirm this from time to time. Once we have it, we can continue with your application."
         >
-          <EddForm extraKyc={view.extraKyc} documentAccept={deps.portal.uploads.document_mime.join(",")} selfieAccept={deps.portal.uploads.selfie_mime.join(",")} />
+          <EddForm extraKyc={view.extraKyc} documentAccept={deps.portal.uploads.document_mime.join(",")} selfieAccept={deps.portal.uploads.selfie_mime.join(",")} samples={{ sof: demoSampleInfo(deps, c, "sof"), eddKyc: view.extraKyc === "required" ? demoSampleInfo(deps, c, "eddKyc") : undefined }} />
           <div className="actions"><SignOut /></div>
         </ApplicantShell>
       );

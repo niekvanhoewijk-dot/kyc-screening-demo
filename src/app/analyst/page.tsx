@@ -7,7 +7,8 @@ import { cases, screeningHits } from "@/db/schema";
 import { caseGaps } from "@/kyb/load";
 import { countryName } from "@/lib/countries";
 import { portalDeps } from "@/portal/deps";
-import { setModeAction } from "./actions";
+import { getDemoState } from "@/demo/prefill";
+import { setDemoModeAction, setModeAction } from "./actions";
 import { BAND_LABEL, STATUS_LABEL } from "./labels";
 
 type Risk = { band?: string; forced_by?: string; decision?: string; reason?: string; country?: { code: string; list: string } | null; basis?: string; driver?: { kind: string; name?: string } };
@@ -24,6 +25,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const deps = portalDeps();
   const mode = getMode(deps);
+  const demo = getDemoState(deps);
   const all = listQueue(deps, { band: sp.band || undefined, status: sp.status || undefined, olderThanDays: sp.age ? Number(sp.age) : undefined });
   const q = (sp.q ?? "").trim().toLowerCase();
   const rows = all
@@ -72,18 +74,29 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
           <h1 className="title">Cases</h1>
           <p className="lede" style={{ fontSize: 15 }}>{rows.length} case{rows.length === 1 ? "" : "s"} shown, oldest first. Scores were computed by the rules engine at submission.</p>
         </div>
-        <form action={setModeAction}>
-          <fieldset>
-            <legend className="eyebrow" style={{ fontSize: 12, letterSpacing: ".1em", marginBottom: 8 }}>Mode</legend>
-            <div className="segmented">
-              {(["mvp1", "mvp2"] as Mode[]).map((m) => (
-                <button key={m} type="submit" name="mode" value={m} aria-pressed={mode === m}>
-                  {m === "mvp1" ? "MVP 1 · manual" : "MVP 2 · Claude pre-review"}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-        </form>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <form action={setDemoModeAction}>
+            <fieldset>
+              <legend className="eyebrow" style={{ fontSize: 12, letterSpacing: ".1em", marginBottom: 8 }}>Demo Mode</legend>
+              <div className="segmented">
+                <button type="submit" name="on" value="0" aria-pressed={!demo.on}>Off</button>
+                <button type="submit" name="on" value="1" aria-pressed={demo.on}>On</button>
+              </div>
+            </fieldset>
+          </form>
+          <form action={setModeAction}>
+            <fieldset>
+              <legend className="eyebrow" style={{ fontSize: 12, letterSpacing: ".1em", marginBottom: 8 }}>Mode</legend>
+              <div className="segmented">
+                {(["mvp1", "mvp2"] as Mode[]).map((m) => (
+                  <button key={m} type="submit" name="mode" value={m} aria-pressed={mode === m}>
+                    {m === "mvp1" ? "MVP 1 · manual" : "MVP 2 · Claude pre-review"}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          </form>
+        </div>
       </header>
 
       <form className="filters" role="search">

@@ -52,6 +52,18 @@ Open `localhost:3000/apply`, create an account, and stop at step 4, **Proof of i
 
 Pick **Valid ID, different family name** instead of the valid one to show the analyst-side name-mismatch flag.
 
+## Demo Mode segment (1 minute, to show the apply journey without typing)
+On the **Cases** page, press **On** in the Demo Mode control (or open **Demo controls**, pick a persona and press Turn on Demo Mode). The nav foot says which persona is loaded. Open `localhost:3000/apply` in a second tab. The picker defaults to the first persona; choose another one before you start, because a persona is fixed once an application has begun.
+
+| Time | Show | Say |
+|---|---|---|
+| 0:00 | `/apply`: the grey Demo Mode banner, the email already filled in. Press Continue, then Verify (the code is filled in too) | Demo Mode fills in what the form asks and attaches sample documents. It never touches the rules. |
+| 0:20 | Identity and residence: thumbnails of the sample ID, selfie and proof of residence with "Demo Mode attached a sample" | Synthetic files with a SAMPLE watermark. Choosing a file yourself replaces the sample. |
+| 0:35 | Questionnaire: every answer filled in. Continue, then Submit for review | The declaration is pre-ticked in this mode only (D26). |
+| 0:50 | **Cases**: the new case in the persona's band | Same values as the seeded case, same engine, same band. |
+
+Turn it off in the same control before showing the normal screens. A reset keeps the switch as it was.
+
 ## If something goes wrong
 - Anything odd on screen: **Demo controls** in the nav, type RESET (about 2 seconds, offline).
 - A Claude panel says "not recorded": the run is in replay without that recording. Say so and move on to the rules engine; it is the part that decides.

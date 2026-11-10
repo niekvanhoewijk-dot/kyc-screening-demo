@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Band } from "@/components/band";
 import { applicants, cases } from "@/db/schema";
 import { loadPersonas } from "@/demo/personas";
+import { demoChoices, getDemoState } from "@/demo/prefill";
 import { env } from "@/lib/env";
 import { portalDeps } from "@/portal/deps";
+import { setDemoModeAction } from "../actions";
 import { ResetForm } from "./reset-form";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +17,9 @@ export const dynamic = "force-dynamic";
 export default function DemoPage() {
   const deps = portalDeps();
   const personas = loadPersonas();
+  const demo = getDemoState(deps);
+  const choices = demoChoices();
+  const chosen = choices.find((c) => c.id === demo.persona)!;
   const cacheDir = path.resolve(/* turbopackIgnore: true */ process.cwd(), "fixtures/claude-cache");
   const recorded = fs.existsSync(cacheDir) ? fs.readdirSync(cacheDir).filter((f) => f.endsWith(".json")).length : 0;
   const byEmail = new Map(
@@ -31,6 +36,27 @@ export default function DemoPage() {
         <h1 className="title">Demo controls</h1>
         <p className="lede" style={{ fontSize: 15 }}>Synthetic data only. Not a regulated compliance system. See docs/DEMO-SCRIPT.md for the 5-minute walkthrough.</p>
       </header>
+      <section className="card">
+        <div className="card-head"><div><span className="eyebrow">Open an account</span><h2 className="card-title">Demo Mode: {demo.on ? "on" : "off"}</h2></div></div>
+        <p className="muted" style={{ lineHeight: 1.6 }}>
+          When on, every screen of the apply flow comes pre-filled with a sample applicant, and the sample documents attach themselves. You only press Continue. Nothing is uploaded from your computer, and the applicant still sees the normal screens: no risk information is shown.
+        </p>
+        <form action={setDemoModeAction} className="stack">
+          <div className="field" style={{ maxWidth: 420 }}>
+            <label htmlFor="demo-persona">Sample applicant</label>
+            <select id="demo-persona" name="persona" defaultValue={demo.persona} key={demo.persona}>
+              {choices.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.kind})</option>)}
+            </select>
+            <span className="hint">{chosen.story}</span>
+          </div>
+          <div className="actions">
+            <button className="btn" type="submit" name="on" value="1">{demo.on ? "Save sample applicant" : "Turn on Demo Mode"}</button>
+            {demo.on && <button className="btn outline" type="submit" name="on" value="0">Turn off</button>}
+            {demo.on && <Link className="link" href="/apply" target="_blank" rel="noopener">Open the apply flow in a new tab</Link>}
+          </div>
+        </form>
+        <p className="hint">Each click-through creates a new application with a made-up email address, so it never signs in to a seeded case. The sample applicant is fixed when the application starts. A reset keeps this setting.</p>
+      </section>
       <section className="card">
         <div className="card-head"><div><span className="eyebrow">Claude</span><h2 className="card-title">Where answers come from</h2></div></div>
         <dl className="kv">

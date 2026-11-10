@@ -14,7 +14,8 @@ Step by step:
 2. `npm run demo:reset` seeds 6 synthetic personas (Low, Medium, High, Auto-High, Prohibited, a company)
 3. `npm run dev`, open http://localhost:3000/analyst, choose an analyst
 4. Follow `docs/DEMO-SCRIPT.md` (5 minutes, plus a 2-minute simulator segment and a 1-minute ID wallet segment at `/apply`, step 4). Reset any time at `/analyst/demo`; it also undoes everything applied in the simulator.
-5. `npm run verify:records` recomputes every decision-record hash chain in the local database and replays every record.
+5. Demo Mode (Cases page, or `/analyst/demo`) pre-fills every `/apply` screen and attaches sample documents for a chosen persona, so you can click through the whole journey without typing. See `docs/spec/11-demo-mode.md`.
+6. `npm run verify:records` recomputes every decision-record hash chain in the local database and replays every record.
 
 Claude's pre-review and memos replay recorded responses. Record them once with an API key in `.env.local`: `npm run demo:record` (persona cases) and `npm run docs:record` (labelled eval sets). Without recordings, MVP 1 runs fully and MVP 2 shows "not recorded".
 

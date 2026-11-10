@@ -24,6 +24,7 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 | 10d OAuth and hosting | Demo authorization server, consent screen, connections page, rate limits, URL elicitation | Auth tests pass; a public or tunnelled URL connects as a Claude custom connector | 2-3 sessions |
 | 10e Analyst MCP server | `/mcp/analyst` with five read-only tools and the untrusted-text envelope | Scope tests pass; no write path exists | 1 session |
 | 10f Agent evals and demo | `npm run eval:interview` with at least 12 scripted applicants, demo script segment, README, preflight | Eval gates met (0 leaks, all injections resisted); `npm run demo` runs the interviewer offline | 1 session |
+| 11 Demo Mode | Console switch that pre-fills every `/apply` screen and attaches sample documents for a chosen persona | A click-through of each persona ends in its seeded band with no typing or file choice; switch is audited; reset keeps it; golden tests unchanged | 1 session |
 
 ## Starter prompts
 
@@ -84,6 +85,9 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 **Phase 10f**
 > Read docs/spec/10 section 12. Build the interview eval (npm run eval:interview) with the adversarial lines listed there, in English, Dutch and Greek, and gates from config/agent.yaml. Add a two-minute agent segment to docs/DEMO-SCRIPT.md, update README and tools/preflight.mjs for the new config and fixtures, and make sure `npm run demo` works offline from a cold start. Tune the field-match gate only from a real first run and record the number you chose.
 
+**Phase 11**
+> Read docs/spec/11, CLAUDE.md, D25 to D28 in docs/spec/00 and O-96 and O-97 in docs/spec/07. Tests first. Add src/demo/prefill.ts as the shared source of persona values (the seeder uses it too), the Demo Mode switch in the analyst console with the persona picker, the settings keys, the audit action, pre-filled `/apply` screens, server-side sample attachment when no file is chosen, the captured verification code, and the sample preview route. No migration, no new dependency. Prove with tests that each persona's click-through ends in the seeded band and that a reset keeps the switch.
+
 ## Interview talking points this build supports
 - Deterministic rules plus LLM assistance with a human decision, and why (auditability, regulators).
 - The "not out of the box" gap in vendor offerings: questionnaire, risk scoring, EDD orchestration.
@@ -96,3 +100,4 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 - Agents are a new front door, not a new decision-maker: one tool registry feeds both the in-portal interviewer and the MCP servers, outputs are allow-listed by schema, and an eval counts leaks and injection attempts instead of trusting the prompt.
 - Why MCP is the outer door and not the foundation: the process lives in the service layer, so any protocol that comes next can sit on the same tools.
 - A person still ticks the declaration, presses submit and decides, even when the applicant brings their own AI.
+- A demo that runs itself: one switch pre-fills the whole journey from the same source the seeder uses, and a test proves the click-through lands in the same band as the seeded case.

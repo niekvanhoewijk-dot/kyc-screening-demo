@@ -3,7 +3,7 @@ import { chooseAnalystAction } from "@/app/analyst/actions";
 import { AnalystNavLinks } from "./analyst-nav-links";
 
 /** Analyst navigation (docs/design/AnalystNav.dc.html): black 260px rail. */
-export function AnalystNav({ analysts, current, claudeSource }: { analysts: { id: string; name: string }[]; current: { id: string; name: string } | null; claudeSource: string }) {
+export function AnalystNav({ analysts, current, claudeSource, demoNote }: { analysts: { id: string; name: string }[]; current: { id: string; name: string } | null; claudeSource: string; demoNote?: string | null }) {
   return (
     <nav className="an on-dark" aria-label="Analyst">
       <div className="an-brand">
@@ -20,6 +20,7 @@ export function AnalystNav({ analysts, current, claudeSource }: { analysts: { id
           </select>
           <div><button className="btn" type="submit">{current ? "Switch" : "Sign in"}</button></div>
         </form>
+        {demoNote && <span className="an-note"><strong>{demoNote}</strong></span>}
         <span className="an-note">Claude: {claudeSource}</span>
         <p className="an-note">Illustrative demo on synthetic data. Not a regulated compliance system.</p>
       </div>

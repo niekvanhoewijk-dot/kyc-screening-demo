@@ -9,6 +9,7 @@ A **private, local demo** of an onboarding + compliance screening tool, built to
 4. `docs/spec/06-claude-roles-and-schemas.md`: what the LLM may and may not do
 5. `docs/BUILD-PLAN.md`: phases and acceptance criteria. Work phase by phase.
 6. Phase 10 only: `docs/spec/10-agent-interviewer-and-mcp.md` (interviewer and MCP servers), D19-D24 in spec 00 and O-77 to O-88 in spec 07.
+7. Phase 11 only: `docs/spec/11-demo-mode.md` (Demo Mode), D25-D28 in spec 00 and O-96 and O-97 in spec 07.
 
 ## Architecture principles (non-negotiable)
 - **The rules engine decides; Claude assists.** Risk score, band, threshold, EDD recalculation, and the final approve / reject / EDD routing are deterministic code reading `config/*.yaml`. Claude never produces a score or a decision. It extracts, classifies, cross-checks, explains and drafts. A human analyst takes the final decision (MVP 1 = Claude off, MVP 2 = Claude pre-review on).

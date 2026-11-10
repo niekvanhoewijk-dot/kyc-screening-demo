@@ -1,6 +1,7 @@
 import { draftsFor } from "@/agent/drafts";
 import { ApplicantShell, backPath } from "@/components/applicant-shell";
 import { COUNTRIES, countryName } from "@/lib/countries";
+import { demoSubject, questionnairePrefill } from "@/demo/prefill";
 import { stepCase, type IdentityData, type ResidenceData } from "@/portal/cases";
 import { lockedFromWallet } from "@/portal/evidence";
 import { OTHER_OCCUPATION } from "@/portal/schemas";
@@ -22,6 +23,7 @@ export default async function QuestionnairePage() {
   const r = c.residence as ResidenceData;
   const address = [r.apartment, r.addressLine1, r.addressLine2, r.city, r.region, r.postcode, countryName(r.country)].filter(Boolean).join(", ");
   const sc = stepCase(c);
+  const demo = demoSubject(deps, applicant.id);
   return (
     <ApplicantShell
       panelTitle="A few questions"
@@ -36,7 +38,7 @@ export default async function QuestionnairePage() {
         </div>
       )}
       <QuestionnaireForm
-        saved={saved}
+        saved={saved ?? (demo ? questionnairePrefill(deps, demo) : null)}
         locked={lockedFromWallet(c.identity as IdentityData | null)}
         email={applicant.email}
         address={address}
