@@ -99,40 +99,57 @@ export function residenceFieldsSchema(portal: PortalConfig) {
 /** Occupation is an open list (O-5): config values plus "other", which takes the default tier. */
 export const OTHER_OCCUPATION = { id: "other", label: "Other" };
 
-export function questionnaireSchema(engine: EngineConfig, portal: PortalConfig, today: string) {
+/**
+ * Per-field rules of the questionnaire (spec 10 section 6). The form validates them together with the
+ * cross-field rules below; an agent's draft answers are validated field by field with the same rules and messages.
+ */
+export function questionnaireShape(engine: EngineConfig, portal: PortalConfig, today: string) {
   const f = engine.matrix.factors;
   const ids = (list: { id: string }[]) => list.map((v) => v.id);
-  return z
-    .object({
-      dateOfBirth: isoDate("Date of birth").refine((d) => d < today, "Date of birth must be in the past"),
-      nationality: country("Nationality"),
-      preferredLanguage: oneOf(ids(portal.questionnaire.preferred_languages), "Preferred language"),
-      phone: required("Phone number")
-        .transform(normalisePhone)
-        .refine((v) => PHONE.test(v), "Use international format with country code, e.g. +31 6 1234 5678"),
-      tin: optional,
-      tinMissingReason: optional,
-      usTaxResident: yesNo("US tax resident"),
-      pep: yesNo("politically exposed person"),
-      declaration: checkbox.refine((v) => v, "Please confirm the declaration to continue"),
-      deposit_12m: oneOf(ids(f.deposit_12m), "Expected deposit"),
-      source_of_funds: oneOf(ids(f.source_of_funds), "Source of funds"),
-      onlySourceOfWealth: checkbox,
-      employment_status: oneOf(ids(f.employment_status), "Employment status"),
-      occupation_industry: oneOf([...ids(f.occupation_industry.values), OTHER_OCCUPATION.id], "Industry"),
-      occupationDetail: optional,
-      annual_income: oneOf(ids(f.annual_income), "Annual income"),
-      net_worth: oneOf(ids(f.net_worth), "Net worth"),
-    })
-    .superRefine((v, ctx) => {
-      if (!v.tin && !v.tinMissingReason)
-        ctx.addIssue({ code: "custom", path: ["tinMissingReason"], message: "Enter your TIN, or tell us briefly why you don't have one" });
-      if (v.occupation_industry === OTHER_OCCUPATION.id && !v.occupationDetail)
-        ctx.addIssue({ code: "custom", path: ["occupationDetail"], message: "Tell us your industry" });
-    });
+  return {
+    dateOfBirth: isoDate("Date of birth").refine((d) => d < today, "Date of birth must be in the past"),
+    nationality: country("Nationality"),
+    preferredLanguage: oneOf(ids(portal.questionnaire.preferred_languages), "Preferred language"),
+    phone: required("Phone number")
+      .transform(normalisePhone)
+      .refine((v) => PHONE.test(v), "Use international format with country code, e.g. +31 6 1234 5678"),
+    tin: optional,
+    tinMissingReason: optional,
+    usTaxResident: yesNo("US tax resident"),
+    pep: yesNo("politically exposed person"),
+    declaration: checkbox.refine((v) => v, "Please confirm the declaration to continue"),
+    deposit_12m: oneOf(ids(f.deposit_12m), "Expected deposit"),
+    source_of_funds: oneOf(ids(f.source_of_funds), "Source of funds"),
+    onlySourceOfWealth: checkbox,
+    employment_status: oneOf(ids(f.employment_status), "Employment status"),
+    occupation_industry: oneOf([...ids(f.occupation_industry.values), OTHER_OCCUPATION.id], "Industry"),
+    occupationDetail: optional,
+    annual_income: oneOf(ids(f.annual_income), "Annual income"),
+    net_worth: oneOf(ids(f.net_worth), "Net worth"),
+  };
+}
+export type QuestionnaireShape = ReturnType<typeof questionnaireShape>;
+export type QuestionnaireFieldId = keyof QuestionnaireShape;
+
+/** Rules across fields. They run on the full form only (the review page), never on single draft answers. */
+export function refineQuestionnaire(v: { tin?: string; tinMissingReason?: string; occupation_industry: string; occupationDetail?: string }, ctx: z.RefinementCtx) {
+  if (!v.tin && !v.tinMissingReason)
+    ctx.addIssue({ code: "custom", path: ["tinMissingReason"], message: "Enter your TIN, or tell us briefly why you don't have one" });
+  if (v.occupation_industry === OTHER_OCCUPATION.id && !v.occupationDetail)
+    ctx.addIssue({ code: "custom", path: ["occupationDetail"], message: "Tell us your industry" });
+}
+
+export function questionnaireSchema(engine: EngineConfig, portal: PortalConfig, today: string) {
+  return z.object(questionnaireShape(engine, portal, today)).superRefine(refineQuestionnaire);
 }
 
 export type QuestionnaireAnswers = z.infer<ReturnType<typeof questionnaireSchema>>;
+
+/** One answer checked with its own form rule: the parsed value, or the form's first message for it. */
+export function validateQuestionnaireField(shape: QuestionnaireShape, id: QuestionnaireFieldId, value: unknown): { ok: true; value: unknown } | { ok: false; message: string } {
+  const r = (shape[id] as z.ZodType).safeParse(value);
+  return r.success ? { ok: true, value: r.data } : { ok: false, message: r.error.issues[0]?.message ?? "Please check this answer." };
+}
 export type ResidenceFields = z.infer<ReturnType<typeof residenceFieldsSchema>>;
 export type IdentityFields = z.infer<ReturnType<typeof identityFieldsSchema>>;
 

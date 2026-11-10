@@ -9,10 +9,10 @@ import { resumeStep, stepPath } from "@/portal/steps";
 import { signOutAction } from "../actions";
 import { EddForm, SubmitForm } from "../_forms/step-forms";
 import { requireStep } from "../session";
+import { NO_GO_TEXT } from "@/portal/status-text";
 
 // D7: neutral, no reasons. Never reveals sanctions, PEP, watchlist or risk-score reasons.
-const NO_GO =
-  "We're unable to open an account for you at this time. This follows from our regulatory requirements. If you think this is a mistake, contact support.";
+const NO_GO = NO_GO_TEXT;
 // The board (A10) shows the first sentence as the heading and the rest below it: same text, split.
 const [NO_GO_HEADING, ...NO_GO_REST] = NO_GO.split(/(?<=\.) /);
 

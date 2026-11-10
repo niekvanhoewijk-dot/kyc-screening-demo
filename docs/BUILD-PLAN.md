@@ -18,6 +18,12 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 | 8d Simulator UI | `/analyst/simulator` in the Phase 7 look, nav item, decision record drawer with verify and replay | Walk S1-S5 in the UI; keyboard and 390px width pass | 1-2 sessions |
 | 8e Demo hardening | Scenario presets, demo script update, README, preflight check for the new config | `npm run demo` runs S1 and S2 offline from a cold start | 1 session |
 | 9 Wallet-first intake | ID wallet (SD-JWT VC PID, test mode) as an identity route with an evidence-assurance level; documents stay as fallback | Verifier rejects every scenario in spec 09 section 9; wallet and document paths reach the same score for the same answers; golden tests unchanged | 2 sessions |
+| 10a Agent registry and drafts | `src/agent` tool registry with strict output schemas, shared field description, split questionnaire schema, `intake_drafts`, answer provenance, review page pre-filled from drafts | Registry, leak, scope, gating, parity and form-snapshot tests pass; golden tests unchanged | 1 session |
+| 10b Interviewer | `/apply/interview` chat on Claude native tool use, with disclosure banner, inline step cards, output guard, caps and replay | A scripted applicant completes the questionnaire in replay and reaches review; adversarial lines get the fixed deflection | 2 sessions |
+| 10c MCP applicant server, local | `/mcp/applicant` over Streamable HTTP, version negotiation, demo tokens, stdio bridge, secure-step links | Contract tests pass; Claude Code and Claude Desktop (via the bridge) complete a questionnaire locally | 1 session |
+| 10d OAuth and hosting | Demo authorization server, consent screen, connections page, rate limits, URL elicitation | Auth tests pass; a public or tunnelled URL connects as a Claude custom connector | 2-3 sessions |
+| 10e Analyst MCP server | `/mcp/analyst` with five read-only tools and the untrusted-text envelope | Scope tests pass; no write path exists | 1 session |
+| 10f Agent evals and demo | `npm run eval:interview` with at least 12 scripted applicants, demo script segment, README, preflight | Eval gates met (0 leaks, all injections resisted); `npm run demo` runs the interviewer offline | 1 session |
 
 ## Starter prompts
 
@@ -60,6 +66,24 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 **Phase 9**
 > Read docs/spec/09, CLAUDE.md and docs/spec/07 (O-68 to O-76). Tests first. Build config/wallet.yaml with its Zod loader, the SD-JWT VC verifier and test ecosystem in src/wallet using node:crypto only (no new dependency), the wallet_sessions table and migration, src/portal/wallet.ts and src/portal/evidence.ts, the identity chooser, wallet page and test wallet panel, the questionnaire and residence pre-fill, the analyst evidence rows, and the wallet branch of pre-review. Every scenario in spec 09 section 9 needs a test. The engine, policies and golden cases must not change. Reason codes never reach the applicant.
 
+**Phase 10a**
+> Read docs/spec/10, CLAUDE.md, docs/spec/06 and 09, and O-77 to O-88 in docs/spec/07. Enter plan mode. Tests first. Build src/agent/registry.ts (ToolDef, the call wrapper, toAnthropicTools and toMcpTools), the five applicant tools with strict output schemas, src/portal/fields.ts as the single question description, the questionnaire schema split into per-field rules and cross-field refinements (add a form snapshot test before touching it), the intake_drafts table and migration 0008, provenance on the stored answers, and the review-prefill mode on /apply/questionnaire. No interviewer UI and no MCP yet. The engine, policies and golden cases must not change, and no tool output may carry a score, band, reason or screening term.
+
+**Phase 10b**
+> Read docs/spec/10 sections 7 and 12. Build /apply/interview on native tool use with the registry: disclosure banner rendered by the page, inline cards for the existing identity and residence UI, src/agent/guard.ts, caps from config/agent.yaml, audit actions, and replay with kind "interview". Write fixtures/interviews with at least 12 scripted applicants first and make them pass in replay. Add a fixed deflection line for everything outside the tools.
+
+**Phase 10c**
+> Read docs/spec/10 section 8.1, 8.2 and 8.4. Add @modelcontextprotocol/sdk (approved in D22) and build POST /mcp/applicant with version negotiation for 2026-07-28 and 2025-11-25, the demo token mint script, tools/mcp/stdio-bridge.mjs in plain Node, request and response caps, an origin check, and request_secure_step with the URL-mode elicitation path and the text fallback. First check what the installed SDK supports and record it under O-82. Add setup instructions for Claude Desktop and Claude Code to the README.
+
+**Phase 10d**
+> Read docs/spec/10 section 8.3. Build the demo OAuth 2.1 authorization server: protected resource and server metadata, authorization code with PKCE S256, the resource parameter, iss on the response, exact redirect matching, an allow-list plus dynamic registration, a consent screen, hashed audience-bound tokens, refresh rotation, and /apply/connections with revoke. Auth tests first. Label it test mode everywhere. Then document hosting (a server with a persistent disk, or a tunnel) in the README.
+
+**Phase 10e**
+> Read docs/spec/10 section 5.2. Add /mcp/analyst with list_cases, get_case, get_audit_trail, explain_score and get_policy_summary. Every tool is read-only, applicant-authored text goes out inside an untrusted envelope, no document bytes or ID numbers, and a test fails if any analyst tool is not read-only or imports src/console/actions. Analysts sign in through the console flow and get their own token scope.
+
+**Phase 10f**
+> Read docs/spec/10 section 12. Build the interview eval (npm run eval:interview) with the adversarial lines listed there, in English, Dutch and Greek, and gates from config/agent.yaml. Add a two-minute agent segment to docs/DEMO-SCRIPT.md, update README and tools/preflight.mjs for the new config and fixtures, and make sure `npm run demo` works offline from a cold start. Tune the field-match gate only from a real first run and record the number you chose.
+
 ## Interview talking points this build supports
 - Deterministic rules plus LLM assistance with a human decision, and why (auditability, regulators).
 - The "not out of the box" gap in vendor offerings: questionnaire, risk scoring, EDD orchestration.
@@ -69,3 +93,6 @@ Work one phase at a time. Use plan mode first for each phase, run the tests at t
 - Policy as data with replayable decision records, and a dry run that shows the blast radius of a policy change before it ships.
 - Why time alone does not change a risk band, and why a policy change routes people to a human instead of closing accounts.
 - Evidence has a grade: a wallet presentation, a document and a selfie are different strengths of proof, the grade is derived by code, audited and shown to the analyst, and it still never decides the case.
+- Agents are a new front door, not a new decision-maker: one tool registry feeds both the in-portal interviewer and the MCP servers, outputs are allow-listed by schema, and an eval counts leaks and injection attempts instead of trusting the prompt.
+- Why MCP is the outer door and not the foundation: the process lives in the service layer, so any protocol that comes next can sit on the same tools.
+- A person still ticks the declaration, presses submit and decides, even when the applicant brings their own AI.

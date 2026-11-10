@@ -1,0 +1,19 @@
+# Agent access (Phase 10, docs/spec/10). Read by src/agent/config.ts (Zod-validated). Never hard-code these in application code.
+# Phase 10a holds only the keys the tool registry uses; 10b to 10f extend this file (interviewer, mcp, eval).
+
+version: 1
+
+guard:
+  # Words no applicant-facing tool output, description, message or prompt may contain (spec 10 section 5.3).
+  # Matched case-insensitively at the start of a word, so "risk" also catches "risky" and "flag" catches "flagged".
+  forbidden_terms: [score, band, risk, threshold, screening, watchlist, sanction, flag, reason code]
+  # Labels, hints and options the portal already shows applicants are exempt, so the PEP question stays askable.
+  exempt_label_sources: [questionnaire]
+
+tools:
+  get_next_questions: { max_questions: 3 }
+  save_answers: { max_fields_per_call: 8 }
+  applicant_visible_issues: []        # O-79: no document issue is told to applicants until approved
+
+mcp:
+  secure_link_ttl_minutes: 30         # how long a secure-step link is offered for; the page still needs the portal sign-in

@@ -17,6 +17,8 @@ import {
 } from "./schemas";
 import { canOpen, type StepId } from "./steps";
 import { lockedFromWallet } from "./evidence";
+import { questionnaireFields } from "./fields";
+import { clearDrafts, draftsFor, mergeProvenance, type Provenance } from "@/agent/drafts";
 import type { WalletEvidence } from "@/wallet/types";
 
 export type CaseRow = typeof cases.$inferSelect;
@@ -29,10 +31,11 @@ type DocKind = (typeof documents.$inferSelect)["kind"];
  */
 export type IdentityData = IdentityFields & { selfie: "passed" | "retry" | "failed_flagged" | "not_required"; complete: boolean; evidence?: WalletEvidence };
 export type ResidenceData = ResidenceFields & { complete: boolean };
-export type QuestionnaireData = QuestionnaireAnswers & { complete: boolean };
+/** `provenance` is present only when an agent drafted some answers (spec 10 section 6); absent means all from the form. */
+export type QuestionnaireData = QuestionnaireAnswers & { complete: boolean; provenance?: Provenance };
 
 const EXT: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "application/pdf": "pdf" };
-const today = (d: Date) => d.toISOString().slice(0, "yyyy-mm-dd".length);
+export const today = (d: Date) => d.toISOString().slice(0, "yyyy-mm-dd".length);
 
 export function getCurrentCase(deps: PortalDeps, applicantId: string): CaseRow {
   const row = deps.db.select().from(cases).where(eq(cases.applicantId, applicantId)).orderBy(desc(cases.createdAt)).get();
@@ -213,8 +216,16 @@ export function saveQuestionnaire(deps: PortalDeps, c: CaseRow, input: unknown) 
     ? { ...posted, dateOfBirth: locked.birthDate, nationality: locked.nationalities.includes(String(posted.nationality)) ? posted.nationality : locked.nationalities[0] }
     : input;
   const answers = parseOrThrow(questionnaireSchema(deps.engine, deps.portal, today(deps.now())), merged);
-  touch(deps, c.id, { questionnaire: { ...answers, complete: true } satisfies QuestionnaireData });
+  // Answers an agent drafted are confirmed here, on the person's own submit of the review page (spec 10 section 6).
+  const ids = questionnaireFields(deps.engine, deps.portal).map((f) => f.id);
+  const drafts = draftsFor(deps, c.id, "questionnaire");
+  const merge = mergeProvenance(drafts, answers, ids, deps.now().toISOString());
+  touch(deps, c.id, { questionnaire: { ...answers, ...(merge ? { provenance: merge.provenance } : {}), complete: true } satisfies QuestionnaireData });
   audit(deps.db, deps.now(), `applicant:${c.applicantId}`, "step.completed", `case:${c.id}`, { step: "questionnaire" });
+  if (merge) {
+    audit(deps.db, deps.now(), `applicant:${c.applicantId}`, "answers.confirmed", `case:${c.id}`, { fields: Object.keys(drafts), sources: merge.sources, unchanged: merge.unchanged, edited: merge.edited });
+    clearDrafts(deps, c.id, "questionnaire");
+  }
 }
 
 /**

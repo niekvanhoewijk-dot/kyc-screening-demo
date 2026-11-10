@@ -8,6 +8,7 @@ A **private, local demo** of an onboarding + compliance screening tool, built to
 3. `docs/spec/01-flow-mapping.md`: screens and states
 4. `docs/spec/06-claude-roles-and-schemas.md`: what the LLM may and may not do
 5. `docs/BUILD-PLAN.md`: phases and acceptance criteria. Work phase by phase.
+6. Phase 10 only: `docs/spec/10-agent-interviewer-and-mcp.md` (interviewer and MCP servers), D19-D24 in spec 00 and O-77 to O-88 in spec 07.
 
 ## Architecture principles (non-negotiable)
 - **The rules engine decides; Claude assists.** Risk score, band, threshold, EDD recalculation, and the final approve / reject / EDD routing are deterministic code reading `config/*.yaml`. Claude never produces a score or a decision. It extracts, classifies, cross-checks, explains and drafts. A human analyst takes the final decision (MVP 1 = Claude off, MVP 2 = Claude pre-review on).
@@ -17,7 +18,7 @@ A **private, local demo** of an onboarding + compliance screening tool, built to
 - **Structured outputs only** for Claude calls: JSON validated against schemas in `docs/spec/06`; reject and retry on invalid; low confidence routes to the analyst, never auto-passes.
 
 ## Stack
-Next.js (App Router) + TypeScript, SQLite via Drizzle (local, private), Zod for schemas, Vitest for tests, Anthropic TypeScript SDK. Model from env `CLAUDE_MODEL` (default `claude-sonnet-5-5`). Key in `.env.local` (never committed). A `DEMO_MODE=replay` setting serves cached Claude responses from `fixtures/claude-cache/` so the demo runs offline and deterministically.
+Next.js (App Router) + TypeScript, SQLite via Drizzle (local, private), Zod for schemas, Vitest for tests, Anthropic TypeScript SDK. Model from env `CLAUDE_MODEL` (default `claude-sonnet-5-5`). Key in `.env.local` (never committed). A `DEMO_MODE=replay` setting serves cached Claude responses from `fixtures/claude-cache/` so the demo runs offline and deterministically. Phase 10 adds one dependency, `@modelcontextprotocol/sdk` (approved in D22).
 
 ## Commands (create these in Phase 0)
 - `npm run test` — Vitest, including `tests/golden/*.json`
@@ -31,6 +32,7 @@ Next.js (App Router) + TypeScript, SQLite via Drizzle (local, private), Zod for 
 - **Synthetic data only.** Never use or ask for real passports, addresses or customer data. Sample documents are generated fixtures with the watermark "SAMPLE".
 - **Confidentiality.** The source documents (requirements PDFs, vendor deck) are confidential to Ateaya / Omikron Financial Holdings Europe LTD. Do not copy them into this repo, quote their pricing, or use their names, the Polis-X/DVAULT branding, or vendor names (Persona, LSEG) in UI copy. Generic branding: "Demo Digital Assets Platform". This folder is private until reuse is cleared.
 - **No tipping off.** Applicant-facing messages never reveal sanctions, PEP, watchlist or risk-score reasons (see D7).
+- **Agents never decide, and tool output is public.** Tool outputs, descriptions, prompts and server instructions reach third-party AI clients. They never contain a score, band, threshold, reason code, screening or PEP information, a vendor name or the original product brand. Agent tools cannot approve, reject, request EDD, clear a hit, tick the declaration or submit (spec 10).
 - **Be honest in the UI:** footer "Illustrative demo. Not a regulated compliance system."
 - Do not invent compliance rules. If a rule is missing or ambiguous, add it to `docs/spec/07-open-questions.md` and use the stated default.
 - Ask before adding dependencies beyond the stack above.

@@ -57,6 +57,13 @@
       "when": 1793810576925,
       "tag": "0007_graceful_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1794317825309,
+      "tag": "0008_modern_iron_lad",
+      "breakpoints": true
     }
   ]
 }

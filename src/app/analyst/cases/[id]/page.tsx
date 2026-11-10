@@ -761,13 +761,14 @@ function AnswersCard({ view }: { view: CaseView }) {
     <div className="cards-row">
       <Card id="h-q" eyebrow="Declared by the applicant" title="Questionnaire">
         <KV rows={[
-          ["Date of birth", q.dateOfBirth], ["Nationality", countryName(q.nationality)], ["Language", q.preferredLanguage], ["Phone", q.phone],
-          ["TIN", q.tin ?? <>none: {q.tinMissingReason}</>], ["US tax resident", yes(q.usTaxResident)], ["PEP (declared)", yes(q.pep)],
-          ["Deposit 12 months", answerLabel(engine, "deposit_12m", q.deposit_12m)],
-          ["Source of funds", `${answerLabel(engine, "source_of_funds", q.source_of_funds)}${q.onlySourceOfWealth ? " (only source of wealth)" : ""}`],
-          ["Employment", answerLabel(engine, "employment_status", q.employment_status)],
-          ["Industry", `${answerLabel(engine, "occupation_industry", q.occupation_industry)}${q.occupationDetail ? `: ${q.occupationDetail}` : ""}`],
-          ["Annual income", answerLabel(engine, "annual_income", q.annual_income)], ["Net worth", answerLabel(engine, "net_worth", q.net_worth)], ["Declaration", yes(q.declaration)],
+          ["Intake channel", intakeChannel(q.provenance)],
+          ["Date of birth", via(q, "dateOfBirth", q.dateOfBirth)], ["Nationality", via(q, "nationality", countryName(q.nationality))], ["Language", via(q, "preferredLanguage", q.preferredLanguage)], ["Phone", via(q, "phone", q.phone)],
+          ["TIN", via(q, "tin", q.tin ?? <>none: {q.tinMissingReason}</>)], ["US tax resident", via(q, "usTaxResident", yes(q.usTaxResident))], ["PEP (declared)", via(q, "pep", yes(q.pep))],
+          ["Deposit 12 months", via(q, "deposit_12m", answerLabel(engine, "deposit_12m", q.deposit_12m))],
+          ["Source of funds", via(q, "source_of_funds", `${answerLabel(engine, "source_of_funds", q.source_of_funds)}${q.onlySourceOfWealth ? " (only source of wealth)" : ""}`)],
+          ["Employment", via(q, "employment_status", answerLabel(engine, "employment_status", q.employment_status))],
+          ["Industry", via(q, "occupation_industry", `${answerLabel(engine, "occupation_industry", q.occupation_industry)}${q.occupationDetail ? `: ${q.occupationDetail}` : ""}`)],
+          ["Annual income", via(q, "annual_income", answerLabel(engine, "annual_income", q.annual_income))], ["Net worth", via(q, "net_worth", answerLabel(engine, "net_worth", q.net_worth))], ["Declaration", yes(q.declaration)],
         ]} />
       </Card>
       <Card id="h-id" eyebrow="Declared by the applicant" title="Identity and address">
@@ -788,6 +789,19 @@ function AnswersCard({ view }: { view: CaseView }) {
       </Card>
     </div>
   );
+}
+
+/** Who answered (spec 10 section 6, D23): shown to the analyst only; it never reaches the engine. */
+const AGENT_LABEL: Record<string, string> = { interviewer: "AI assistant in the portal", mcp: "AI client over MCP" };
+function intakeChannel(p: QuestionnaireData["provenance"]): string {
+  if (!p) return "Form";
+  const agents = [...new Set(Object.values(p).filter((e) => e.source !== "form").map((e) => (e.source === "mcp" && e.clientName ? `${AGENT_LABEL.mcp} (${e.clientName})` : AGENT_LABEL[e.source]!)))];
+  return agents.length ? `Form, with answers drafted by ${agents.join(" and ")} and confirmed by the applicant` : "Form (assistant drafts were all edited by the applicant)";
+}
+function via(q: QuestionnaireData, field: string, value: ReactNode): ReactNode {
+  const e = q.provenance?.[field];
+  if (!e || e.source === "form") return value;
+  return <>{value} <span className="muted">· drafted by {e.source === "mcp" ? (e.clientName ?? "an AI client") : "the AI assistant"}, confirmed</span></>;
 }
 
 function AuditTrail({ view }: { view: CaseView }) {

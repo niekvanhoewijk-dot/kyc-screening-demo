@@ -1,3 +1,4 @@
+import { draftsFor } from "@/agent/drafts";
 import { ApplicantShell, backPath } from "@/components/applicant-shell";
 import { COUNTRIES, countryName } from "@/lib/countries";
 import { stepCase, type IdentityData, type ResidenceData } from "@/portal/cases";
@@ -9,8 +10,14 @@ import { requireStep } from "../session";
 const opts = (list: { id: string; label: string }[]) => list.map(({ id, label }) => ({ id, label }));
 
 // 2.1.6 Questionnaire (docs/design/A06-Questionnaire.dc.html). Options and labels come from config/risk-matrix.yaml; the score is never shown.
+// Also the review page for answers an AI assistant drafted (spec 10 section 6): same form, same action, pre-filled and editable.
 export default async function QuestionnairePage() {
   const { deps, c, applicant } = await requireStep("questionnaire");
+  const drafts = draftsFor(deps, c.id, "questionnaire");
+  const drafted = Object.keys(drafts).length > 0;
+  const saved = drafted
+    ? { ...((c.questionnaire as Record<string, unknown> | null) ?? {}), ...Object.fromEntries(Object.entries(drafts).map(([k, d]) => [k, d.value ?? undefined])) }
+    : (c.questionnaire as Record<string, unknown> | null);
   const f = deps.engine.matrix.factors;
   const r = c.residence as ResidenceData;
   const address = [r.apartment, r.addressLine1, r.addressLine2, r.city, r.region, r.postcode, countryName(r.country)].filter(Boolean).join(", ");
@@ -23,8 +30,13 @@ export default async function QuestionnairePage() {
       current="questionnaire"
       title="Questionnaire"
     >
+      {drafted && (
+        <div className="banner" role="status">
+          <strong>Filled in with an AI assistant.</strong> Check every answer before you continue. You can change any of them, and you tick the declaration yourself.
+        </div>
+      )}
       <QuestionnaireForm
-        saved={c.questionnaire as Record<string, unknown> | null}
+        saved={saved}
         locked={lockedFromWallet(c.identity as IdentityData | null)}
         email={applicant.email}
         address={address}

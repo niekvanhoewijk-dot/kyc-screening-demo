@@ -8,7 +8,8 @@ Source of logic: Ateaya KYC-KYB-AML Requirements **Full v3** (13 Jun 2024). Flow
 - Two views: **Applicant portal** and **Analyst console**.
 - Two modes (flow "Operational Orchestration" lane): **MVP 1** manual checks by designated people; **MVP 2** automated checks with Claude pre-review. A toggle in the demo.
 - Out of scope: crypto wallet connection (flow 2.2, "KYC/KYB on wallet vendor side"; not the ID wallet of Phase 9), investing (4), customer support, CRM, channels, real vendor integrations, real payments.
-- Deployment: **private, runs locally** on the laptop.
+- Agent access (Phase 10, spec 10): an interviewer in the portal and MCP servers for applicants and analysts, for individuals only. Agents never decide.
+- Deployment: **private, runs locally** on the laptop. A public URL for the MCP servers (Phase 10d) is for replay-only demos with synthetic data (O-84).
 
 ## Confirmed by Niek
 | # | Topic | Decision |
@@ -34,6 +35,12 @@ Source of logic: Ateaya KYC-KYB-AML Requirements **Full v3** (13 Jun 2024). Flow
 | D16 | Wallet-first intake (Phase 9) | An ID wallet presentation (SD-JWT VC PID, test mode) can replace document capture and the selfie for individuals. Documents stay available. Spec 09 |
 | D17 | Evidence-assurance level (Phase 9) | Derived by code from stored evidence, recorded and shown to the analyst. It is not an engine input and never changes the score, threshold or decision |
 | D18 | What the wallet does not replace (Phase 9) | Questionnaire, screening, risk score, source of funds and EDD still run. Proof of residence is still required |
+| D19 | Agent intake channels (Phase 10) | An in-portal interviewer and an applicant-side MCP server can collect the questionnaire answers for individuals. They use the same service layer as the forms. The applicant confirms every answer on the review page, ticks the declaration and submits on portal pages. Spec 10 |
+| D20 | Agent boundaries (Phase 10) | Agents collect and explain. They cannot score, decide, submit, tick the declaration, request EDD or clear a screening hit. Identity, selfie, residence and review stay on portal pages, reached by an inline card or a link. No file bytes and no ID attributes pass through a model or an AI client |
+| D21 | Tool registry is the contract (Phase 10) | One registry of tools with strict Zod input and output schemas feeds both the interviewer (native tool use) and the MCP servers. Outputs are allow-listed by schema. A test scans outputs and descriptions for score, band, reason and screening terms |
+| D22 | MCP SDK dependency (Phase 10) | `@modelcontextprotocol/sdk` is approved as the one new dependency for Phase 10. This was taken as accepted from "build them all" in the planning chat on 10 Nov 2026. Change it here if wrong (fallback: a thin hand-written handler, O-82). Anything else new still needs approval |
+| D23 | Provenance and channel (Phase 10) | Each answer records its source (`form`, `interviewer`, `mcp`) and the client name. The analyst sees the channel. Like the evidence level in D17, it is not an engine input and never changes the score, threshold or decision |
+| D24 | Analyst MCP server is read-only (Phase 10) | Five read tools. No decision, EDD, hit-clearing, policy or simulator tool, now or later. Applicant-authored text is returned inside an `untrusted` envelope |
 
 ## Resolved doc ambiguities
 - Selfie "TBC" -> required (D5).
