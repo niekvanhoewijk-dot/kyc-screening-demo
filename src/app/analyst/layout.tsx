@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AnalystNav } from "@/components/analyst-nav";
+import { demoChoices, getDemoState } from "@/demo/prefill";
 import { env } from "@/lib/env";
 import { portalDeps } from "@/portal/deps";
 import { currentAnalyst } from "./analyst-session";
@@ -10,11 +11,14 @@ export const dynamic = "force-dynamic";
 export default async function AnalystLayout({ children }: { children: ReactNode }) {
   const deps = portalDeps();
   const analyst = await currentAnalyst();
+  const demo = getDemoState(deps);
+  const demoNote = demo.on ? `Demo Mode on: ${demoChoices().find((c) => c.id === demo.persona)?.name ?? demo.persona}` : null;
   return (
     <div className="frame">
       <AnalystNav
         analysts={deps.consoleConfig.analysts}
         current={analyst}
+        demoNote={demoNote}
         claudeSource={env.DEMO_MODE === "replay" ? "replay of recorded responses" : `live API (${env.CLAUDE_MODEL})`}
       />
       <main className="an-main">

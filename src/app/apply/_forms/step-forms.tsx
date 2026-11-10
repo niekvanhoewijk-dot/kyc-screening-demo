@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, type ReactNode } from "react";
-import { Dropzone, Field, FormMessage, OnFile, Submit, v } from "@/components/form";
+import { Dropzone, Field, FormMessage, OnFile, SampleTile, Submit, v, type Sample } from "@/components/form";
 import { Ticked } from "@/components/icons";
 import { eddAction, identityAction, questionnaireAction, residenceAction, submitAction } from "../actions";
 import { initialState, type FormState } from "../form-state";
@@ -63,6 +63,8 @@ export function IdentityForm(props: {
   documentAccept: string;
   selfieAccept: string;
   selfieRetry: boolean;
+  /** Demo Mode: samples the server attaches when nothing is chosen. */
+  samples?: { front?: Sample; selfie?: Sample };
   back?: string;
   /** Opened from the interviewer: go back to the chat after saving. */
   returnTo?: boolean;
@@ -103,7 +105,7 @@ export function IdentityForm(props: {
 
       <div className="stack" style={{ gap: 14 }}>
         <span className="label">Photo of your document</span>
-        <Dropzone name="front" label="Front of the document: drop your photo here or choose a file" hint="JPG, PNG or PDF, up to 10 MB. All four corners visible." accept={props.documentAccept} onFile={props.onFile.front} state={state} icon />
+        <Dropzone name="front" label="Front of the document: drop your photo here or choose a file" hint="JPG, PNG or PDF, up to 10 MB. All four corners visible." accept={props.documentAccept} onFile={props.onFile.front} state={state} icon sample={props.samples?.front} />
         <Dropzone name="back" label="Back of the document" hint={`Needed for ${needsBack}.`} accept={props.documentAccept} onFile={props.onFile.back} state={state} />
         <div className="cols">
           <div>
@@ -135,7 +137,7 @@ export function IdentityForm(props: {
         </p>
         <label htmlFor="selfie" className="label">Selfie</label>
         <input id="selfie" name="selfie" type="file" accept={props.selfieAccept} capture="user" />
-        {props.onFile.selfie ? <OnFile name={props.onFile.selfie} /> : <span className="hint">Not taken yet</span>}
+        {props.onFile.selfie ? <OnFile name={props.onFile.selfie} /> : props.samples?.selfie ? <SampleTile sample={props.samples.selfie} /> : <span className="hint">Not taken yet</span>}
         {state.fieldErrors?.selfie?.map((e) => <span key={e} className="error" role="alert">{e}</span>)}
       </div>
 
@@ -150,6 +152,7 @@ export function ResidenceForm(props: {
   countries: Country[];
   saved: Saved;
   onFile?: string;
+  sample?: Sample;
   documentAccept: string;
   maxAgeMonths: number;
   back?: string;
@@ -209,7 +212,7 @@ export function ResidenceForm(props: {
         <Field name="porType" label="Document type" state={state}>
           <Select name="porType" options={props.porTypes} value={v(state, props.saved, "porType")} />
         </Field>
-        <Dropzone name="por" label="Choose your document" hint="JPG, PNG or PDF, up to 10 MB. All four corners visible. Bank statements may hide transactions, but issuer, name, address and date must stay visible." accept={props.documentAccept} onFile={props.onFile} state={state} />
+        <Dropzone name="por" label="Choose your document" hint="JPG, PNG or PDF, up to 10 MB. All four corners visible. Bank statements may hide transactions, but issuer, name, address and date must stay visible." accept={props.documentAccept} onFile={props.onFile} state={state} sample={props.sample} />
       </section>
 
       <StepActions back={props.back}><Submit pending="Uploading…">Continue</Submit></StepActions>
@@ -346,7 +349,7 @@ export function SubmitForm() {
 }
 
 // EDD request (A08-EDD-Request). Neutral wording: never says why (D7).
-export function EddForm({ extraKyc, documentAccept, selfieAccept }: { extraKyc: "required" | "already_satisfied"; documentAccept: string; selfieAccept: string }) {
+export function EddForm({ extraKyc, documentAccept, selfieAccept, samples }: { extraKyc: "required" | "already_satisfied"; documentAccept: string; selfieAccept: string; samples?: { sof?: Sample; eddKyc?: Sample } }) {
   const [state, action] = useActionState(eddAction, initialState);
   return (
     <form action={action} noValidate className="stack-lg">
@@ -357,7 +360,7 @@ export function EddForm({ extraKyc, documentAccept, selfieAccept }: { extraKyc: 
           <div className="stack" style={{ gap: 10, flex: "1 1 auto", minWidth: 0 }}>
             <h2 style={{ fontSize: 19 }}>Proof of source of funds</h2>
             <p>A document that shows where the money you deposit comes from, for example a recent tax report, payslips, a sale contract or a statement of the account it comes from.</p>
-            <Dropzone name="sof" label="Choose one or more documents" hint="JPG, PNG or PDF, up to 10 MB each." accept={documentAccept} multiple state={state} />
+            <Dropzone name="sof" label="Choose one or more documents" hint="JPG, PNG or PDF, up to 10 MB each." accept={documentAccept} multiple state={state} sample={samples?.sof} />
             <Field name="note" label="Anything we should know?" optional state={state}>
               <textarea id="note" name="note" rows={3} defaultValue={state.values?.note} />
             </Field>
@@ -368,7 +371,7 @@ export function EddForm({ extraKyc, documentAccept, selfieAccept }: { extraKyc: 
           <div className="stack" style={{ gap: 10, flex: "1 1 auto", minWidth: 0 }}>
             <h2 style={{ fontSize: 19 }}>Extra identity confirmation</h2>
             {extraKyc === "required" ? (
-              <Dropzone name="eddKyc" label="Photo of you holding your identity document" hint="Your face and the document both clearly visible." accept={selfieAccept} capture="user" state={state} />
+              <Dropzone name="eddKyc" label="Photo of you holding your identity document" hint="Your face and the document both clearly visible." accept={selfieAccept} capture="user" state={state} sample={samples?.eddKyc} />
             ) : (
               <>
                 <p>Already done. The selfie you took earlier covers this, so there is nothing more to upload.</p>

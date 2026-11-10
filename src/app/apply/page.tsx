@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { ApplicantShell } from "@/components/applicant-shell";
 import { portalDeps } from "@/portal/deps";
+import { signupDefaults } from "@/demo/prefill";
 import { getCurrentCase, stepCase } from "@/portal/cases";
 import { resumeStep, stepPath } from "@/portal/steps";
 import { CreateAccountForm } from "./_forms/account-forms";
@@ -20,7 +21,7 @@ export default async function ApplyPage() {
       lede="Tell us who is opening the account. Verification takes about ten minutes and is saved as you go."
       narrow
     >
-      <CreateAccountForm />
+      <CreateAccountForm defaults={signupDefaults(portalDeps())} />
     </ApplicantShell>
   );
 }

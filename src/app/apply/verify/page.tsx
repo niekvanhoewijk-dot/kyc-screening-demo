@@ -3,13 +3,17 @@ import { redirect } from "next/navigation";
 import { ApplicantShell } from "@/components/applicant-shell";
 import { portalDeps } from "@/portal/deps";
 import { VerifyForm } from "../_forms/account-forms";
-import { PENDING_EMAIL_COOKIE } from "../session";
+import { getDemoState } from "@/demo/prefill";
+import { DEMO_CODE_COOKIE, PENDING_EMAIL_COOKIE } from "../session";
 
 // 2.1.2 Verify email (docs/design/A02-Verify-Email.dc.html)
 export default async function VerifyPage() {
   const email = (await cookies()).get(PENDING_EMAIL_COOKIE)?.value;
   if (!email) redirect("/apply/continue");
-  const { otp } = portalDeps().portal;
+  const deps = portalDeps();
+  const { otp } = deps.portal;
+  // Demo Mode: the code was captured when it was issued, so the screen can fill it in.
+  const demoCode = getDemoState(deps).on ? (await cookies()).get(DEMO_CODE_COOKIE)?.value : undefined;
   return (
     <ApplicantShell
       panelTitle="Check your email"
@@ -23,7 +27,7 @@ export default async function VerifyPage() {
       }
       narrow
     >
-      <VerifyForm length={otp.length} />
+      <VerifyForm length={otp.length} defaultCode={demoCode} />
     </ApplicantShell>
   );
 }

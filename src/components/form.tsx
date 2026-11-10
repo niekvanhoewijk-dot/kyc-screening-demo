@@ -84,8 +84,20 @@ export const v = (state: FormState, saved: Record<string, unknown> | null | unde
 
 export const OnFile = ({ name }: { name?: string }) => (name ? <Ticked>On file: {name}. Choose a new file only to replace it.</Ticked> : null);
 
+export type Sample = { slot: string; name: string; what: string };
+
+/** Demo Mode (docs/spec/11): the sample file the server sends when nothing is chosen. */
+export function SampleTile({ sample }: { sample: Sample }) {
+  return (
+    <figure className="sample-tile" style={{ display: "flex", gap: 12, alignItems: "center", margin: 0 }}>
+      <img src={`/apply/demo-sample/${sample.slot}`} alt={`Sample ${sample.what}`} width={112} height={80} style={{ objectFit: "contain", background: "#FFFFFF", borderRadius: 6, border: "1px solid #D4D4D4" }} />
+      <figcaption><Ticked>Demo Mode attached a sample {sample.what} ({sample.name}). Choose a file only to replace it.</Ticked></figcaption>
+    </figure>
+  );
+}
+
 /** Drop zone around a native file input (boards A04/A05/A08). */
-export function Dropzone({ name, label, hint, accept, multiple, capture, onFile, state, icon }: {
+export function Dropzone({ name, label, hint, accept, multiple, capture, onFile, state, icon, sample }: {
   name: string;
   label: string;
   hint: string;
@@ -95,6 +107,8 @@ export function Dropzone({ name, label, hint, accept, multiple, capture, onFile,
   onFile?: string;
   state: FormState;
   icon?: boolean;
+  /** Demo Mode: shown when nothing is on file and nothing is chosen. */
+  sample?: Sample;
 }) {
   const errors = state.fieldErrors?.[name];
   return (
@@ -105,6 +119,7 @@ export function Dropzone({ name, label, hint, accept, multiple, capture, onFile,
         <span className="hint">{hint}</span>
         <input id={name} name={name} type="file" accept={accept} multiple={multiple} capture={capture} />
         <OnFile name={onFile} />
+        {sample && !onFile && <SampleTile sample={sample} />}
       </div>
       {errors?.map((e) => <span key={e} className="error" role="alert">{e}</span>)}
     </div>

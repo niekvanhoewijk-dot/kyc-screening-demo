@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { decide, recalculateEddForCase, requestEdd, startReview, triageHit } from "@/console/actions";
 import { setMode, type Mode } from "@/console/mode";
+import { setDemoState } from "@/demo/prefill";
 import { draftCaseMemo } from "@/documents/memo";
 import { runPreReview } from "@/documents/pre-review";
 import { audit } from "@/lib/audit";
@@ -45,6 +46,16 @@ export async function setModeAction(fd: FormData) {
   if (!a) return;
   setMode(portalDeps(), str(fd, "mode") as Mode, a.id);
   revalidatePath("/analyst", "layout");
+}
+
+/** Demo Mode (docs/spec/11): pre-fills the apply screens. `on` and `persona` are each optional. */
+export async function setDemoModeAction(fd: FormData) {
+  const a = await currentAnalyst();
+  if (!a) return;
+  const on = fd.get("on");
+  const persona = str(fd, "persona");
+  setDemoState(portalDeps(), { on: on === null ? undefined : on === "1", persona: persona || undefined }, a.id);
+  revalidatePath("/", "layout");
 }
 
 export async function startReviewAction(_: FormState, fd: FormData) {

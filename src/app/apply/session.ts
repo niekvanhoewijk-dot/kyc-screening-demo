@@ -7,6 +7,8 @@ import { canOpen, resumeStep, stepPath, type StepId } from "@/portal/steps";
 
 export const SESSION_COOKIE = "kyc_session";
 export const PENDING_EMAIL_COOKIE = "kyc_pending_email";
+/** Demo Mode only: the latest verification code, so the verify screen can fill it in. Synthetic accounts only. */
+export const DEMO_CODE_COOKIE = "kyc_demo_code";
 
 export const cookieOptions = (maxAgeSeconds: number) => ({
   httpOnly: true,

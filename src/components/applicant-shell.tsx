@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { getDemoState } from "@/demo/prefill";
 import { env } from "@/lib/env";
+import { portalDeps } from "@/portal/deps";
 import { completedSteps, stepsFor, type StepCase, type StepId } from "@/portal/steps";
 import { LeftPanel, type PanelStep } from "./left-panel";
 
@@ -52,6 +54,8 @@ export function ApplicantShell({
 }) {
   const j = current ? journey(c, current) : null;
   const label = eyebrow === undefined && j ? `Step ${j.index + 1} of ${j.steps.length}` : eyebrow;
+  // Demo Mode (docs/spec/11): says so on every screen it fills in. Says nothing about the outcome.
+  const demo = current !== null && current !== "confirmation" && (!c || c.status === "draft" || c.status === "edd_requested") && getDemoState(portalDeps()).on;
   return (
     <div className="frame">
       <LeftPanel title={panelTitle} body={panelBody} steps={j?.steps} />
@@ -62,6 +66,7 @@ export function ApplicantShell({
             <h1 className="title">{title}</h1>
             {lede && <p className="lede">{lede}</p>}
           </div>
+          {demo && <p className="banner"><strong>Demo Mode is on.</strong> Everything on this screen is filled in for you, and sample documents attach themselves. Just press the button.</p>}
           {children}
           {env.AGENT_ENABLED && c?.persona === "individual" && c.status === "draft" && (current === "identity" || current === "residence" || current === "questionnaire") && (
             <p className="hint">

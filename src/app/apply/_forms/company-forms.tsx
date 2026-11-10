@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { Dropzone, Field, FormMessage, OnFile, Submit, v } from "@/components/form";
+import { Dropzone, Field, FormMessage, OnFile, Submit, v, type Sample } from "@/components/form";
+import { Ticked } from "@/components/icons";
 import { companyAction, companyDocumentsAction, confirmPersonsAction, personAction } from "../actions";
 import { initialState } from "../form-state";
 
@@ -87,6 +88,8 @@ export function PersonForm(props: {
   countries: Country[];
   roles: Option[];
   onFile: { poi?: string; por?: string };
+  /** Demo Mode: samples the server attaches when nothing is chosen. */
+  samples?: { poi?: Sample; por?: Sample };
   documentAccept: string;
 }) {
   const [state, action] = useActionState(personAction, initialState);
@@ -137,8 +140,8 @@ export function PersonForm(props: {
         <p className="banner">Your own ID, selfie and proof of residence come in the next steps.</p>
       ) : (
         <div className="row">
-          <Dropzone name="poi" label="Passport, ID card or driving licence" hint="Valid, all four corners visible." accept={props.documentAccept} onFile={props.onFile.poi} state={state} />
-          <Dropzone name="por" label="Proof of residence" hint="Issued in the last 3 months." accept={props.documentAccept} onFile={props.onFile.por} state={state} />
+          <Dropzone name="poi" label="Passport, ID card or driving licence" hint="Valid, all four corners visible." accept={props.documentAccept} onFile={props.onFile.poi} state={state} sample={props.samples?.poi} />
+          <Dropzone name="por" label="Proof of residence" hint="Issued in the last 3 months." accept={props.documentAccept} onFile={props.onFile.por} state={state} sample={props.samples?.por} />
         </div>
       )}
       <div className="actions">
@@ -162,7 +165,7 @@ export function ConfirmPersonsForm({ back }: { back?: string }) {
   );
 }
 
-export function CompanyDocumentsForm(props: { items: { id: string; item: number; label: string; uploaded: string[] }[]; unsorted: string[]; documentAccept: string; back?: string }) {
+export function CompanyDocumentsForm(props: { items: { id: string; item: number; label: string; uploaded: string[] }[]; unsorted: string[]; documentAccept: string; back?: string; /** Demo Mode: sample file name per checklist item. */ samples?: Record<string, string> }) {
   const [state, action] = useActionState(companyDocumentsAction, initialState);
   return (
     <form action={action} noValidate className="stack-lg" style={{ gap: 28 }}>
@@ -174,6 +177,7 @@ export function CompanyDocumentsForm(props: { items: { id: string; item: number;
               <label htmlFor={`doc_${i.id}`}>{i.item}. {i.label}</label>
               <input id={`doc_${i.id}`} name={`doc_${i.id}`} type="file" multiple accept={props.documentAccept} />
               <OnFile name={i.uploaded.length ? i.uploaded.join(", ") : undefined} />
+              {!i.uploaded.length && props.samples?.[i.id] && <Ticked>Demo Mode attaches a sample ({props.samples[i.id]}). Choose a file only to replace it.</Ticked>}
               {state.fieldErrors?.[`doc_${i.id}`]?.map((e) => <span key={e} className="error" role="alert">{e}</span>)}
             </div>
             <span className={`chip ${i.uploaded.length ? "pass" : "flag"}`}>{i.uploaded.length ? "Received" : "Missing"}</span>

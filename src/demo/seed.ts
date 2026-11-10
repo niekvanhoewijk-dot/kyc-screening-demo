@@ -30,6 +30,7 @@ import { createAccount, verifyOtp } from "@/portal/accounts";
 import { getCurrentCase, markOverviewSeen, saveIdentity, saveQuestionnaire, saveResidence, submitCase } from "@/portal/cases";
 import { confirmPersons, saveCompany, saveCompanyDocuments, savePerson } from "@/portal/company";
 import { fixtureUpload, loadPersonas, type IndividualPersona } from "./personas";
+import { DEMO_KEYS, identityOf, questionnaireInput, residenceOf } from "./prefill";
 
 export type ClaudeSeedMode = "skip" | "run" | "auto";
 export type SeedResult = {
@@ -55,23 +56,12 @@ async function signUp(deps: PreReviewDeps, persona: "individual" | "company", fi
   return () => getCurrentCase(d, applicant.id);
 }
 
-const residenceOf = (p: IndividualPersona) => ({ ...p.address, porType: "utility_bill", mobilePhone: "+31 6 0000 0000" });
-const identityOf = (p: IndividualPersona) => ({ docType: "passport", issuingCountry: p.nationality, expiryDate: "2031-03-14" });
-
 async function seedIndividual(deps: PreReviewDeps, p: IndividualPersona) {
   const current = await signUp(deps, "individual", p.first, p.last, p.email);
   markOverviewSeen(deps, current());
   await saveIdentity(deps, current(), identityOf(p), { front: fixtureUpload(`${p.id}-poi.png`), selfie: fixtureUpload("selfie.png") });
   await saveResidence(deps, current(), residenceOf(p), { por: fixtureUpload(`${p.id}-por.png`) });
-  saveQuestionnaire(deps, current(), {
-    dateOfBirth: p.dob,
-    nationality: p.nationality,
-    preferredLanguage: "en",
-    phone: "+31 6 0000 0000",
-    tin: `SAMPLE-TIN-${p.id.toUpperCase()}`,
-    declaration: "on",
-    ...p.answers,
-  });
+  saveQuestionnaire(deps, current(), questionnaireInput(p));
   await submitCase(deps, current());
   return current();
 }
@@ -126,7 +116,10 @@ export async function resetDemo(
 ): Promise<SeedResult> {
   const cache = opts.cache ?? new ReplayCache();
   const model = opts.model ?? env.CLAUDE_MODEL;
+  // Demo Mode is a presentation setting: it survives a reset (the per-applicant bindings go with the applicants).
+  const keep = deps.db.select().from(settings).all().filter((r) => (DEMO_KEYS as readonly string[]).includes(r.key));
   await wipeDemoData(deps);
+  for (const r of keep) deps.db.insert(settings).values(r).run();
   const personas = loadPersonas();
   const seeded: SeedResult["cases"] = [];
   for (const p of personas.individuals) {

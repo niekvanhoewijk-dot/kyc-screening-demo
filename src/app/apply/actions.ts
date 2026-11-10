@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { after } from "next/server";
+import { MemoryMailer } from "@/adapters/mailer";
 import { getMode } from "@/console/mode";
+import { demoCompanyDocuments, demoUpload, getDemoState } from "@/demo/prefill";
 import { runPreReview } from "@/documents/pre-review";
 import { audit } from "@/lib/audit";
 import { redirect } from "next/navigation";
@@ -18,14 +20,15 @@ import {
   submitCase,
   type UploadInput,
 } from "@/portal/cases";
-import { portalDeps } from "@/portal/deps";
+import { applicantView } from "@/portal/decision";
+import { portalDeps, type PortalDeps } from "@/portal/deps";
 import { submitEdd } from "@/portal/edd";
 import { presentFromTestWallet, startWallet } from "@/portal/wallet";
 import { confirmPersons, removePerson, saveCompany, saveCompanyDocuments, savePerson } from "@/portal/company";
 import { PortalError } from "@/portal/errors";
 import { nextStep, resumeStep, stepPath } from "@/portal/steps";
 import type { FormState } from "./form-state";
-import { cookieOptions, currentApplicant, PENDING_EMAIL_COOKIE, SESSION_COOKIE } from "./session";
+import { cookieOptions, currentApplicant, DEMO_CODE_COOKIE, PENDING_EMAIL_COOKIE, SESSION_COOKIE } from "./session";
 import { INTERVIEW_PATH, returnPath } from "./return-to";
 
 const textValues = (fd: FormData) =>
@@ -60,10 +63,24 @@ async function rememberPendingEmail(email: string) {
   (await cookies()).set(PENDING_EMAIL_COOKIE, email, cookieOptions(ttl));
 }
 
+/**
+ * Demo Mode: the verification code goes to a capturing mailer instead of the console, and the verify screen
+ * reads it back from a short-lived cookie to fill it in. Outside Demo Mode this runs `fn` as usual.
+ */
+async function withDemoCode<T>(fn: (deps: PortalDeps) => Promise<T>): Promise<T> {
+  const base = portalDeps();
+  if (!getDemoState(base).on) return fn(base);
+  const mailer = new MemoryMailer();
+  const result = await fn({ ...base, mailer });
+  const code = /code is (\d+)/.exec(mailer.sent.at(-1)?.text ?? "")?.[1];
+  if (code) (await cookies()).set(DEMO_CODE_COOKIE, code, cookieOptions(base.portal.otp.ttl_minutes * 60));
+  return result;
+}
+
 // 2.1.1
 export async function createAccountAction(_: FormState, fd: FormData): Promise<FormState> {
   try {
-    const { email } = await createAccount(portalDeps(), textValues(fd));
+    const { email } = await withDemoCode((d) => createAccount(d, textValues(fd)));
     await rememberPendingEmail(email);
   } catch (e) {
     return failed(e, fd);
@@ -73,7 +90,7 @@ export async function createAccountAction(_: FormState, fd: FormData): Promise<F
 
 export async function signInAction(_: FormState, fd: FormData): Promise<FormState> {
   try {
-    const { email } = await startSignIn(portalDeps(), textValues(fd));
+    const { email } = await withDemoCode((d) => startSignIn(d, textValues(fd)));
     await rememberPendingEmail(email);
   } catch (e) {
     return failed(e, fd);
@@ -90,6 +107,7 @@ export async function verifyOtpAction(_: FormState, fd: FormData): Promise<FormS
     const { sessionToken } = verifyOtp(portalDeps(), email, textValues(fd));
     jar.set(SESSION_COOKIE, sessionToken, cookieOptions(portalDeps().portal.session.ttl_days * 86_400));
     jar.delete(PENDING_EMAIL_COOKIE);
+    jar.delete(DEMO_CODE_COOKIE);
   } catch (e) {
     return { ...failed(e, fd), values: undefined }; // never echo a code back
   }
@@ -101,7 +119,7 @@ export async function resendOtpAction(_: FormState, fd: FormData): Promise<FormS
   const email = (await cookies()).get(PENDING_EMAIL_COOKIE)?.value;
   if (!email) redirect("/apply/continue");
   try {
-    await resendOtp(portalDeps(), email);
+    await withDemoCode((d) => resendOtp(d, email));
     return { ok: true, message: "If this email has an account, a new code is on its way." };
   } catch (e) {
     return failed(e, fd);
@@ -127,9 +145,9 @@ export async function identityAction(_: FormState, fd: FormData): Promise<FormSt
   const { deps, c } = await signedInCase();
   try {
     await saveIdentity(deps, c, textValues(fd), {
-      front: await upload(fd, "front"),
+      front: (await upload(fd, "front")) ?? demoUpload(deps, c, "front"),
       back: await upload(fd, "back"),
-      selfie: await upload(fd, "selfie"),
+      selfie: (await upload(fd, "selfie")) ?? demoUpload(deps, c, "selfie"),
     });
   } catch (e) {
     // Valid files may have been stored before the error (e.g. a selfie retake): refresh "on file".
@@ -168,7 +186,7 @@ export async function presentTestWalletAction(_: FormState, fd: FormData): Promi
 export async function residenceAction(_: FormState, fd: FormData): Promise<FormState> {
   const { deps, c } = await signedInCase();
   try {
-    await saveResidence(deps, c, textValues(fd), { por: await upload(fd, "por") });
+    await saveResidence(deps, c, textValues(fd), { por: (await upload(fd, "por")) ?? demoUpload(deps, c, "por") });
   } catch (e) {
     return failed(e, fd);
   }
@@ -220,7 +238,10 @@ export async function eddAction(_: FormState, fd: FormData): Promise<FormState> 
     const sof = await Promise.all(
       fd.getAll("sof").filter((f): f is File => f instanceof File && f.size > 0).map(async (f) => ({ name: f.name, type: f.type, size: f.size, bytes: Buffer.from(await f.arrayBuffer()) })),
     );
-    await submitEdd(deps, c, { note: textValues(fd).note }, { sof, eddKyc: await upload(fd, "eddKyc") });
+    const view = applicantView(c);
+    const sample = !sof.length ? demoUpload(deps, c, "sof") : undefined;
+    const eddKyc = (await upload(fd, "eddKyc")) ?? (view.kind === "edd" && view.extraKyc === "required" ? demoUpload(deps, c, "eddKyc") : undefined);
+    await submitEdd(deps, c, { note: textValues(fd).note }, { sof: sample ? [sample] : sof, eddKyc });
   } catch (e) {
     return failed(e, fd);
   }
@@ -242,12 +263,14 @@ export async function personAction(_: FormState, fd: FormData): Promise<FormStat
   const { deps, c } = await signedInCase();
   try {
     const personId = textValues(fd).personId || undefined;
+    const isApplicant = textValues(fd).isApplicant === "true";
+    const sampleFor = (slot: "person_poi" | "person_por") => (personId || isApplicant ? undefined : demoUpload(deps, c, slot));
     await savePerson(
       deps,
       c,
       { ...textValues(fd), roles: fd.getAll("roles").map(String) },
-      { poi: await upload(fd, "poi"), por: await upload(fd, "por") },
-      { personId, isApplicant: textValues(fd).isApplicant === "true" },
+      { poi: (await upload(fd, "poi")) ?? sampleFor("person_poi"), por: (await upload(fd, "por")) ?? sampleFor("person_por") },
+      { personId, isApplicant },
     );
   } catch (e) {
     return failed(e, fd);
@@ -281,6 +304,8 @@ export async function companyDocumentsAction(_: FormState, fd: FormData): Promis
       if (!key.startsWith("doc_") || !(v instanceof File) || v.size === 0) continue;
       (files[key.slice("doc_".length)] ??= []).push({ name: v.name, type: v.type, size: v.size, bytes: Buffer.from(await v.arrayBuffer()) });
     }
+    // Demo Mode: a sample for every checklist item the applicant gave nothing for.
+    for (const [item, samples] of Object.entries(demoCompanyDocuments(deps, c))) if (!files[item]?.length) files[item] = samples;
     await saveCompanyDocuments(deps, c, files, { finish });
   } catch (e) {
     return failed(e, fd);
