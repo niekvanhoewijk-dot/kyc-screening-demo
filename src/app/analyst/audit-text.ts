@@ -29,6 +29,9 @@ export function describe(e: Entry): string {
     case "session.started": return "Signed in again with a new code.";
     case "session.ended": return "Signed out.";
     case "step.completed": return `Completed step: ${p.step}${p.source === "wallet" ? " (shared from an ID wallet)" : p.selfie ? ` (selfie ${p.selfie})` : ""}.`;
+    case "agent.conversation_started": return `Applicant started a chat with the AI assistant in the portal (prompt ${p.promptVersion}).`;
+    case "agent.cap_reached": return `AI assistant stopped at its ${p.cap === "tool_calls" ? "tool-call" : p.cap === "cost" ? "spending" : "conversation length"} limit and offered the form.`;
+    case "agent.output_blocked": return `AI assistant reply withheld by the output guard (${p.termCount} blocked term${p.termCount === 1 ? "" : "s"}); the applicant saw the fixed deflection line.`;
     case "agent.tool_called": return `AI ${p.channel === "mcp" ? `client${p.clientName ? ` "${p.clientName}"` : ""} (MCP)` : "assistant (portal)"} used ${p.tool}${p.outcome === "ok" ? "" : ` (${p.outcome})`}.`;
     case "agent.tool_denied": return `AI ${p.channel === "mcp" ? "client (MCP)" : "assistant (portal)"} was refused ${p.tool}: ${String(p.reason).replaceAll("_", " ")}.`;
     case "agent.secure_step_requested": return `AI ${p.channel === "mcp" ? "client (MCP)" : "assistant (portal)"} sent the applicant a link to the ${p.step} page.`;

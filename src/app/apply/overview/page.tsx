@@ -2,7 +2,8 @@ import { ApplicantShell } from "@/components/applicant-shell";
 import { ArrowIcon } from "@/components/icons";
 import { uploadableItems } from "@/engine";
 import { stepCase } from "@/portal/cases";
-import { startAction } from "../actions";
+import { env } from "@/lib/env";
+import { startAction, startInterviewAction } from "../actions";
 import { requireStep } from "../session";
 
 // Lowercase a leading capital only when a lowercase letter follows ("Passport" -> "passport", "ID card" stays).
@@ -55,6 +56,9 @@ export default async function OverviewPage() {
       </ol>
       <form action={startAction} className="actions">
         <button className="btn" type="submit">{started ? "Continue" : "Start verification"} <ArrowIcon /></button>
+        {env.AGENT_ENABLED && !company && c.status === "draft" && (
+          <button className="link-btn" type="submit" formAction={startInterviewAction}>Answer with an AI assistant</button>
+        )}
         <span className="muted">About 10 minutes. Save and return at any time.</span>
       </form>
     </ApplicantShell>

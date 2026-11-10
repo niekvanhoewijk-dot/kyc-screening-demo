@@ -6,6 +6,8 @@ export const envSchema = z.object({
   // replay (default) serves recorded Claude responses: the demo runs offline. live calls the API.
   DEMO_MODE: z.enum(["live", "replay"]).default("replay"),
   DATABASE_PATH: z.string().min(1).default("./data/demo.sqlite"),
+  // The interviewer chat at /apply/interview (spec 10 section 10). "false" hides it and its links.
+  AGENT_ENABLED: z.enum(["true", "false"]).default("true").transform((v) => v === "true"),
 });
 
 export type Env = z.infer<typeof envSchema>;

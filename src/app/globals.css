@@ -283,5 +283,12 @@ td.td, .tbl tbody td, .tbl tbody th { padding: 12px 12px 12px 0; font-size: 14px
 .triage select, .triage input { height: 40px !important; font-size: 14px !important; }
 .triage .btn { height: 40px; padding: 0 16px; font-size: 13px; }
 
+/* Interviewer chat (spec 10 section 7): monochrome, roles told apart by position and a visually hidden label */
+.chat-log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.chat-msg { max-width: 85%; padding: 12px 16px; border-radius: var(--radius); font-size: 15px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-msg.assistant { align-self: flex-start; background: var(--white); border: 1px solid var(--hairline); }
+.chat-msg.user { align-self: flex-end; background: var(--surface); border: 1px solid var(--surface); }
+@media (max-width: 600px) { .chat-msg { max-width: 100%; } }
+
 /* Plain pages (home, not found) */
 .plain { max-width: 640px; margin: 0 auto; padding: 72px 16px; display: flex; flex-direction: column; gap: 28px; }

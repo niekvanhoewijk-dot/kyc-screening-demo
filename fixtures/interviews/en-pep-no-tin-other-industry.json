@@ -1,0 +1,68 @@
+{
+  "id": "en-pep-no-tin-other-industry",
+  "note": "Synthetic applicant for the Phase 10 interviewer (docs/spec/10 section 12). All data made up.",
+  "profile": "cooperative",
+  "language": "en",
+  "route": "documents",
+  "steps": [
+    {
+      "say": "Hi, I'd like to open an account."
+    },
+    {
+      "do": "identity_documents"
+    },
+    {
+      "say": "I've uploaded my passport and taken the selfie."
+    },
+    {
+      "do": "residence"
+    },
+    {
+      "say": "My address and proof of residence are done."
+    },
+    {
+      "say": "I was born on 30 November 1965, I'm Cypriot, and I'd like to continue in English."
+    },
+    {
+      "say": "My phone number is +357 99 123456. I don't have a tax number: my country only issues them to companies, not to people like me."
+    },
+    {
+      "say": "I'm not a US tax resident. Yes, I am a politically exposed person: I'm a former member of a regional parliament."
+    },
+    {
+      "say": "I expect to deposit between $250,000 and $500,000, from an inheritance, and that inheritance is my only source of wealth."
+    },
+    {
+      "say": "I'm self-employed. My industry isn't on your list: I run a farm, so agriculture."
+    },
+    {
+      "say": "My annual income is between $100,000 and $500,000, and my net worth is more than $1 million."
+    },
+    {
+      "say": "Thank you, I'll check it all on the review page."
+    }
+  ],
+  "expect": {
+    "answers": {
+      "dateOfBirth": "1965-11-30",
+      "nationality": "CY",
+      "preferredLanguage": "en",
+      "phone": "+35799123456",
+      "tin": null,
+      "usTaxResident": false,
+      "pep": true,
+      "deposit_12m": "250k_500k",
+      "source_of_funds": "inheritance",
+      "onlySourceOfWealth": true,
+      "employment_status": "self_employed",
+      "occupation_industry": "other",
+      "annual_income": "100k_500k",
+      "net_worth": "gt_1m"
+    },
+    "present": [
+      "tinMissingReason",
+      "occupationDetail"
+    ],
+    "reaches_review": true
+  }
+}

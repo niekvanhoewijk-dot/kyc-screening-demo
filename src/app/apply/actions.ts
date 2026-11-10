@@ -26,6 +26,7 @@ import { PortalError } from "@/portal/errors";
 import { nextStep, resumeStep, stepPath } from "@/portal/steps";
 import type { FormState } from "./form-state";
 import { cookieOptions, currentApplicant, PENDING_EMAIL_COOKIE, SESSION_COOKIE } from "./session";
+import { INTERVIEW_PATH, returnPath } from "./return-to";
 
 const textValues = (fd: FormData) =>
   Object.fromEntries([...fd.entries()].filter(([k, v]) => typeof v === "string" && !k.startsWith("$")) as [string, string][]);
@@ -114,6 +115,13 @@ export async function startAction(): Promise<void> {
   await goToResume();
 }
 
+/** From the overview: the applicant chooses the AI interviewer (spec 10 section 7). */
+export async function startInterviewAction(): Promise<void> {
+  const { deps, c } = await signedInCase();
+  markOverviewSeen(deps, c);
+  redirect(INTERVIEW_PATH);
+}
+
 // 2.1.4
 export async function identityAction(_: FormState, fd: FormData): Promise<FormState> {
   const { deps, c } = await signedInCase();
@@ -128,19 +136,20 @@ export async function identityAction(_: FormState, fd: FormData): Promise<FormSt
     revalidatePath("/apply/identity");
     return failed(e, fd);
   }
-  redirect(stepPath(nextStep("identity", c)));
+  redirect(returnPath(fd) ?? stepPath(nextStep("identity", c)));
 }
 
 // 2.1.4, ID wallet route (docs/spec/09)
-export async function startWalletAction(): Promise<void> {
+export async function startWalletAction(fd: FormData): Promise<void> {
   const { deps, c } = await signedInCase();
+  const fromAssistant = returnPath(fd) !== null;
   try {
     startWallet(deps, c);
   } catch (e) {
-    if (e instanceof PortalError) redirect("/apply/identity?method=documents");
+    if (e instanceof PortalError) redirect(`/apply/identity?method=documents${fromAssistant ? "&via=assistant" : ""}`);
     throw e;
   }
-  redirect("/apply/identity/wallet");
+  redirect(`/apply/identity/wallet${fromAssistant ? "?via=assistant" : ""}`);
 }
 
 /** Test mode only (O-68): the built-in test wallet answers the open request. */
@@ -152,7 +161,7 @@ export async function presentTestWalletAction(_: FormState, fd: FormData): Promi
     revalidatePath("/apply/identity/wallet");
     return failed(e, fd);
   }
-  redirect(stepPath(nextStep("identity", c)));
+  redirect(returnPath(fd) ?? stepPath(nextStep("identity", c)));
 }
 
 // 2.1.5
@@ -163,7 +172,7 @@ export async function residenceAction(_: FormState, fd: FormData): Promise<FormS
   } catch (e) {
     return failed(e, fd);
   }
-  redirect(stepPath(nextStep("residence", c)));
+  redirect(returnPath(fd) ?? stepPath(nextStep("residence", c)));
 }
 
 // 2.1.6

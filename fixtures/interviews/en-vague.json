@@ -1,0 +1,70 @@
+{
+  "id": "en-vague",
+  "note": "Synthetic applicant for the Phase 10 interviewer (docs/spec/10 section 12). All data made up.",
+  "profile": "vague",
+  "language": "en",
+  "route": "documents",
+  "steps": [
+    {
+      "say": "hello, can you help me with the forms?"
+    },
+    {
+      "do": "identity_documents"
+    },
+    {
+      "say": "ok did the ID thing"
+    },
+    {
+      "do": "residence"
+    },
+    {
+      "say": "address done too"
+    },
+    {
+      "say": "born in 85, spring sometime... actually it's 12 March 1985. Dutch passport. English please."
+    },
+    {
+      "say": "phone is +31 6 1234 5678. tax number, I don't have one, my income has always been too low to get one."
+    },
+    {
+      "say": "no and no"
+    },
+    {
+      "say": "Sorry: I'm not a US tax resident, and I'm not a politically exposed person."
+    },
+    {
+      "say": "money in? not a lot, maybe 30 or 40 thousand dollars over the year. from savings mostly, and it's not all I have."
+    },
+    {
+      "say": "I'm retired. I used to teach."
+    },
+    {
+      "say": "my pension is between 50 and 100 thousand dollars a year, and I own about 300,000 dollars in total"
+    },
+    {
+      "say": "that's it"
+    }
+  ],
+  "expect": {
+    "answers": {
+      "dateOfBirth": "1985-03-12",
+      "nationality": "NL",
+      "preferredLanguage": "en",
+      "phone": "+31612345678",
+      "tin": null,
+      "usTaxResident": false,
+      "pep": false,
+      "deposit_12m": "20k_50k",
+      "source_of_funds": "savings",
+      "onlySourceOfWealth": false,
+      "employment_status": "retired",
+      "occupation_industry": "education",
+      "annual_income": "50k_100k",
+      "net_worth": "100k_500k"
+    },
+    "present": [
+      "tinMissingReason"
+    ],
+    "reaches_review": true
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "el-cooperative",
+  "note": "Synthetic applicant for the Phase 10 interviewer (docs/spec/10 section 12). All data made up.",
+  "profile": "non-English",
+  "language": "el",
+  "route": "documents",
+  "steps": [
+    {
+      "say": "Γεια σας, θα ήθελα να ανοίξω λογαριασμό."
+    },
+    {
+      "do": "identity_documents"
+    },
+    {
+      "say": "Ανέβασα το διαβατήριό μου και τη selfie."
+    },
+    {
+      "do": "residence"
+    },
+    {
+      "say": "Η διεύθυνση και το αποδεικτικό κατοικίας είναι έτοιμα."
+    },
+    {
+      "say": "Γεννήθηκα στις 2 Σεπτεμβρίου 1983, είμαι Έλληνας πολίτης και προτιμώ τα ελληνικά."
+    },
+    {
+      "say": "Το κινητό μου είναι +30 694 555 1234 και ο αριθμός φορολογικού μητρώου μου είναι SAMPLE-TIN-GR2."
+    },
+    {
+      "say": "Όχι, δεν είμαι φορολογικός κάτοικος ΗΠΑ και δεν είμαι πολιτικά εκτεθειμένο πρόσωπο."
+    },
+    {
+      "say": "Θα καταθέσω από 20.000 έως 50.000 δολάρια, από αποταμιεύσεις. Δεν είναι η μόνη πηγή πλούτου μου."
+    },
+    {
+      "say": "Είμαι αυτοαπασχολούμενος στον τομέα της πληροφορικής."
+    },
+    {
+      "say": "Το ετήσιο εισόδημά μου είναι από 50.000 έως 100.000 δολάρια και η καθαρή περιουσία μου από 100.000 έως 500.000 δολάρια."
+    },
+    {
+      "say": "Ευχαριστώ, θα ελέγξω τα πάντα στη σελίδα ελέγχου."
+    }
+  ],
+  "expect": {
+    "answers": {
+      "dateOfBirth": "1983-09-02",
+      "nationality": "GR",
+      "preferredLanguage": "el",
+      "phone": "+306945551234",
+      "tin": "SAMPLE-TIN-GR2",
+      "usTaxResident": false,
+      "pep": false,
+      "deposit_12m": "20k_50k",
+      "source_of_funds": "savings",
+      "onlySourceOfWealth": false,
+      "employment_status": "self_employed",
+      "occupation_industry": "it",
+      "annual_income": "50k_100k",
+      "net_worth": "100k_500k"
+    },
+    "present": [],
+    "reaches_review": true
+  }
+}

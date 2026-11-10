@@ -1,0 +1,68 @@
+{
+  "id": "en-self-contradicting",
+  "note": "Synthetic applicant for the Phase 10 interviewer (docs/spec/10 section 12). All data made up.",
+  "profile": "self-contradicting",
+  "language": "en",
+  "route": "documents",
+  "steps": [
+    {
+      "say": "I want to apply."
+    },
+    {
+      "do": "identity_documents"
+    },
+    {
+      "say": "Done."
+    },
+    {
+      "do": "residence"
+    },
+    {
+      "say": "Done with the address as well."
+    },
+    {
+      "say": "Date of birth 20 July 1979, nationality Greek, language English."
+    },
+    {
+      "say": "Phone +30 697 123 4567, tax number SAMPLE-TIN-77."
+    },
+    {
+      "say": "Not a US tax resident. Not a politically exposed person."
+    },
+    {
+      "say": "Deposits between $50,000 and $250,000, from investments, and that is my only source of wealth."
+    },
+    {
+      "say": "I'm employed in financial services."
+    },
+    {
+      "say": "Wait, I made a mistake: I'm self-employed, not employed."
+    },
+    {
+      "say": "Annual income between $100,000 and $500,000, net worth between $500,000 and $1 million."
+    },
+    {
+      "say": "Yes, that's everything."
+    }
+  ],
+  "expect": {
+    "answers": {
+      "dateOfBirth": "1979-07-20",
+      "nationality": "GR",
+      "preferredLanguage": "en",
+      "phone": "+306971234567",
+      "tin": "SAMPLE-TIN-77",
+      "usTaxResident": false,
+      "pep": false,
+      "deposit_12m": "50k_250k",
+      "source_of_funds": "investment",
+      "onlySourceOfWealth": true,
+      "employment_status": "self_employed",
+      "occupation_industry": "financial_services",
+      "annual_income": "100k_500k",
+      "net_worth": "500k_1m"
+    },
+    "present": [],
+    "reaches_review": true
+  }
+}

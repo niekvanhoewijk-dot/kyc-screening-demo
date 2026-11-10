@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+import { parse } from "yaml";
 // Per-reason-code precision / recall over labelled documents (spec 06 "Evaluation"). Pure.
 
 export type Labelled = { id: string; expected: string[]; fired: string[]; evaluated: boolean };
@@ -34,6 +37,11 @@ export function callCost(usage: Usage | null | undefined, price: Price | undefin
       (usage.cache_read_input_tokens ?? 0) * price.cache_read) *
     PER_TOKEN
   );
+}
+
+/** config/claude-pricing.yaml: list prices per million tokens (cost reporting and the interviewer's spend cap). */
+export function loadClaudePricing(file = path.resolve(/* turbopackIgnore: true */ process.cwd(), "config/claude-pricing.yaml")): { as_of: string; models: Record<string, Price> } {
+  return parse(fs.readFileSync(file, "utf8")) as { as_of: string; models: Record<string, Price> };
 }
 
 export const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);

@@ -9,11 +9,12 @@ import { initialState } from "../form-state";
 
 type Scenario = { id: string; label: string; outcome: string };
 
-export function TestWalletPanel({ scenarios }: { scenarios: Scenario[] }) {
+export function TestWalletPanel({ scenarios, returnTo }: { scenarios: Scenario[]; returnTo?: boolean }) {
   const [state, action] = useActionState(presentTestWalletAction, initialState);
   const error = state.fieldErrors?.scenario;
   return (
     <form action={action} noValidate className="panel-soft" aria-labelledby="test-wallet-title">
+      {returnTo && <input type="hidden" name="returnTo" value="interview" />}
       <span className="eyebrow">Test mode</span>
       <h2 id="test-wallet-title" className="section-title">Test wallet</h2>
       <p style={{ fontSize: 14, lineHeight: 1.65, color: "#262626" }}>
