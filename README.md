@@ -1,6 +1,6 @@
 # KYC/KYB Screening Demo
 
-An illustrative onboarding and compliance-screening demo built from the Ateaya KYC-KYB-AML requirements (Full v3) and the DVAULT onboarding flow, using Claude for document reading and case preparation and a deterministic rules engine for every decision number.
+An illustrative onboarding and compliance-screening demo for a digital assets platform. It uses Claude for document reading, case preparation and an AI interviewer, and a deterministic rules engine for every decision number.
 
 **Status:** Phases 0-9, 10a, 10b and 11 done (demo-ready). Next: 10c-10f (MCP servers, OAuth, agent evals). OTP codes print in the `npm run dev` console.
 - **Phases 0-7:** scaffold, rules engine (`src/engine`), applicant portal for individuals and companies (`/apply`, steps 2.1.1-2.1.8 plus EDD and KYB), Claude document reading, KYB classification and case memo (`src/documents`), KYB gap list (`src/kyb`), analyst console (`/analyst`), eval report (`npm run eval`), Ateaya-look design (Phase 7).
